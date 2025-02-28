@@ -10,6 +10,7 @@ import type { UserConfigExport } from 'vite';
 
 function generateConfig(): Promise<UserConfigExport> {
     return new Promise((resolve, reject) => {
+        console.log("IN THE VITE CONFIGURATION FILE");
         const filePath = path.dirname(fileURLToPath(import.meta.url));
 
         const exclude = [
