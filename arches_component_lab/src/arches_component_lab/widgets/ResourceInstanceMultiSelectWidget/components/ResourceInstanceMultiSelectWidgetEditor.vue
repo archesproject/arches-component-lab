@@ -218,15 +218,15 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     </FormField>
 </template>
 <style scoped>
-.resource-instance-multiselect-widget .p-multiselect-label {
-    visibility: visible !important;
-    display: grid !important;
+:deep(.resource-instance-multiselect-widget .p-multiselect-label) {
+    visibility: visible;
+    display: grid;
     min-width: 0;
     min-height: 0;
 }
 
 .resource-instance-multiselect-widget .p-multiselect-chip {
-    display: grid !important;
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     min-width: 0;
@@ -262,34 +262,6 @@ a.p-chip-link:visited {
     text-overflow: ellipsis;
     min-width: 0;
     max-width: 100%;
-}
-</style>
-
-<!-- 
-    This is a workaround for the checkboxes in the PrimeVue MultiSelect component 
-    setting the FormField value to true/false instead of the selected options.
--->
-<style>
-.p-multiselect-overlay .p-checkbox {
-    pointer-events: none;
-}
-
-.p-multiselect-overlay .p-multiselect-header .p-checkbox {
-    pointer-events: all;
-}
-</style>
-
-<!-- 
-    This is a workaround for the checkboxes in the PrimeVue MultiSelect component 
-    setting the FormField value to true/false instead of the selected options.
--->
-<style>
-.p-multiselect-overlay .p-checkbox {
-    pointer-events: none;
-}
-
-.p-multiselect-overlay .p-multiselect-header .p-checkbox {
-    pointer-events: all;
 }
 </style>
 
