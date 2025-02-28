@@ -39,6 +39,8 @@ function generateConfig(): Promise<UserConfigExport> {
             'arches': path.join(parsedData['ROOT_DIR'], 'app', 'media', 'js', 'arches.js'),
         };
 
+        console.log("alias: ", alias);
+
         for (
             const [archesApplicationName, archesApplicationPath] 
             of Object.entries(
@@ -47,6 +49,16 @@ function generateConfig(): Promise<UserConfigExport> {
         ) {
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
+
+        console.log("DODOD", {
+                include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
+                exclude: exclude,
+                reporter: [
+                    ['clover', { 'file': 'coverage.xml' }],
+                    'text',
+                ],
+                reportsDirectory: path.join(filePath, 'coverage', 'frontend'),
+        })
 
         resolve({
             plugins: [vue()],
