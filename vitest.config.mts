@@ -41,12 +41,16 @@ function generateConfig(): Promise<UserConfigExport> {
 
         console.log("alias: ", alias);
 
+        console.log("parsedData: ", parsedData);
+
         for (
             const [archesApplicationName, archesApplicationPath] 
             of Object.entries(
                 parsedData['ARCHES_APPLICATIONS_PATHS'] as { [key: string]: string }
             )
         ) {
+            console.log("archesApplicationName: ", archesApplicationName);
+            console.log("archesApplicationPath: ", archesApplicationPath);
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
