@@ -13,6 +13,9 @@ function generateConfig(): Promise<UserConfigExport> {
         console.log("IN THE VITE CONFIGURATION FILE");
         const filePath = path.dirname(fileURLToPath(import.meta.url));
 
+        console.log("filePath: ", filePath);
+
+
         const exclude = [
             '**/*.d.ts',
             '**/node_modules/**',
@@ -22,6 +25,8 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
         ];
+
+        console.log("frontend config path", path.join(filePath, '.frontend-configuration-settings.json'));
 
         const rawData = fs.readFileSync(
             path.join(filePath, '.frontend-configuration-settings.json'), 
