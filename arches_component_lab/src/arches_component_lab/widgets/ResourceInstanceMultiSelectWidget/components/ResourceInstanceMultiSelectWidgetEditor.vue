@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch, onMounted } from "vue";
 import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
 import Button from "primevue/button";
@@ -27,7 +27,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
 
-const options = ref<ResourceInstanceReference[]>(props.initialValue || []);
+const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -54,6 +54,8 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
+onMounted(async () => { await getOptions(1) });
+
 async function getOptions(page: number) {
     try {
         isLoading.value = true;
@@ -62,7 +64,9 @@ async function getOptions(page: number) {
             props.graphSlug,
             props.nodeAlias,
             page,
+            props.initialValue
         );
+        console.log(resourceData);
 
         const references = resourceData.data.map(
             (
@@ -166,7 +170,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue.map((resource) => resource.resourceId)
+        :initial-value="props.initialValue?.map((resource) => resource.resourceId)
             "
         :resolver="resolver"
     >

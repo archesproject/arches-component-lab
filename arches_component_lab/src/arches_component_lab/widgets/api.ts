@@ -1,4 +1,5 @@
 import arches from "arches";
+import type { ResourceInstanceReference } from "./types";
 
 export const fetchWidgetConfiguration = async (
     graphSlug: string,
@@ -40,12 +41,19 @@ export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
+    initialValues: ResourceInstanceReference[] | undefined,
 ) => {
+    const initialValuesQueryString =
+        initialValues
+            ?.map((initialValue) => {
+                return `initialValue=${initialValue.resourceId}`;
+            })
+            .join("&") || "";
     const response = await fetch(
         `${arches.urls.api_relatable_resources(
             graphSlug,
             nodeAlias,
-        )}?page=${page}`,
+        )}?page=${page}&${initialValuesQueryString}`,
     );
 
     const parsed = await response.json();
