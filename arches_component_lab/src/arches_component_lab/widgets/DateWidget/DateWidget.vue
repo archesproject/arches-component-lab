@@ -7,7 +7,10 @@ import ProgressSpinner from "primevue/progressspinner";
 import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
-import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetConfiguration,
+    fetchNodeConfiguration,
+} from "@/arches_component_lab/widgets/api.ts";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
@@ -35,8 +38,14 @@ onMounted(async () => {
         props.nodeAlias,
     );
 
+    const nodeConfiguration = await fetchNodeConfiguration(
+        props.graphSlug,
+        props.nodeAlias,
+    );
+
     configuration.value = {
         ...widgetConfiguration,
+        ...nodeConfiguration,
         datePickerDisplayConfiguration:
             convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
                 widgetConfiguration.dateFormat,
@@ -55,6 +64,7 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">{{ configuration.label }}</label>
+        <span v-if="configuration.isrequired && props.mode === EDIT">*</span>
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
