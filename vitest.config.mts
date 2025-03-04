@@ -10,7 +10,11 @@ import type { UserConfigExport } from 'vite';
 
 function generateConfig(): Promise<UserConfigExport> {
     return new Promise((resolve, reject) => {
+        console.log("IN THE VITE CONFIGURATION FILE");
         const filePath = path.dirname(fileURLToPath(import.meta.url));
+
+        console.log("filePath: ", filePath);
+
 
         const exclude = [
             '**/*.d.ts',
@@ -21,6 +25,8 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
         ];
+
+        console.log("frontend config path", path.join(filePath, '.frontend-configuration-settings.json'));
 
         const rawData = fs.readFileSync(
             path.join(filePath, '.frontend-configuration-settings.json'), 
@@ -33,14 +39,30 @@ function generateConfig(): Promise<UserConfigExport> {
             'arches': path.join(parsedData['ROOT_DIR'], 'app', 'media', 'js', 'arches.js'),
         };
 
+        console.log("alias: ", alias);
+
+        console.log("parsedData: ", parsedData);
+
         for (
             const [archesApplicationName, archesApplicationPath] 
             of Object.entries(
                 parsedData['ARCHES_APPLICATIONS_PATHS'] as { [key: string]: string }
             )
         ) {
+            console.log("archesApplicationName: ", archesApplicationName);
+            console.log("archesApplicationPath: ", archesApplicationPath);
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
+
+        console.log("DODOD", {
+                include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
+                exclude: exclude,
+                reporter: [
+                    ['clover', { 'file': 'coverage.xml' }],
+                    'text',
+                ],
+                reportsDirectory: path.join(filePath, 'coverage', 'frontend'),
+        })
 
         resolve({
             plugins: [vue()],
