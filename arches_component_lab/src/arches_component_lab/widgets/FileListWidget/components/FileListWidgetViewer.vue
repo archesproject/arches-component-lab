@@ -13,8 +13,8 @@ const props = defineProps<{
 const images = computed(() => {
     const val = props.value?.map((x) => {
         return {
-            thumbnailImageSrc: `http://localhost:8059/${x.url}`,
-            itemImageSrc: `http://localhost:8059/${x.url}`,
+            thumbnailImageSrc: `${x.url}`,
+            itemImageSrc: `${x.url}`,
             alt: x.altText,
             title: x.title,
         };
