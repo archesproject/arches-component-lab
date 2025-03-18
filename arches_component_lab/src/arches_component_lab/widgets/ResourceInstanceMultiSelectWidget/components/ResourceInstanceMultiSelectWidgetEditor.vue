@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch, onMounted } from "vue";
 
 import arches from "arches";
 
@@ -31,7 +31,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
 
-const options = ref<ResourceInstanceReference[]>(props.initialValue || []);
+const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -64,6 +64,10 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
+onMounted(async () => {
+    await getOptions(1);
+});
+
 function clearOptions() {
     options.value = props.initialValue || [];
 }
@@ -82,6 +86,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
+            props.initialValue,
         );
 
         const references = resourceData.data.map(
@@ -95,7 +100,11 @@ async function getOptions(page: number, filterTerm?: string) {
             }),
         );
 
-        options.value = [...options.value, ...references];
+        if (resourceData.current_page == 1) {
+            options.value = references;
+        } else {
+            options.value = [...options.value, ...references];
+        }
 
         resourceResultsPage.value = resourceData.current_page;
         resourceResultsTotalCount.value = resourceData.total_results;
@@ -208,12 +217,12 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                 onLazyLoad: onLazyLoadResources,
                 resizeDelay: 200,
             }"
-            @before-show="getOptions(1)"
             @filter="onFilter"
+            @before-show="getOptions(1)"
         >
             <template
                 #chip="//@ts-expect-error - This is a bug in the PrimeVue types
-                { value, removeCallback }"
+                    { value, removeCallback }"
             >
                 <div class="p-multiselect-chip">
                     <span class="p-chip-label">
@@ -226,6 +235,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                         variant="text"
                         as="a"
                         class="p-chip-button"
+                        @click.stop="() => {}"
                     ></Button>
                     <Button
                         icon="pi pi-times-circle"
