@@ -6,6 +6,7 @@ from django.views.generic import View
 
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 def update_i18n_properties(response):
@@ -26,17 +27,31 @@ def update_i18n_properties(response):
 
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
-        card_x_node_x_widget = models.CardXNodeXWidget.objects.filter(
-            node__graph__slug=graph_slug,
-            node__alias=node_alias,
-            node__source_identifier_id__isnull=True,
-        ).first()
+        card_x_node_x_widget = (
+            models.CardXNodeXWidget.objects.filter(
+                node__graph__slug=graph_slug,
+                node__alias=node_alias,
+                node__source_identifier_id__isnull=True,
+            )
+            .select_related("node")
+            .get()
+        )
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(
                 JSONSerializer().serialize(card_x_node_x_widget)
             )
         )
+
+        datatype = DataTypeFactory().get_instance(card_x_node_x_widget.node.datatype)
+        # When dropping support for v7.6, try/except can be removed
+        try:
+            response["config"]["defaultValue"] = datatype.build_dropdown_option(
+                response["config"].get("defaultValue", None)
+            )
+        except AttributeError:
+            # Handle the case where the datatype does not have a build_dropdown_option method
+            pass
 
         return JSONResponse(response)
 
