@@ -46,11 +46,11 @@ class WidgetDataView(View):
         datatype = DataTypeFactory().get_instance(card_x_node_x_widget.node.datatype)
         # When dropping support for v7.6, try/except can be removed
         try:
-            response["config"]["defaultValue"] = datatype.build_dropdown_option(
+            response["config"]["defaultValue"] = datatype.transform_value_from_tile(
                 response["config"].get("defaultValue", None)
             )
         except AttributeError:
-            # Handle the case where the datatype does not have a build_dropdown_option method
+            # Handle the case where the datatype does not have a transform_value_from_tile method
             pass
 
         return JSONResponse(response)
