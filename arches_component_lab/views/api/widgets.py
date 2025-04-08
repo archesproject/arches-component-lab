@@ -4,6 +4,7 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializ
 from django.utils import translation
 from django.views.generic import View
 
+from arches import __version__ as arches_version
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -27,15 +28,25 @@ def update_i18n_properties(response):
 
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
-        card_x_node_x_widget = (
-            models.CardXNodeXWidget.objects.filter(
-                node__graph__slug=graph_slug,
-                node__alias=node_alias,
-                node__source_identifier_id__isnull=True,
+        if arches_version < "8":
+            card_x_node_x_widget = (
+                models.CardXNodeXWidget.objects.filter(
+                    node__graph__slug=graph_slug,
+                    node__alias=node_alias,
+                )
+                .select_related("node")
+                .get()
             )
-            .select_related("node")
-            .get()
-        )
+        elif arches_version >= "8":
+            card_x_node_x_widget = (
+                models.CardXNodeXWidget.objects.filter(
+                    node__graph__slug=graph_slug,
+                    node__alias=node_alias,
+                    node__source_identifier_id__isnull=True,
+                )
+                .select_related("node")
+                .get()
+            )
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(
