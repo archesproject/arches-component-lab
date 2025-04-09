@@ -57,11 +57,11 @@ class WidgetDataView(View):
         datatype = DataTypeFactory().get_instance(card_x_node_x_widget.node.datatype)
         # When dropping support for v7.6, try/except can be removed
         try:
-            response["config"]["defaultValue"] = datatype.transform_value_for_frontend(
+            response["config"]["defaultValue"] = datatype.transform_default_value(
                 response["config"].get("defaultValue", None)
             )
         except AttributeError:
-            # Handle the case where the datatype does not have a transform_value_for_frontend method
+            # Handle the case where the datatype does not have a transform_default_value method
             pass
 
         return JSONResponse(response)
