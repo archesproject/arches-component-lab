@@ -48,11 +48,12 @@ const formFieldRef = useTemplateRef("formFieldRef");
 onMounted(() => {
     allowedFileTypes.value = props.nodeData.config.imagesOnly ? "image/*" : "*";
 
-    currentMax.value = props.nodeData.config.maxFiles - (props.initialValue?.length ?? 0);
+    currentMax.value =
+        props.nodeData.config.maxFiles - (props.initialValue?.length ?? 0);
     formFieldRef.value!.field.states.value = {
         newFiles: [],
-        deletedFiles: []
-    }
+        deletedFiles: [],
+    };
 });
 
 function resolver(e: FormFieldResolverOptions) {
@@ -62,16 +63,15 @@ function resolver(e: FormFieldResolverOptions) {
 function select(event: FileUploadSelectEvent) {
     formFieldRef.value!.field.states.value = {
         ...formFieldRef.value!.field.states.value,
-        newFiles: event.files
-    }
+        newFiles: event.files,
+    };
 }
 
 function remove(event: FileUploadRemoveEvent) {
     formFieldRef.value!.field.states.value = {
         ...formFieldRef.value!.field.states.value,
-        newFiles: event.files
-    }
-
+        newFiles: event.files,
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
@@ -81,10 +81,12 @@ function validate(e: FormFieldResolverOptions) {
 function deleteImage(fileId: string) {
     formFieldRef.value!.field.states.value = {
         ...formFieldRef.value!.field.states.value,
-        deletedFiles: [...formFieldRef.value!.field.states.value.deletedFiles, fileId]
-    }
+        deletedFiles: [
+            ...formFieldRef.value!.field.states.value.deletedFiles,
+            fileId,
+        ],
+    };
 }
-
 </script>
 
 <template>
@@ -95,13 +97,17 @@ function deleteImage(fileId: string) {
         :initial-value="props.initialValue"
         :resolver="resolver"
     >
-        <div class="uploadedImagesContainer" >
-            <div class="uploadedImageRow" v-for="(image, index) in props.initialValue">
+        <div class="uploadedImagesContainer">
+            <div
+                class="uploadedImageRow"
+                v-for="(image, index) in props.initialValue"
+            >
                 <Image
                     class="uploadedImage"
                     :key="index"
                     :src="image.url"
-                    :alt="image.name"></Image>
+                    :alt="image.name"
+                ></Image>
                 <div class="spacer"></div>
                 <Button
                     icon="pi pi-trash"
@@ -150,7 +156,6 @@ function deleteImage(fileId: string) {
 :deep(.uploadedImageRow .spacer) {
     flex: 1;
 }
-
 
 .uploadedImageContainer {
     display: flex;
