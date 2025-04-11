@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef, ref, watch } from "vue";
-
+import { useGettext } from "vue3-gettext";
 import Message from "primevue/message";
 import FileUpload, {
-    type FileUploadBeforeSendEvent,
     type FileUploadBeforeUploadEvent,
+    type FileUploadRemoveEvent,
     type FileUploadSelectEvent,
     type FileUploadUploadEvent,
 } from "primevue/fileupload";
 
+import Image from "primevue/image";
+import Button from "primevue/button";
+import { useConfirm } from "primevue/useconfirm";
+
 import { FormField } from "@primevue/forms";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
-import type { Ref } from "vue";
+const { $gettext } = useGettext();
+const allowedFileTypes = ref();
+const currentMax = ref<number | undefined>(undefined);
+const initialFiles = ref<number>();
+const confirm = useConfirm();
 const item = ref<FileReference>();
 const props = defineProps<{
     initialValue: FileReference[] | null | undefined;
@@ -37,80 +45,46 @@ const props = defineProps<{
 
 const formFieldRef = useTemplateRef("formFieldRef");
 
-// this watcher is necessary to be able to format the value of the form field when the date picker is updated
-watch(
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    () => formFieldRef.value?.field?.states?.value,
-    (newVal, oldVal) => {
-        console.log("VALS", newVal, oldVal);
-        if (newVal !== oldVal) {
-            // @ts-expect-error - This is a bug in the PrimeVue types
-            // formFieldRef.value!.field.states.value = dayjs(newVal).format(
-            //     props.widgetData.config.dateFormat,
-            // );
-        }
-    },
-);
-
 onMounted(() => {
-    console.log("PROPS", props);
-    console.log("FORMFIELDREF", formFieldRef);
+    allowedFileTypes.value = props.nodeData.config.imagesOnly ? "image/*" : "*";
+
+    currentMax.value = props.nodeData.config.maxFiles - (props.initialValue?.length ?? 0);
+    formFieldRef.value!.field.states.value = {
+        newFiles: [],
+        deletedFiles: []
+    }
 });
 
-// let timeout: ReturnType<typeof setTimeout>;
-const addHeader = (event: FileUploadBeforeSendEvent) => {
-    // const token = Cookies.get("csrftoken");
-    // if (token) {
-    //     event.xhr.setRequestHeader("X-CSRFToken", token);
-    //     event.formData.set("list_item_id", item.value.id);
-    // }
-};
-
-const upload = (event: FileUploadUploadEvent) => {
-    if (event.xhr.status !== 201) {
-        return;
-    }
-    const newImage = JSON.parse(event.xhr.responseText);
-    // item.value.images.push(newImage);
-};
-
 function resolver(e: FormFieldResolverOptions) {
-    const ffr = formFieldRef;
-    console.log("RESOLVER", e);
     validate(e);
-
-    return { [props.nodeAlias]: "foo" };
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
-
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
 }
 
 function select(event: FileUploadSelectEvent) {
-    for (const file of event.files) {
-        const reader = new FileReader();
-
-        reader.onload = async (e) => {
-            formFieldRef.value!.field.states.value = e.target?.result;
-        };
-
-        reader.readAsDataURL(file);
+    formFieldRef.value!.field.states.value = {
+        ...formFieldRef.value!.field.states.value,
+        newFiles: event.files
     }
 }
-function onUpload(e: object) {
-    console.log("onUpload", e);
-}
 
-function beforeUpload(e: FileUploadBeforeUploadEvent) {
-    console.log("before", e);
+function remove(event: FileUploadRemoveEvent) {
+    formFieldRef.value!.field.states.value = {
+        ...formFieldRef.value!.field.states.value,
+        newFiles: event.files
+    }
+
 }
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
 }
+
+function deleteImage(fileId: string) {
+    formFieldRef.value!.field.states.value = {
+        ...formFieldRef.value!.field.states.value,
+        deletedFiles: [...formFieldRef.value!.field.states.value.deletedFiles, fileId]
+    }
+}
+
 </script>
 
 <template>
@@ -121,20 +95,36 @@ function validate(e: FormFieldResolverOptions) {
         :initial-value="props.initialValue"
         :resolver="resolver"
     >
+        <div class="uploadedImagesContainer" >
+            <div class="uploadedImageRow" v-for="(image, index) in props.initialValue">
+                <Image
+                    class="uploadedImage"
+                    :key="index"
+                    :src="image.url"
+                    :alt="image.name"></Image>
+                <div class="spacer"></div>
+                <Button
+                    icon="pi pi-trash"
+                    :aria-label="$gettext('delete')"
+                    severity="danger"
+                    outlined
+                    @click="deleteImage(image.file_id)"
+                />
+            </div>
+        </div>
         <FileUpload
             accept="image/*"
-            :file-limit="10"
+            :file-limit="currentMax"
+            :disabled="currentMax == 0"
             :preview-width="250"
             :with-credentials="true"
             :show-cancel-button="false"
             :show-upload-button="false"
-            @select="select"
             choose-icon="fa fa-plus-circle"
             :choose-label="$gettext('Upload an image')"
             :name="props.nodeAlias"
-            @upload="upload"
-            @before-send="addHeader"
-            @before-upload="beforeUpload"
+            @select="select"
+            @remove="remove"
         >
         </FileUpload>
         <Message
@@ -147,3 +137,22 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
+<style scoped>
+:deep(.uploadedImage img) {
+    max-width: 6rem;
+    max-height: 6rem;
+}
+
+:deep(.uploadedImageRow) {
+    display: flex;
+}
+
+:deep(.uploadedImageRow .spacer) {
+    flex: 1;
+}
+
+
+.uploadedImageContainer {
+    display: flex;
+}
+</style>
