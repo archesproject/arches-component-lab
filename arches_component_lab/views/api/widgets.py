@@ -71,12 +71,12 @@ class NodeDataView(View):
             models.Node.objects.get(
                 graph__slug=graph_slug,
                 alias=node_alias,
+                source_identifier_id__isnull=True,
             )
-            if arches_version < "8"
+            if getattr(models.Node, "source_identifier_id", False)
             else models.Node.objects.get(
                 graph__slug=graph_slug,
                 alias=node_alias,
-                source_identifier_id__isnull=True,
             )
         )
 
