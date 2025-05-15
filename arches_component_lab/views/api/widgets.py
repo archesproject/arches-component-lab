@@ -33,7 +33,7 @@ class WidgetDataView(View):
             )
             .select_related("node")
             .get()
-            if hasattr(Node, "source_identifier_id")
+            if hasattr(models.Node, "source_identifier_id")
             else models.CardXNodeXWidget.objects.filter(
                 node__graph__slug=graph_slug,
                 node__alias=node_alias,
