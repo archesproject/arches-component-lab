@@ -12,12 +12,21 @@ from django.db.models import Value, Case, When, Q
 
 class RelatableResourcesView(View):
     def get(self, request, graph, node_alias):
-        node = Node.objects.get(
-            alias=node_alias,
-            graph__slug=graph,
-            graph__is_active=True,
-            graph__publication__isnull=False,
+        node = (
+            Node.objects.get(
+                alias=node_alias,
+                graph__slug=graph,
+                graph__is_active=True,
+                graph__publication__isnull=False,
+            )
+            if hasattr(GraphModel, "is_active")
+            else Node.objects.get(
+                alias=node_alias,
+                graph__slug=graph,
+                graph__publication__isnull=False,
+            )
         )
+
         page_number = request.GET.get("page", 1)
         filter_term = request.GET.get("filter_term", None)
         items_per_page = request.GET.get("items", 25)
