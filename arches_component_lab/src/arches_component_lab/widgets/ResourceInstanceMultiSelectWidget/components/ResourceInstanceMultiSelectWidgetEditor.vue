@@ -21,11 +21,13 @@ import type {
     ResourceInstanceResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    initialValue: ResourceInstanceReference[] | null | undefined;
-    graphSlug: string;
-    nodeAlias: string;
-}>();
+const props =
+    defineProps<{
+        businessValidator: any | null | undefined;
+        initialValue: ResourceInstanceReference[] | null | undefined;
+        graphSlug: string;
+        nodeAlias: string;
+    }>();
 
 const { $gettext } = useGettext();
 
@@ -129,7 +131,6 @@ function getOption(value: string): ResourceInstanceReference | undefined {
 
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
-
     let value = e.value;
 
     if (!Array.isArray(value)) {
@@ -147,6 +148,10 @@ function resolver(e: FormFieldResolverOptions) {
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
+    if (props.businessValidator)
+    {
+        props.businessValidator(e);
+    }
 }
 </script>
 
