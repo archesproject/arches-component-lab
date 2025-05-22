@@ -5,7 +5,7 @@ from django.views.generic import View
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches_component_lab.utils.safe_filter_handler import apply_filters
+from arches_component_lab.utils.safe_object_filter import SafeObjectFilter
 
 
 def update_i18n_properties(response):
@@ -27,13 +27,11 @@ def update_i18n_properties(response):
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
         card_x_node_x_widget = (
-            apply_filters(
-                models.CardXNodeXWidget,
-                {
-                    "node__graph__slug": graph_slug,
-                    "node__alias": node_alias,
-                    "node__source_identifier_id__isnull": True,
-                },
+            SafeObjectFilter(models.CardXNodeXWidget)
+            .apply_filters(
+                node__graph__slug=graph_slug,
+                node__alias=node_alias,
+                node__source_identifier_id__isnull=True,
             )
             .select_related("node")
             .get()
@@ -60,14 +58,15 @@ class WidgetDataView(View):
 
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
-        node = apply_filters(
-            models.Node,
-            {
-                "graph__slug": graph_slug,
-                "alias": node_alias,
-                "source_identifier_id__isnull": True,
-            },
-        ).get()
+        node = (
+            SafeObjectFilter(models.Node)
+            .apply_filters(
+                graph__slug=graph_slug,
+                alias=node_alias,
+                source_identifier_id__isnull=True,
+            )
+            .get()
+        )
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(JSONSerializer().serialize(node))
