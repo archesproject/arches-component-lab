@@ -18,7 +18,7 @@ class RelatableResourcesView(View):
             graph__publication__isnull=False,
         )
         if arches_version >= (8, 0):
-            node_filter = node_filter | Q(graph__is_active=True)
+            node_filter = node_filter & Q(graph__is_active=True)
 
         node = Node.objects.get(node_filter)
 
