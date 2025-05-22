@@ -8,24 +8,21 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 from arches.app.utils.decorators import user_can_read_resource
 from django.db.models import Value, Case, When, Q
+from arches_component_lab.utils.safe_filter_handler import apply_filters
 
 
 class RelatableResourcesView(View):
     def get(self, request, graph, node_alias):
-        node = (
-            Node.objects.get(
-                alias=node_alias,
-                graph__slug=graph,
-                graph__is_active=True,
-                graph__publication__isnull=False,
-            )
-            if hasattr(GraphModel, "is_active")
-            else Node.objects.get(
-                alias=node_alias,
-                graph__slug=graph,
-                graph__publication__isnull=False,
-            )
-        )
+
+        node = apply_filters(
+            Node,
+            {
+                "alias": node_alias,
+                "graph__isactive": True,
+                "graph__slug": graph,
+                "graph__publication__isnull": False,
+            },
+        ).get()
 
         page_number = request.GET.get("page", 1)
         filter_term = request.GET.get("filter_term", None)
