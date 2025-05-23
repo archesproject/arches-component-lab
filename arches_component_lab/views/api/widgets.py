@@ -9,6 +9,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 
+# TODO: Move this to a util
 def update_i18n_properties(response):
     user_language = translation.get_language()
     config = response["config"]
@@ -25,6 +26,7 @@ def update_i18n_properties(response):
     return response
 
 
+# TODO: Remove this in favor of card_x_node_x_widget.py View
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
         query_filter = Q(
@@ -77,6 +79,7 @@ class WidgetDataView(View):
         return JSONResponse(response)
 
 
+# TODO: Replace this with nodes.py view
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
         node_filter = Q(
