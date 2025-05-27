@@ -124,14 +124,10 @@ function resolver(e: FormFieldResolverOptions) {
 
     let value = e.value;
 
-    if (!Array.isArray(value)) {
-        value = [value];
-    }
-
     return {
         values: {
             [props.nodeAlias]: options.value.filter((option) => {
-                return value?.includes(option.resourceId);
+                return value && value === option.resourceId;
             }),
         },
     };
