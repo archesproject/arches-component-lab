@@ -183,37 +183,3 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
-
-<style scoped>
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.chip-text {
-    width: min-content;
-    min-width: fit-content;
-    overflow-wrap: anywhere;
-    padding: 0.5rem 1rem;
-}
-
-:deep(.p-multiselect-label) {
-    width: inherit;
-    flex-direction: column;
-    white-space: break-spaces;
-    align-items: flex-start;
-}
-
-:deep(.p-multiselect-chip-item) {
-    width: inherit;
-    border: 0.125rem solid var(--p-inputtext-border-color);
-    padding: 0.25rem;
-    border-radius: 0.5rem;
-    margin: 0.25rem;
-}
-
-:deep(.p-multiselect-label-container) {
-    white-space: break-spaces;
-    width: inherit;
-}
-</style>
