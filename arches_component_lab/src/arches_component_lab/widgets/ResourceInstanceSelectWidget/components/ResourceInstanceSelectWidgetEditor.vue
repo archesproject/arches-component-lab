@@ -126,7 +126,7 @@ function resolver(e: FormFieldResolverOptions) {
 
     return {
         values: {
-            [props.nodeAlias]: options.value.filter((option) => {
+            [props.nodeAlias]: options.value.find((option) => {
                 return value && value === option.resourceId;
             }),
         },
