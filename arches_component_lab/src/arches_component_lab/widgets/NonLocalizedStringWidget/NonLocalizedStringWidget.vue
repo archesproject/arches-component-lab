@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
@@ -8,38 +8,43 @@ import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLo
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
+import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/widgets/api.ts";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
+        cardXNodeXWidgetData?: CardXNodeXWidget;
+        initialValue?: string | null;
         showLabel?: boolean;
     }>(),
     {
+        cardXNodeXWidgetData: undefined,
+        initialValue: undefined,
         showLabel: true,
     },
 );
 
-const isLoading = ref(true);
-const nodeData = ref();
-const widgetData = ref();
+const isLoading = ref();
+const cardXNodeXWidgetData = ref(props.cardXNodeXWidgetData);
 const configurationError = ref();
 
-onMounted(async () => {
+watchEffect(async () => {
+    if (props.cardXNodeXWidgetData) {
+        return;
+    }
+
+    isLoading.value = true;
+
     try {
-        widgetData.value = await fetchWidgetData(
-            props.graphSlug,
+        cardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
             props.nodeAlias,
+            props.graphSlug,
         );
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -49,34 +54,51 @@ onMounted(async () => {
 </script>
 
 <template>
-    <ProgressSpinner
-        v-if="isLoading"
-        style="width: 2em; height: 2em"
-    />
-    <template v-else>
-        <label v-if="props.showLabel">
-            <span>{{ widgetData.label }}</span>
-            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
-        </label>
+    <div class="widget">
+        <ProgressSpinner
+            v-if="isLoading"
+            style="width: 2em; height: 2em"
+        />
+        <Message
+            v-else-if="configurationError"
+            severity="error"
+            size="small"
+        >
+            {{ configurationError.message }}
+        </Message>
+        <template v-else>
+            <label v-if="props.showLabel">
+                <span>{{ cardXNodeXWidgetData.label }}</span>
+                <span
+                    v-if="
+                        cardXNodeXWidgetData.node.isrequired &&
+                        props.mode === EDIT
+                    "
+                    >*</span
+                >
+            </label>
 
-        <div :class="[nodeAlias, graphSlug].join(' ')">
-            <NonLocalizedStringWidgetEditor
-                v-if="mode === EDIT"
-                :initial-value="initialValue"
-                :graph-slug="props.graphSlug"
-                :node-alias="props.nodeAlias"
-            />
-            <NonLocalizedStringWidgetViewer
-                v-else-if="mode === VIEW"
-                :value="props.initialValue"
-            />
-        </div>
-    </template>
-    <Message
-        v-if="configurationError"
-        severity="error"
-        size="small"
-    >
-        {{ configurationError.message }}
-    </Message>
+            <div :class="[nodeAlias, graphSlug].join(' ')">
+                <NonLocalizedStringWidgetEditor
+                    v-if="mode === EDIT"
+                    :initial-value="initialValue"
+                    :graph-slug="props.graphSlug"
+                    :node-alias="props.nodeAlias"
+                />
+                <NonLocalizedStringWidgetViewer
+                    v-else-if="props.mode === VIEW"
+                    :value="props.initialValue"
+                />
+            </div>
+        </template>
+    </div>
 </template>
+
+<style scoped>
+.widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+</style>
