@@ -13,7 +13,7 @@ export interface NewResourceInstance {
 }
 
 export interface ResourceInstanceReference {
-    resourceId: string;
+    resource_id: string;
     ontologyProperty: string;
     resourceXresourceId?: string;
     inverseOntologyProperty: string;
