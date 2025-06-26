@@ -70,8 +70,6 @@ async function getOptions(page: number, filterTerm?: string) {
             ): ResourceInstanceReference => ({
                 display_value: resourceRecord.display_value,
                 resource_id: resourceRecord.resourceinstanceid,
-                ontologyProperty: "",
-                inverseOntologyProperty: "",
             }),
         );
 
