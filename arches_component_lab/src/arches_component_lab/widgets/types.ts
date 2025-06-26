@@ -14,10 +14,10 @@ export interface NewResourceInstance {
 
 export interface ResourceInstanceReference {
     resource_id: string;
-    ontologyProperty: string;
+    display_value: string;
+    ontologyProperty?: string;
     resourceXresourceId?: string;
-    inverseOntologyProperty: string;
-    display_value?: string;
+    inverseOntologyProperty?: string;
 }
 
 export interface ResourceInstanceResult {
