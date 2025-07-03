@@ -40,14 +40,32 @@ function validate(e: FormFieldResolverOptions) {
         ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.value"
+        :initial-value="props.value.interchange_value"
         :resolver="resolver"
     >
+        <div>url label</div>
         <InputText
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
+            :id="`${props.graphSlug}-${props.nodeAlias}-label`"
             type="text"
+            plaucegolder="Enter URL label..."
+            v-model="$field.value.interchange_value.url_label"
+            :fluid="true"
+        />   
+        <div>url</div>
+        <InputText
+            :id="`${props.graphSlug}-${props.nodeAlias}-url`"
+            type="text"
+            plaucegolder="Enter URL..."
+            v-model="$field.value.interchange_value.url"
             :fluid="true"
         />
+        <div>preview</div>
+        <a
+            v-if="$field.value.interchange_value.url"
+            :href="$field.value.interchange_value.url"
+        >
+            {{ $field.value.interchange_value.url_label || $field.value.interchange_value.url }}
+        </a>
         <Message
             v-for="error in $field.errors"
             :key="error.message"

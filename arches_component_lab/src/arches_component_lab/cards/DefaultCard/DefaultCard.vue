@@ -25,6 +25,8 @@ const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
         "arches_component_lab/widgets/NonLocalizedStringWidget/NonLocalizedStringWidget",
     "views/components/widgets/non-localized-text":
         "arches_component_lab/widgets/NonLocalizedStringWidget/NonLocalizedStringWidget",
+    "views/components/widgets/urldatatype":
+        "arches_component_lab/widgets/URLWidget/URLWidget",
 };
 
 const props = defineProps<{
