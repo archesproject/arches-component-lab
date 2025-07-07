@@ -50,6 +50,21 @@ export interface FileReference {
     title: string;
 }
 
+export interface ConceptFetchResult {
+    more: boolean;
+    results: ConceptOption[];
+}
+// For v7 Concepts
+export interface ConceptOption {
+    collector:	string;
+    conceptid:	string;
+    depth: number;
+    id: string;
+    language: string;
+    text: string;
+    type: string;
+}
+
 export interface URLDatatype {
     url: string;
     url_label: string;

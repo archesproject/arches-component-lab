@@ -1,6 +1,6 @@
 import arches from "arches";
 
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
+import type { ConceptOption, ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
 export const fetchCardXNodeXWidgetData = async (
     graphSlug: string,
@@ -111,6 +111,36 @@ export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
         ),
     );
 
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchConceptsForNode = async (
+    graphSlug: string,
+    nodeAlias: string,
+    page: number,
+    filterTerm?: string,
+    initialValues?: ConceptOption[] | null | undefined,
+) => {
+    const params = new URLSearchParams();
+
+    params.append("page", page.toString());
+    if (filterTerm) {
+        params.append("filter_term", filterTerm);
+    }
+    initialValues?.forEach((initialValue) =>
+        params.append("initialValue", initialValue.id),
+    );
+    const response = await fetch(
+        `${arches.urls.api_conepts_for_node(graphSlug, nodeAlias)}?${params}`,
+    );
     try {
         const parsed = await response.json();
         if (response.ok) {
