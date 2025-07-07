@@ -5,7 +5,7 @@ import ConceptSelectWidgetViewer from "@/arches_component_lab/widgets/ConceptSel
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type {
-    ResourceInstanceReference,
+    ConceptOption,
     WidgetMode,
 } from "@/arches_component_lab/widgets/types.ts";
 
@@ -15,7 +15,7 @@ const props = withDefaults(
         nodeAlias: string;
         graphSlug: string;
         cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: ResourceInstanceReference | null | undefined;
+        value?: ConceptOption | null | undefined;
         showLabel?: boolean;
     }>(),
     {
