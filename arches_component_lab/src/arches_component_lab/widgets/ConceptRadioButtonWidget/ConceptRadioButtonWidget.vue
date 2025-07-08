@@ -44,6 +44,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
                 :graph-slug="graphSlug"
                 :node-alias="nodeAlias"
                 :value="props.value"
+                :group-direction="groupDirection"
                 @update:value="emit('update:value', $event)"
                 @update:is-dirty="emit('update:isDirty', $event)"
             />
