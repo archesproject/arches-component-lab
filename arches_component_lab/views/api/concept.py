@@ -5,7 +5,6 @@ from ..node_config_mixin import CardNodeWidgetConfigMixin
 
 
 class ConceptsForNodeView(View, CardNodeWidgetConfigMixin):
-    # "http://localhost:82/bcap/concepts/paged_dropdown?conceptid=b0d496d4-2b00-4a65-8715-a9384e9e188e&query=&page=3"
     def get(self, request, graph_slug, node_alias, page=0):
         cnw_config = self.get_card_x_node_x_widget(graph_slug, node_alias)
         print("Config: ", cnw_config.node.config)

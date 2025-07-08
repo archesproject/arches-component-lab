@@ -49,6 +49,16 @@ function clearOptions() {
     options.value = props.value ? [props.value] : [];
 }
 
+function addIndenting(options: ConceptOption[]) {
+    const factor = 4;
+    options.forEach((option) => {
+        option.text = option.text.padStart(
+            option.text.length + option.depth * factor,
+            " ",
+        );
+    });
+}
+
 function onFilter(event: MultiSelectFilterEvent) {
     clearOptions();
     optionsPage.value = 0;
@@ -67,6 +77,7 @@ async function getOptions(page: number, filterTerm?: string) {
             filterTerm,
         );
 
+        addIndenting(fetchedData.results);
         if (optionsPage.value == 0) {
             options.value = fetchedData.results;
             optionsPage.value = 1;
@@ -168,7 +179,6 @@ function validate(e: FormFieldResolverOptions) {
                 onLazyLoad: onLazyLoadResources,
             }"
             @filter="onFilter"
-            @before-show="getOptions(1)"
         >
         </Select>
         <Message
@@ -181,3 +191,10 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
+
+<style>
+/* This allows indenting to happen based on concept item list */
+.p-select-option-label {
+    white-space: pre !important;
+}
+</style>
