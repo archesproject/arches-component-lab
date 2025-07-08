@@ -22,8 +22,14 @@ import arches from "arches";
 const props = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    value: ConceptOption | null | undefined;
+    value?: ConceptOption[] | null | undefined;
 }>();
+
+const selectedValues = computed(() => {
+    return value?.map((option) => option.id) || [];
+});
+
+const { value = [] } = props;
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
@@ -47,7 +53,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.value ? [props.value] : [];
+    options.value = value ? value : [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -151,12 +157,12 @@ function validate(e: FormFieldResolverOptions) {
         v-else
         ref="formField"
         v-slot="$field"
-        :name="props.nodeAlias"
-        :initial-value="props.value?.id"
+        :name="nodeAlias"
+        :initial-value="selectedValues"
         :resolver="resolver"
     >
         <MultiSelect
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
+            :id="`${graphSlug}-${nodeAlias}-input`"
             display="chip"
             option-label="text"
             option-value="id"
