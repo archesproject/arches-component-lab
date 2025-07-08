@@ -15,7 +15,7 @@ import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
     ConceptOption,
-    ConceptFetchResult
+    ConceptFetchResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
@@ -64,7 +64,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.graphSlug,
             props.nodeAlias,
             page,
-            filterTerm
+            filterTerm,
         );
 
         if (optionsPage.value == 0) {
@@ -88,8 +88,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
         return;
     }
 
-    if (!hasMore.value
-    ) {
+    if (!hasMore.value) {
         return;
     }
 

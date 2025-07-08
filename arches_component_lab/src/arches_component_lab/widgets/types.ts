@@ -56,8 +56,8 @@ export interface ConceptFetchResult {
 }
 // For v7 Concepts
 export interface ConceptOption {
-    collector:	string;
-    conceptid:	string;
+    collector: string;
+    conceptid: string;
     depth: number;
     id: string;
     language: string;

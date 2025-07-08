@@ -1,6 +1,9 @@
 import arches from "arches";
 
-import type { ConceptOption, ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    ConceptOption,
+    ResourceInstanceReference,
+} from "@/arches_component_lab/widgets/types.ts";
 
 export const fetchCardXNodeXWidgetData = async (
     graphSlug: string,
