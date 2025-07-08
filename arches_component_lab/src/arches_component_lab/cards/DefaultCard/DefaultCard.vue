@@ -84,7 +84,7 @@ watchEffect(async () => {
                 props.graphSlug,
                 props.nodegroupAlias,
             );
-        if (props.tileId && props.tileId !== "root") {
+        if (props.tileId) {
             const tileDataPromise = fetchTileData(
                 props.graphSlug,
                 props.nodegroupAlias,
