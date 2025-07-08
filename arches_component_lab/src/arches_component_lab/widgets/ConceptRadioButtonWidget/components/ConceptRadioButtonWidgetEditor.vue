@@ -31,9 +31,8 @@ const props = withDefaults(
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const flexDirection = computed(() => {
-    return props.groupDirection === 'column' ? 'flex-col' : 'flex-row gap-2';
+    return props.groupDirection === "column" ? "flex-col" : "flex-row gap-2";
 });
-
 
 const formFieldRef = useTemplateRef("formField");
 
