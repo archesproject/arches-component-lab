@@ -15,18 +15,12 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        graphSlug: string;
-        nodeAlias: string;
-        value?: ConceptOption | null;
-        groupDirection?: string;
-    }>(),
-    {
-        value: undefined,
-        groupDirection: "column",
-    },
-);
+const props = defineProps<{
+    graphSlug: string;
+    nodeAlias: string;
+    value: ConceptOption | null;
+    groupDirection: string;
+}>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 

@@ -9,33 +9,31 @@ import type {
     WidgetMode,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: ConceptOption | null | undefined;
-        groupDirection?: string;
-        showLabel?: boolean;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        groupDirection: "column",
-        showLabel: true,
-        value: undefined,
-    },
-);
+const props = defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData?: CardXNodeXWidget;
+    value?: ConceptOption;
+    groupDirection?: string;
+    showLabel?: boolean;
+}>();
 
+const {
+    showLabel = true,
+    groupDirection = "column",
+    value = null,
+    cardXNodeXWidgetData = undefined,
+} = props;
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
     <GenericWidget
-        :graph-slug="props.graphSlug"
-        :node-alias="props.nodeAlias"
-        :mode="props.mode"
-        :show-label="props.showLabel"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+        :mode="mode"
+        :show-label="showLabel"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
     >
         <template #editor="slotProps">
@@ -43,7 +41,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
                 :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :node-alias="nodeAlias"
-                :value="props.value"
+                :value="value"
                 :group-direction="groupDirection"
                 @update:value="emit('update:value', $event)"
                 @update:is-dirty="emit('update:isDirty', $event)"
@@ -52,7 +50,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         <template #viewer="slotProps">
             <ConceptRadioButtonWidgetViewer
                 :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
-                :value="props.value"
+                :value="value"
             />
         </template>
     </GenericWidget>
