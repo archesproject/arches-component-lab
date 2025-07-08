@@ -19,8 +19,8 @@ const props = withDefaults(
     defineProps<{
         graphSlug: string;
         nodeAlias: string;
-        value?: ConceptOption;
-        groupDirection: string;
+        value?: ConceptOption | null;
+        groupDirection?: string;
     }>(),
     {
         value: undefined,

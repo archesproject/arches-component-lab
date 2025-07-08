@@ -15,7 +15,7 @@ const props = withDefaults(
         nodeAlias: string;
         graphSlug: string;
         cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: ResourceInstanceReference | null | undefined;
+        value?: ConceptOption | null | undefined;
         showLabel?: boolean;
     }>(),
     {
