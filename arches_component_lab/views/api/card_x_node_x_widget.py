@@ -10,6 +10,8 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from ..node_config_mixin import CardNodeWidgetConfigMixin
 
 
+
+
 class CardXNodeXWidgetView(View, CardNodeWidgetConfigMixin):
     def get(self, request, graph_slug, node_alias):
         config = self.get_card_x_node_x_widget(graph_slug, node_alias)
@@ -18,10 +20,10 @@ class CardXNodeXWidgetView(View, CardNodeWidgetConfigMixin):
 
 
 class CardXNodeXWidgetListFromNodegroupView(View, CardNodeWidgetConfigMixin):
-    def get(self, request, graph_slug, nodegroup_grouping_node_alias):
+    def get(self, request, graph_slug, nodegroup_alias):
         card_x_node_x_widgets_query = Q(
             node__graph__slug=graph_slug,
-            node__nodegroup__node__alias=nodegroup_grouping_node_alias,
+            node__nodegroup__node__alias=nodegroup_alias,
         )
 
         if arches_version >= (8, 0):
