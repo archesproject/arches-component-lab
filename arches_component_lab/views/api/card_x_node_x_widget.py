@@ -1,4 +1,3 @@
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from django.db.models import Q
 from django.views.generic import View
 
@@ -8,73 +7,17 @@ from arches.app.utils.response import JSONResponse
 
 # TODO: Replace with DataTypeFactory from arches_querysets
 from arches.app.datatypes.datatypes import DataTypeFactory
+from ..node_config_mixin import CardNodeWidgetConfigMixin
 
 
-def serialize_card_x_node_x_widget(widget, datatype_factory):
-    data = JSONDeserializer().deserialize(JSONSerializer().serialize(widget))
-
-    data["card"] = JSONDeserializer().deserialize(
-        JSONSerializer().serialize(widget.card)
-    )
-    del data["card_id"]
-
-    data["node"] = JSONDeserializer().deserialize(
-        JSONSerializer().serialize(widget.node)
-    )
-    del data["node_id"]
-
-    data["widget"] = JSONDeserializer().deserialize(
-        JSONSerializer().serialize(widget.widget)
-    )
-    del data["widget_id"]
-
-    try:
-        datatype = datatype_factory.get_instance(widget.node.datatype)
-        data["config"]["defaultValue"] = datatype.get_interchange_value(
-            data["config"].get("defaultValue", None)
-        )
-    except AttributeError:
-        pass
-
-    return data
-
-
-class CardXNodeXWidgetView(View):
+class CardXNodeXWidgetView(View, CardNodeWidgetConfigMixin):
     def get(self, request, graph_slug, node_alias):
-        query = Q(node__graph__slug=graph_slug, node__alias=node_alias)
-
-        if arches_version >= (8, 0):
-            query &= Q(node__source_identifier_id__isnull=True)
-
-        card_x_node_x_widget = (
-            models.CardXNodeXWidget.objects.filter(query)
-            .select_related()  # eagerly load all related objects
-            .first()
-        )
-
-        if not card_x_node_x_widget:
-            # Supply default widget configuration.
-            nodes = models.Node.objects.filter(graph__slug=graph_slug, alias=node_alias)
-            if arches_version >= (8, 0):
-                nodes = nodes.filter(source_identifier=None)
-            node = nodes.get()
-            datatype_factory = DataTypeFactory()
-            d_data_type = datatype_factory.datatypes[node.datatype]
-            default_widget = d_data_type.defaultwidget
-            card_x_node_x_widget = models.CardXNodeXWidget(
-                node=node,
-                card=node.nodegroup.cardmodel_set.first(),
-                widget=default_widget,
-                config=default_widget.defaultconfig,
-            )
-
-        serialized = serialize_card_x_node_x_widget(
-            card_x_node_x_widget, DataTypeFactory()
-        )
+        config = self.get_card_x_node_x_widget(graph_slug, node_alias)
+        serialized = self.serialize_card_x_node_x_widget(config, DataTypeFactory())
         return JSONResponse(serialized)
 
 
-class CardXNodeXWidgetListFromNodegroupView(View):
+class CardXNodeXWidgetListFromNodegroupView(View, CardNodeWidgetConfigMixin):
     def get(self, request, graph_slug, nodegroup_grouping_node_alias):
         card_x_node_x_widgets_query = Q(
             node__graph__slug=graph_slug,
@@ -92,7 +35,7 @@ class CardXNodeXWidgetListFromNodegroupView(View):
 
         datatype_factory = DataTypeFactory()
         data = [
-            serialize_card_x_node_x_widget(widget, datatype_factory)
+            self.serialize_card_x_node_x_widget(widget, datatype_factory)
             for widget in card_x_node_x_widgets
         ]
 
