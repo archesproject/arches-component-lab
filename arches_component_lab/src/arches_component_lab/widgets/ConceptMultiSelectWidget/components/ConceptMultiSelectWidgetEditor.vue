@@ -6,6 +6,7 @@ import { FormField } from "@primevue/forms";
 
 import Message from "primevue/message";
 import MultiSelect from "primevue/multiselect";
+import Button from "primevue/button";
 
 import { fetchConceptsForNode } from "@/arches_component_lab/widgets/api.ts";
 
@@ -190,26 +191,6 @@ function validate(e: FormFieldResolverOptions) {
                 </div>
                 <div class="button-container">
                     <Button
-                        as="a"
-                        icon="pi pi-info-circle"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_report}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
-                        as="a"
-                        icon="pi pi-pencil"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
                         icon="pi pi-times"
                         variant="text"
                         size="small"
@@ -232,3 +213,37 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
+
+<style scoped>
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chip-text {
+    width: min-content;
+    min-width: fit-content;
+    overflow-wrap: anywhere;
+    padding: 0.5rem 1rem;
+}
+
+:deep(.p-multiselect-label) {
+    width: inherit;
+    flex-direction: column;
+    white-space: break-spaces;
+    align-items: flex-start;
+}
+
+:deep(.p-multiselect-chip-item) {
+    width: inherit;
+    border: 0.125rem solid var(--p-inputtext-border-color);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
+}
+
+:deep(.p-multiselect-label-container) {
+    white-space: break-spaces;
+    width: inherit;
+}
+</style>
