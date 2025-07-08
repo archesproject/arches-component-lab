@@ -31,7 +31,7 @@ const props = withDefaults(
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const flexDirection = computed(() => {
-    return props.groupDirection === "column" ? "flex-col" : "flex-row gap-2";
+    return props.groupDirection === "column" ? "flex-column" : "flex-row gap-2";
 });
 
 const formFieldRef = useTemplateRef("formField");
@@ -119,13 +119,13 @@ function validate(e: FormFieldResolverOptions) {
             <div
                 v-for="option in options"
                 :key="option.id"
-                class="flex items-center gap-2"
+                class="flex items-center gap-2 flex-row"
             >
                 <RadioButton
                     :input-id="option.id"
+                    input-class="brett_test"
                     name="dynamic"
                     :value="option.id"
-                    variant="filled"
                     size="small"
                 />
                 <label :for="option.id">{{ option.text }}</label>
@@ -141,3 +141,15 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
+
+<style scoped>
+/* These utility classes not available until Bootstrap 4+ */
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+</style>

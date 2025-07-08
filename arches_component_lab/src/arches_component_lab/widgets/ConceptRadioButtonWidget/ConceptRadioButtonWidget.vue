@@ -16,10 +16,12 @@ const props = withDefaults(
         graphSlug: string;
         cardXNodeXWidgetData?: CardXNodeXWidget;
         value?: ConceptOption | null | undefined;
+        groupDirection?: string;
         showLabel?: boolean;
     }>(),
     {
         cardXNodeXWidgetData: undefined,
+        groupDirection: "column",
         showLabel: true,
         value: undefined,
     },
