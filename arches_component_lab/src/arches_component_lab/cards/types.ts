@@ -1,7 +1,9 @@
-import type { Component } from "vue";
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-
-export interface WidgetComponent {
-    component: Component;
-    cardXNodeXWidgetData: CardXNodeXWidget;
+export interface AliasedTileData {
+    tileid: string;
+    aliased_data: {
+        [key: string]: {
+            display_value: string;
+            interchange_value: unknown;
+        };
+    };
 }
