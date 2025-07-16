@@ -8,25 +8,22 @@ import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import { upsertTile } from "@/arches_component_lab/cards/api.ts";
+import GenericWidget from "@/arches_component_lab/widgets/GenericWidget/GenericWidget.vue";
 
+import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
-
-import type { WidgetComponent } from "@/arches_component_lab/cards/types.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types";
 
 const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget[];
     graphSlug: string;
-    mode: string;
+    mode: WidgetMode;
     nodegroupAlias: string;
-    tileData: {
-        tileid: string;
-        aliased_data: Record<string, unknown>;
-    };
-    widgets: WidgetComponent[];
+    tileData: AliasedTileData | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:tileData"]);
@@ -38,12 +35,12 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref();
 
-const localData = reactive({ ...props.tileData.aliased_data });
+const aliasedData = reactive({ ...props.tileData?.aliased_data });
 
 const widgetDirtyStates = reactive(
-    props.widgets.reduce(
+    props.cardXNodeXWidgetData.reduce(
         (acc, widget) => {
-            acc[widget.cardXNodeXWidgetData.node.alias] = false;
+            acc[widget.node.alias] = false;
             return acc;
         },
         {} as Record<string, boolean>,
@@ -63,7 +60,7 @@ watch(isDirty, (newValue, oldValue) => {
 });
 
 function resetForm() {
-    Object.assign(localData, props.tileData.aliased_data);
+    Object.assign(aliasedData, props.tileData?.aliased_data);
 
     Object.keys(widgetDirtyStates).forEach((key) => {
         widgetDirtyStates[key] = false;
@@ -79,8 +76,8 @@ async function save(_event: FormSubmitEvent) {
         const updatedTileData = {
             ...props.tileData,
             aliased_data: {
-                ...props.tileData.aliased_data,
-                ...localData,
+                ...props.tileData?.aliased_data,
+                ...aliasedData,
             },
         };
 
@@ -88,10 +85,10 @@ async function save(_event: FormSubmitEvent) {
             props.graphSlug,
             props.nodegroupAlias,
             updatedTileData,
-            props.tileData.tileid,
+            props.tileData?.tileid,
         );
 
-        Object.assign(localData, updatedTileData.aliased_data);
+        Object.assign(aliasedData, updatedTileData.aliased_data);
 
         emit("update:tileData", upsertedTileData);
     } catch (error) {
@@ -119,21 +116,24 @@ async function save(_event: FormSubmitEvent) {
             class="form"
             @submit="save"
         >
-            <component
-                :is="widget.component"
-                v-for="widget in widgets"
-                :key="widget.cardXNodeXWidgetData.id"
-                v-model:value="
-                    localData[widget.cardXNodeXWidgetData.node.alias]
-                "
-                v-model:is-dirty="
-                    widgetDirtyStates[widget.cardXNodeXWidgetData.node.alias]
-                "
-                :mode="props.mode"
-                :graph-slug="props.graphSlug"
-                :node-alias="widget.cardXNodeXWidgetData.node.alias"
-                :card-x-node-x-widget-data="widget.cardXNodeXWidgetData"
-            />
+            <template
+                v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
+                :key="cardXNodeXWidgetDatum.id"
+            >
+                <GenericWidget
+                    v-if="cardXNodeXWidgetDatum.visible"
+                    v-model:value="
+                        aliasedData[cardXNodeXWidgetDatum.node.alias]
+                    "
+                    v-model:is-dirty="
+                        widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
+                    "
+                    :mode="mode"
+                    :graph-slug="graphSlug"
+                    :node-alias="cardXNodeXWidgetDatum.node.alias"
+                    :card-x-node-x-widget-data="cardXNodeXWidgetDatum"
+                />
+            </template>
 
             <div style="display: flex">
                 <Button
