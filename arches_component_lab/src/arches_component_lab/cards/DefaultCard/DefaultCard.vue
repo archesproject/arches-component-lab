@@ -7,11 +7,8 @@ import Skeleton from "primevue/skeleton";
 import DefaultCardEditor from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardEditor.vue";
 import DefaultCardViewer from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardViewer.vue";
 
-import {
-    fetchCardData,
-    fetchTileData,
-} from "@/arches_component_lab/cards/api.ts";
-import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/widgets/api.ts";
+import { fetchTileData } from "@/arches_component_lab/cards/api.ts";
+import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/cards/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -19,19 +16,20 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    graphSlug: string;
-    tileId?: string | null;
-}>();
+const { mode, nodegroupAlias, graphSlug, resourceInstanceId, tileId } =
+    defineProps<{
+        mode: WidgetMode;
+        nodegroupAlias: string;
+        graphSlug: string;
+        resourceInstanceId?: string | null;
+        tileId?: string | null;
+    }>();
 
-const emit = defineEmits(["update:isDirty", "update:tileData"]);
+const emit = defineEmits(["update:widgetDirtyStates", "update:tileData"]);
 
 const isLoading = ref(false);
 const configurationError = ref();
 
-const cardData = ref();
 const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
 const tileData = ref<AliasedTileData>();
 
@@ -39,25 +37,25 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        const cardDataPromise = fetchCardData(
-            props.graphSlug,
-            props.nodegroupAlias,
-        );
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(
-                props.graphSlug,
-                props.nodegroupAlias,
-            );
-        if (props.tileId) {
+            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+
+        if (tileId) {
             const tileDataPromise = fetchTileData(
-                props.graphSlug,
-                props.nodegroupAlias,
-                props.tileId,
+                graphSlug,
+                nodegroupAlias,
+                tileId,
             );
             tileData.value = await tileDataPromise;
+        } else if (resourceInstanceId) {
+            // TODO: Replace with querysets call for empty tile structure
+            // @ts-expect-error this is an incomplete tile structure
+            tileData.value = {
+                resourceinstance: resourceInstanceId,
+                aliased_data: {},
+            };
         }
 
-        cardData.value = await cardDataPromise;
         cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
     } catch (error) {
         configurationError.value = error;
@@ -80,25 +78,28 @@ watchEffect(async () => {
             {{ configurationError.message }}
         </Message>
         <template v-else>
-            <span>{{ cardData.name }}</span>
+            <span>{{ cardXNodeXWidgetData[0].card.name }}</span>
 
             <DefaultCardEditor
-                v-if="props.mode === EDIT"
+                v-if="mode === EDIT"
                 v-model:tile-data="tileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
-                :graph-slug="props.graphSlug"
-                :mode="props.mode"
-                :nodegroup-alias="props.nodegroupAlias"
-                @update:is-dirty="emit('update:isDirty', $event)"
+                :graph-slug="graphSlug"
+                :mode="mode"
+                :nodegroup-alias="nodegroupAlias"
+                :resource-instance-id="resourceInstanceId"
+                @update:widget-dirty-states="
+                    emit('update:widgetDirtyStates', $event)
+                "
                 @update:tile-data="emit('update:tileData', $event)"
             />
             <DefaultCardViewer
-                v-else-if="props.mode === VIEW"
+                v-else-if="mode === VIEW"
                 v-model:tile-data="tileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
-                :graph-slug="props.graphSlug"
-                :mode="props.mode"
-                :nodegroup-alias="props.nodegroupAlias"
+                :graph-slug="graphSlug"
+                :mode="mode"
+                :nodegroup-alias="nodegroupAlias"
             />
         </template>
     </div>

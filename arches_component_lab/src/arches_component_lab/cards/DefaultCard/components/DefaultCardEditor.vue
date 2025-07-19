@@ -1,98 +1,125 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { reactive, toRaw, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
-
 import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import GenericWidget from "@/arches_component_lab/widgets/GenericWidget/GenericWidget.vue";
+import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
 
 import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
+
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types";
 
-const props = defineProps<{
+const { $gettext } = useGettext();
+
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    mode,
+    nodegroupAlias,
+    resourceInstanceId,
+    tileData,
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget[];
     graphSlug: string;
     mode: WidgetMode;
     nodegroupAlias: string;
-    tileData: AliasedTileData | undefined;
+    resourceInstanceId: string | null | undefined;
+    tileData?: AliasedTileData;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:tileData"]);
-
-const { $gettext } = useGettext();
+const emit = defineEmits(["update:widgetDirtyStates", "update:tileData"]);
 
 const formKey = ref(0);
-
 const isSaving = ref(false);
-const saveError = ref();
+const saveError = ref<Error>();
 
-const aliasedData = reactive({ ...props.tileData?.aliased_data });
+const originalAliasedData = structuredClone(tileData?.aliased_data || {});
+const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
 
 const widgetDirtyStates = reactive(
-    props.cardXNodeXWidgetData.reduce(
-        (acc, widget) => {
-            acc[widget.node.alias] = false;
-            return acc;
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+        (dirtyStatesMap, widgetDatum) => {
+            dirtyStatesMap[widgetDatum.node.alias] = false;
+            return dirtyStatesMap;
         },
-        {} as Record<string, boolean>,
+        {},
     ),
 );
 
-const isDirty = computed(() => {
-    return Object.values(widgetDirtyStates).some(
-        (widgetDirtyState) => widgetDirtyState,
-    );
-});
+watch(
+    aliasedData,
+    () => {
+        emit("update:tileData", {
+            ...tileData,
+            aliased_data: toRaw(aliasedData),
+        });
+    },
+    { deep: true },
+);
 
-watch(isDirty, (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-        emit("update:isDirty", newValue);
-    }
-});
+watch(
+    widgetDirtyStates,
+    (newValue) => {
+        emit("update:widgetDirtyStates", newValue);
+    },
+    { deep: true },
+);
+
+// TODO: should we force widgets to coerce their values to match aliased data?
+function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
+    aliasedData[nodeAlias].node_value = value;
+}
+
+function resetWidgetDirtyStates() {
+    Object.keys(widgetDirtyStates).forEach((nodeAlias) => {
+        widgetDirtyStates[nodeAlias] = false;
+    });
+}
 
 function resetForm() {
-    Object.assign(aliasedData, props.tileData?.aliased_data);
+    resetWidgetDirtyStates();
 
-    Object.keys(widgetDirtyStates).forEach((key) => {
-        widgetDirtyStates[key] = false;
-    });
-
+    Object.assign(aliasedData, structuredClone(originalAliasedData));
     formKey.value += 1;
 }
 
 async function save(_event: FormSubmitEvent) {
     isSaving.value = true;
+    saveError.value = undefined;
 
     try {
-        const updatedTileData = {
-            ...props.tileData,
-            aliased_data: {
-                ...props.tileData?.aliased_data,
-                ...aliasedData,
+        const updatedTileData = await upsertTile(
+            graphSlug,
+            nodegroupAlias,
+            {
+                ...(tileData as AliasedTileData),
+                aliased_data: toRaw(aliasedData),
             },
-        };
-
-        const upsertedTileData = await upsertTile(
-            props.graphSlug,
-            props.nodegroupAlias,
-            updatedTileData,
-            props.tileData?.tileid,
+            tileData?.tileid,
+            resourceInstanceId,
         );
 
-        Object.assign(aliasedData, updatedTileData.aliased_data);
+        Object.assign(
+            aliasedData,
+            structuredClone(updatedTileData.aliased_data),
+        );
+        Object.assign(
+            originalAliasedData,
+            structuredClone(updatedTileData.aliased_data),
+        );
 
-        emit("update:tileData", upsertedTileData);
+        resetWidgetDirtyStates();
     } catch (error) {
-        saveError.value = error;
+        saveError.value = error as Error;
     } finally {
         isSaving.value = false;
     }
@@ -122,9 +149,6 @@ async function save(_event: FormSubmitEvent) {
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
-                    v-model:value="
-                        aliasedData[cardXNodeXWidgetDatum.node.alias]
-                    "
                     v-model:is-dirty="
                         widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
                     "
@@ -132,6 +156,13 @@ async function save(_event: FormSubmitEvent) {
                     :graph-slug="graphSlug"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
                     :card-x-node-x-widget-data="cardXNodeXWidgetDatum"
+                    :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
+                    @update:value="
+                        onUpdateWidgetValue(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
                 />
             </template>
 

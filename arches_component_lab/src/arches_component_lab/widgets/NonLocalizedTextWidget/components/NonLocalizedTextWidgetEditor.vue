@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
-
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
-import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
+
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
 const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
-    value: AliasedTileNodeValue | null | undefined;
+    value: NonLocalizedTextValue | null | undefined;
 }>();
 </script>
 
@@ -14,7 +14,7 @@ const { nodeAlias, value } = defineProps<{
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value"
+        :initial-value="value?.node_value"
     >
         <InputText
             type="text"
