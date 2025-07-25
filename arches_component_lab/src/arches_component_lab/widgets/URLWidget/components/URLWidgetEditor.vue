@@ -3,7 +3,6 @@ import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import InputText from "primevue/inputtext";
-import type { FormFieldResolverOptions } from "@primevue/forms";
 
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
@@ -39,15 +38,15 @@ function resolver() {
     >
         <div>url label</div>
         <InputText
-            type="text"
             v-model="url_label"
+            type="text"
             :placeholder="$gettext('Enter URL label...')"
             :fluid="true"
         />   
         <div>url</div>
         <InputText
-            type="text"
             v-model="url"
+            type="text"
             :required="true"
             :placeholder="$gettext('Enter URL...')"
             :fluid="true"
