@@ -34,7 +34,7 @@ function resolver() {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value.node_value"
+        :initial-value="value"
         :resolver="resolver"
     >
         <div>url label</div>
