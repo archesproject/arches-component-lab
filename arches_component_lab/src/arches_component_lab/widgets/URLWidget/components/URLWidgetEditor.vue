@@ -42,7 +42,7 @@ function resolver() {
             type="text"
             :placeholder="$gettext('Enter URL label...')"
             :fluid="true"
-        />   
+        />
         <div>url</div>
         <InputText
             v-model="url"
