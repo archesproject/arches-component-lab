@@ -18,8 +18,8 @@ const { nodeAlias, value } = defineProps<{
 const url_label = ref(value?.node_value?.url_label || "");
 const url = ref(value?.node_value?.url || "");
 
-function resolver(event: FormFieldResolverOptions) {
-    if (!event.value) {
+function resolver() {
+    if (!url.value) {
         return null;
     }
 
@@ -34,7 +34,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value"
+        :initial-value="value.node_value"
         :resolver="resolver"
     >
         <div>url label</div>
