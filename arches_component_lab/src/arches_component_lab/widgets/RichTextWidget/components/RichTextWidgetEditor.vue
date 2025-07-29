@@ -17,12 +17,12 @@ const props = defineProps<{
     value: StringValue;
 }>();
 
+const { $gettext } = useGettext();
+
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
 const managedNodeValue = ref<StringValue["node_value"]>();
 const singleInputValue = ref<string>();
-
-const { $gettext } = useGettext();
 
 watchEffect(async () => {
     languages.value = (await fetchLanguages()) as Language[];

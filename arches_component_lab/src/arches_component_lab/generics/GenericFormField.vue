@@ -26,11 +26,12 @@ const formFieldRef = useTemplateRef("formField");
 
 const derivedInitialValue = computed(() => {
     const defaultSlotNodes = slots.default?.();
-    const firstInputVNode = findFormFieldNode(defaultSlotNodes?.[0]);
-    if (!firstInputVNode) {
-        return null;
+    const firstVNode = defaultSlotNodes?.[0];
+    const formFieldNode = findDeclaredFormFieldNode(firstVNode) ?? firstVNode;
+    if (!formFieldNode) {
+        throw new Error();
     }
-    const firstVNodeProps = firstInputVNode.props;
+    const firstVNodeProps = formFieldNode.props;
     if (!firstVNodeProps) {
         return null;
     }
@@ -73,7 +74,7 @@ function internalResolver(event: FormFieldResolverOptions) {
     return value;
 }
 
-function findFormFieldNode(node?: VNode): VNode | undefined {
+function findDeclaredFormFieldNode(node?: VNode): VNode | undefined {
     if (!node) {
         return;
     }
@@ -85,7 +86,7 @@ function findFormFieldNode(node?: VNode): VNode | undefined {
     }
     if (Array.isArray(node.children)) {
         for (const child of node.children) {
-            const found = findFormFieldNode(child as VNode);
+            const found = findDeclaredFormFieldNode(child as VNode);
             if (found) {
                 return found;
             }
