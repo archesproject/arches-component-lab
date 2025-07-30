@@ -2,7 +2,7 @@
 import { ref, watch, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import InputText from "primevue/inputtext";
+import Editor from "primevue/editor";
 import Select from "primevue/select";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
@@ -79,7 +79,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
         :node-alias="nodeAlias"
         :transform-value-for-form="transformValueForForm"
     >
-        <div style="display: flex; column-gap: 0.5rem">
+        <div style="display: flex; flex-direction: column; row-gap: 0.5rem">
             <Select
                 v-model="selectedLanguage"
                 :aria-label="$gettext('Select language for node value')"
@@ -93,7 +93,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
                     optionLabel: { style: { fontSize: '1rem' } },
                 }"
             />
-            <InputText
+            <Editor
                 type="text"
                 :fluid="true"
                 :model-value="singleInputValue"
