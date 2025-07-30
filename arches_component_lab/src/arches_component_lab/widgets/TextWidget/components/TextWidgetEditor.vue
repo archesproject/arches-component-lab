@@ -25,8 +25,15 @@ const managedNodeValue = ref<StringValue["node_value"]>();
 const singleInputValue = ref<string>();
 
 watchEffect(async () => {
-    languages.value = (await fetchLanguages()) as Language[];
-    selectedLanguage.value = languages.value.find((lang) => lang.isdefault);
+    const response = (await fetchLanguages()) as {
+        languages: Language[];
+        request_language: string;
+    };
+    languages.value = response.languages;
+    selectedLanguage.value =
+        languages.value.find(
+            (lang) => lang.code === response.request_language,
+        ) ?? response.languages[0];
 });
 
 watch(languages, () => {
