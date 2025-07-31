@@ -4,7 +4,7 @@ import { ref, onMounted, computed } from "vue";
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import { fetchConceptsForNode } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { fetchConcepts } from "@/arches_component_lab/datatypes/concept/api.ts";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     ConceptValue,
@@ -43,7 +43,7 @@ onMounted(async () => {
 async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
-        const fetchedData: ConceptFetchResult = await fetchConceptsForNode(
+        const fetchedData: ConceptFetchResult = await fetchConcepts(
             props.graphSlug,
             props.nodeAlias,
             page,
