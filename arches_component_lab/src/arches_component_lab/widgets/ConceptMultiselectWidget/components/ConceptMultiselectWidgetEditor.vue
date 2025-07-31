@@ -59,10 +59,10 @@ async function getOptions(page: number, filterTerm?: string) {
         );
 
         if (optionsPage.value == 0) {
-            options.value = fetchedData.results;
+            options.value = fetchedData.results as CollectionItem[];
             optionsPage.value = 1;
         } else {
-            options.value = [...options.value, ...fetchedData.results];
+            options.value = [...options.value, ...fetchedData.results as CollectionItem[]];
         }
 
         hasMore.value = fetchedData.more;
