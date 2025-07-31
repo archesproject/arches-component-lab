@@ -28,7 +28,13 @@ const flexDirection = computed(() =>
 );
 
 const options = ref<ConceptOption[]>([]);
-const selectedId = ref<string | ConceptOption | null>(props.value ?? null);
+const selectedId = ref<string | null>(
+    !props.value
+        ? null
+        : typeof props.value == "string"
+          ? props.value
+          : props.value.node_value,
+);
 
 const isLoading = ref(false);
 const optionsPage = ref(0);
@@ -51,10 +57,10 @@ async function getOptions(page: number, filterTerm?: string) {
         );
 
         if (optionsPage.value === 0) {
-            options.value = fetchedData.results;
+            options.value = fetchedData.results as ConceptOption[];
             optionsPage.value = 1;
         } else {
-            options.value = [...options.value, ...fetchedData.results];
+            options.value = [...options.value, ...fetchedData.results as ConceptOption[]];
         }
 
         hasMore.value = fetchedData.more;
