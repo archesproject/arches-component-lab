@@ -1,4 +1,4 @@
-import type { AliasedNodeData} from "@/arches_component_lab/types.ts";
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 export interface ConceptFetchResult {
     more: boolean;

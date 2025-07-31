@@ -9,8 +9,11 @@ const props = defineProps<{
 const dataValue = computed(() =>
     !props.value
         ? { display_value: "Unknown", node_value: ["Unknown"] }
-        : Array.isArray( props.value )
-          ? { display_value: (props.value as string[]).join(", "), node_value: props.value }
+        : Array.isArray(props.value)
+          ? {
+                display_value: (props.value as string[]).join(", "),
+                node_value: props.value,
+            }
           : (props.value as ConceptListValue),
 );
 </script>

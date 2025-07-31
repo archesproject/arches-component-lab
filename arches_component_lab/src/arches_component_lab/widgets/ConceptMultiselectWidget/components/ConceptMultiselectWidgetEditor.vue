@@ -62,7 +62,10 @@ async function getOptions(page: number, filterTerm?: string) {
             options.value = fetchedData.results as CollectionItem[];
             optionsPage.value = 1;
         } else {
-            options.value = [...options.value, ...fetchedData.results as CollectionItem[]];
+            options.value = [
+                ...options.value,
+                ...(fetchedData.results as CollectionItem[]),
+            ];
         }
 
         hasMore.value = fetchedData.more;

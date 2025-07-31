@@ -27,7 +27,7 @@ export const fetchConcepts = async (
     try {
         const parsed = await response.json();
         if (response.ok) {
-            return {total_results: parsed.length} = parsed;
+            return ({ total_results: parsed.length } = parsed);
         }
         throw new Error(parsed.message);
     } catch (error) {
