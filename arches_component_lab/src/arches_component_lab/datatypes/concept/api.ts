@@ -5,7 +5,7 @@ import type {
     ConceptOption,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-export const fetchConceptsForNode = async (
+export const fetchConcepts = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
@@ -22,7 +22,7 @@ export const fetchConceptsForNode = async (
         params.append("initialValue", initialValue.id),
     );
     const response = await fetch(
-        `${arches.urls.api_concepts_for_node(graphSlug, nodeAlias)}?${params}`,
+        `${arches.urls.api_concepts_flat(graphSlug, nodeAlias)}?${params}`,
     );
     try {
         const parsed = await response.json();
@@ -56,7 +56,7 @@ export const fetchConceptsTree = async (
         params.append("filter_term", filterTerm);
     }
     const response = await fetch(
-        `${arches.urls.api_concepts(graphSlug, nodeAlias)}?${params}`,
+        `${arches.urls.api_concepts_tree(graphSlug, nodeAlias)}?${params}`,
     );
 
     const parsed = await response.json();

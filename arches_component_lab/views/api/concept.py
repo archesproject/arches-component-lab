@@ -5,7 +5,7 @@ from ..node_config_mixin import CardNodeWidgetConfigMixin
 from arches.app.models.concept import Concept
 
 
-class ConceptsForNodeView(View, CardNodeWidgetConfigMixin):
+class ConceptsFlatView(View, CardNodeWidgetConfigMixin):
     # "http://localhost:82/bcap/concepts/paged_dropdown?conceptid=b0d496d4-2b00-4a65-8715-a9384e9e188e&query=&page=3"
     def get(self, request, graph_slug, node_alias, page=0):
         cnw_config = self.get_card_x_node_x_widget(graph_slug, node_alias)
@@ -29,7 +29,7 @@ class ConceptsForNodeView(View, CardNodeWidgetConfigMixin):
         return paged_dropdown(request)
 
 
-class ConceptsView(View, CardNodeWidgetConfigMixin):
+class ConceptsTreeView(View, CardNodeWidgetConfigMixin):
     def get(self, request, graph_slug, node_alias):
         cnw_config = self.get_card_x_node_x_widget(graph_slug, node_alias)
         print("Config: ", cnw_config.node.config)
