@@ -13,6 +13,7 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
 )
+from arches_component_lab.views.api.concept import ConceptsForNodeView, ConceptsView
 
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileDetailView,
@@ -34,6 +35,16 @@ urlpatterns = [
         "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
         WidgetDataView.as_view(),
         name="api-widget-data",
+    ),
+    path(
+        "arches-component-lab/api/concepts_for_node/<slug:graph_slug>/<slug:node_alias>",
+        ConceptsForNodeView.as_view(),
+        name="concepts-for-node",
+    ),
+    path(
+        "arches-component-lab/api/concepts/<slug:graph_slug>/<slug:node_alias>",
+        ConceptsView.as_view(),
+        name="api-concepts",
     ),
     path(
         "arches-component-lab/api/node-data/<slug:graph_slug>/<slug:node_alias>",
