@@ -1,0 +1,43 @@
+<script setup lang="ts">
+import ConceptSelectWidgetEditor from "@/arches_component_lab/widgets/ConceptSelectWidget/components/ConceptSelectWidgetEditor.vue";
+import ConceptSelectWidgetViewer from "@/arches_component_lab/widgets/ConceptSelectWidget/components/ConceptSelectWidgetViewer.vue";
+
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        nodeAlias: string;
+        graphSlug: string;
+        cardXNodeXWidgetData?: CardXNodeXWidgetData;
+        value?: ConceptValue | string;
+    }>(),
+    {
+        cardXNodeXWidgetData: undefined,
+        value: undefined,
+    },
+);
+
+const emit = defineEmits(["update:isDirty", "update:value"]);
+</script>
+
+<template>
+    <ConceptSelectWidgetEditor
+        v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :graph-slug="props.graphSlug"
+        :node-alias="props.nodeAlias"
+        :value="props.value"
+        @update:value="emit('update:value', $event)"
+        @update:is-dirty="emit('update:isDirty', $event)"
+    />
+    <ConceptSelectWidgetViewer
+        v-if="mode === VIEW"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :value="props.value"
+    />
+</template>

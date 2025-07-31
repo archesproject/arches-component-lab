@@ -1,0 +1,37 @@
+import type { AliasedNodeData} from "@/arches_component_lab/types.ts";
+
+export interface ConceptFetchResult {
+    more: boolean;
+    results: ConceptOption[] | CollectionItem[];
+    total_results: number;
+}
+// For v7 Concepts
+export interface ConceptOption {
+    collector: string;
+    conceptid: string;
+    depth: number;
+    id: string;
+    language: string;
+    text: string;
+    type: string;
+}
+
+export interface CollectionItem {
+    key: string; // This is "id" in the response JSON
+    label: string; // This is "text" in the response JSON
+    conceptId: string;
+    sortOrder: string;
+    children: CollectionItem[];
+}
+
+export interface ConceptValue extends AliasedNodeData {
+    display_value: string;
+    node_value: string;
+    details: CollectionItem[];
+}
+
+export interface ConceptListValue extends AliasedNodeData {
+    display_value: string;
+    node_value: string[];
+    details: CollectionItem[];
+}
