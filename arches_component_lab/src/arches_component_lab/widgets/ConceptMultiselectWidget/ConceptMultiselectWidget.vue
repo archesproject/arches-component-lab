@@ -5,7 +5,7 @@ import ConceptMultiSelectWidgetViewer from "@/arches_component_lab/widgets/Conce
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptOption } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
@@ -14,7 +14,7 @@ const props = withDefaults(
         nodeAlias: string;
         graphSlug: string;
         cardXNodeXWidgetData: CardXNodeXWidgetData;
-        value?: ConceptOption[];
+        value?: ConceptListValue | string[] | null | undefined;
     }>(),
     {
         cardXNodeXWidgetData: undefined,
@@ -40,5 +40,4 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :card-x-node-x-widget-data="props.cardXNodeXWidgetData"
         :value="props.value"
     />
-    <div style="background-color: red">{{ props.value }}</div>
 </template>

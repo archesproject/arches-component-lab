@@ -3,14 +3,14 @@ import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept/
 import { computed } from "vue";
 
 const props = defineProps<{
-    value?: string | ConceptListValue | null;
+    value?: ConceptListValue | string[] | null | undefined;
 }>();
 
 const dataValue = computed(() =>
     !props.value
         ? { display_value: "Unknown", node_value: ["Unknown"] }
-        : typeof props.value === "string"
-          ? { display_value: props.value, node_value: [props.value] }
+        : Array.isArray( props.value )
+          ? { display_value: (props.value as string[]).join(", "), node_value: props.value }
           : (props.value as ConceptListValue),
 );
 </script>
