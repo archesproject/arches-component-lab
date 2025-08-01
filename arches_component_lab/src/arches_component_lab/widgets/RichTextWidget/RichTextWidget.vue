@@ -4,7 +4,7 @@ import RichTextWidgetViewer from "@/arches_component_lab/widgets/RichTextWidget/
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -12,7 +12,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     value: StringValue;
 }>();
 

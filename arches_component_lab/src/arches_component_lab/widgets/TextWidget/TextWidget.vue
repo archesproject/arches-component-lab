@@ -4,7 +4,7 @@ import TextWidgetViewer from "@/arches_component_lab/widgets/TextWidget/componen
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -12,7 +12,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     value: StringValue;
 }>();
 

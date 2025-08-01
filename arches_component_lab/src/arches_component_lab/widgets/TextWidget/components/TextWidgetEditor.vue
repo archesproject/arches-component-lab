@@ -9,10 +9,14 @@ import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { Language } from "@/arches_component_lab/types.ts";
+import type {
+    StringCardXNodeXWidgetData,
+    Language,
+} from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
 
 const props = defineProps<{
+    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     nodeAlias: string;
     value: StringValue;
 }>();
@@ -59,7 +63,7 @@ watch(selectedLanguage, () => {
 });
 
 function transformValueForForm(event: FormFieldResolverOptions) {
-    if (!selectedLanguage.value || event.value === undefined) {
+    if (!selectedLanguage.value || !event.value) {
         return;
     }
     if (event.value.code) {
@@ -104,6 +108,9 @@ function transformValueForForm(event: FormFieldResolverOptions) {
                 type="text"
                 :fluid="true"
                 :model-value="singleInputValue"
+                :maxlength="cardXNodeXWidgetData.config.maxLength"
+                :placeholder="cardXNodeXWidgetData.config.placeholder"
+                :required="cardXNodeXWidgetData.node.isrequired"
                 form-input
             />
         </div>

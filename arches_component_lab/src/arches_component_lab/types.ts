@@ -25,6 +25,13 @@ export interface CardXNodeXWidgetData {
     };
 }
 
+export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
+        maxLength: string | null;
+        placeholder: string | null;
+    };
+}
+
 export interface Language {
     code: string;
     default_direction: "ltr" | "rtl";
