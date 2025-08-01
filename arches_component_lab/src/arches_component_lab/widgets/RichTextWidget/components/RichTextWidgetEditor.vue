@@ -111,7 +111,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
                 :maxlength="cardXNodeXWidgetData.config.maxLength"
                 :placeholder="cardXNodeXWidgetData.config.placeholder ?? ''"
                 :required="cardXNodeXWidgetData.node.isrequired"
-                form-input
+                :form-input="true"
             />
         </div>
     </GenericFormField>

@@ -80,7 +80,7 @@ function findDeclaredFormFieldNode(node?: VNode): VNode | undefined {
     }
     if (
         node.props &&
-        ("form-input" in node.props || "formInput" in node.props)
+        (node.props["form-input"] === true || node.props["formInput"] === true)
     ) {
         return node;
     }
