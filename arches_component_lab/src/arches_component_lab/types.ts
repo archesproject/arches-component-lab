@@ -1,7 +1,23 @@
-export interface AliasedTileNodeValue {
+export interface AliasedNodeData {
     display_value: string;
     node_value: unknown;
     details: unknown[];
+}
+
+export type AliasedNodegroupData = AliasedTileData | AliasedTileData[] | null;
+
+export interface AliasedData {
+    [key: string]: AliasedNodeData | AliasedNodegroupData;
+}
+
+export interface AliasedTileData {
+    aliased_data: AliasedData;
+    nodegroup: string;
+    parenttile: string | null;
+    provisionaledits: object | null;
+    resourceinstance: string;
+    sortorder: number;
+    tileid: string | null;
 }
 
 export interface CardXNodeXWidgetData {
@@ -10,6 +26,7 @@ export interface CardXNodeXWidgetData {
     };
     config: {
         defaultValue: unknown | null;
+        placeholder?: string;
     };
     id: string;
     label: string;
@@ -21,6 +38,7 @@ export interface CardXNodeXWidgetData {
     sortorder: number;
     visible: boolean;
     widget: {
+        widgetid: string;
         component: string;
     };
 }
