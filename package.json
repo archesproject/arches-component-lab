@@ -21,13 +21,15 @@
     "dependencies": {
         "@primevue/forms": "4.3.3",
         "arches": "archesproject/arches#dev/8.0.x",
-        "dayjs": "^1.11.13"
+        "dayjs": "^1.11.13",
+        "quill": "2.0.3"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.0.x"
     },
     "nodeModulesPaths": {},
     "overrides": {
+        "@primeuix/themes": "1.0.1",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7",

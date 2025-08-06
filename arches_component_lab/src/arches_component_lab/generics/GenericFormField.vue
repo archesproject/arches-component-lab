@@ -4,6 +4,7 @@ import { computed, useSlots, useTemplateRef } from "vue";
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
 
+import type { VNode } from "vue";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 
 const slots = useSlots();
@@ -25,8 +26,12 @@ const formFieldRef = useTemplateRef("formField");
 
 const derivedInitialValue = computed(() => {
     const defaultSlotNodes = slots.default?.();
-    const firstVNodeProps = defaultSlotNodes?.[0].props;
-
+    const firstVNode = defaultSlotNodes?.[0];
+    const formFieldNode = findDeclaredFormFieldNode(firstVNode) ?? firstVNode;
+    if (!formFieldNode) {
+        throw new Error();
+    }
+    const firstVNodeProps = formFieldNode.props;
     if (!firstVNodeProps) {
         return null;
     }
@@ -55,6 +60,11 @@ function internalResolver(event: FormFieldResolverOptions) {
         value = event.value;
     }
 
+    if (value === undefined) {
+        // e.g. language switcher interaction
+        return;
+    }
+
     internalValidate(value);
 
     // @ts-expect-error This is a bug with PrimeVue types
@@ -62,6 +72,26 @@ function internalResolver(event: FormFieldResolverOptions) {
     emit("update:value", value);
 
     return value;
+}
+
+function findDeclaredFormFieldNode(node?: VNode): VNode | undefined {
+    if (!node) {
+        return;
+    }
+    if (
+        node.props &&
+        (node.props["form-input"] === true || node.props["formInput"] === true)
+    ) {
+        return node;
+    }
+    if (Array.isArray(node.children)) {
+        for (const child of node.children) {
+            const found = findDeclaredFormFieldNode(child as VNode);
+            if (found) {
+                return found;
+            }
+        }
+    }
 }
 </script>
 
