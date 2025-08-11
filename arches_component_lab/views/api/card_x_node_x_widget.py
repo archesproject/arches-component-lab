@@ -58,6 +58,7 @@ class CardXNodeXWidgetView(View):
                 card=node.nodegroup.cardmodel_set.first(),
                 widget=default_widget,
                 config=default_widget.defaultconfig,
+                label=node.name,
             )
 
         serialized_widget = serialize_card_x_node_x_widget(
@@ -120,6 +121,7 @@ class CardXNodeXWidgetListFromNodegroupView(View):
                             card=node.nodegroup.cardmodel_set.first(),
                             widget=default_widget_definition,
                             config=default_widget_definition.defaultconfig,
+                            label=node.name,
                         )
                     )
 

@@ -1,8 +1,6 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.conf.urls.i18n import i18n_patterns
-from django.urls import include, path
+from django.urls import path
 
+from arches_component_lab.apps import ArchesComponentLabConfig
 from arches_component_lab.views.api.language import LanguageViewWithRequestLanguage
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.card_x_node_x_widget import (
@@ -16,54 +14,42 @@ from arches_querysets.rest_framework.generic_views import (
     ArchesTileListCreateView,
 )
 
+app_name = ArchesComponentLabConfig.name
+
 urlpatterns = [
     path(
-        "arches-component-lab/api/language",
+        "api/languages-with-request-language",
         LanguageViewWithRequestLanguage.as_view(),
         name="api-languages-with-request-language",
     ),
     path(
-        "arches-component-lab/api/relatable-resources/<slug:graph>/<slug:node_alias>",
+        "api/relatable-resources/<slug:graph>/<slug:node_alias>",
         RelatableResourcesView.as_view(),
         name="api-relatable-resources",
     ),
     path(
-        "arches-component-lab/api/card-x-node-x-widget-data/<slug:graph_slug>/<slug:node_alias>",
+        "api/card-x-node-x-widget-data/<slug:graph_slug>/<slug:node_alias>",
         CardXNodeXWidgetView.as_view(),
         name="api-card-x-node-x-widget",
     ),
     path(
-        "arches-component-lab/api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
+        "api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
     ),
     path(
-        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
         ArchesTileBlankView.as_view(),
         name="api-tile-blank",
     ),
     path(
-        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
         ArchesTileDetailView.as_view(),
         name="api-tile",
     ),
     path(
-        "arches-component-lab/api/tile-list-create/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        "api/tile-list-create/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
         ArchesTileListCreateView.as_view(),
         name="api-tile-list-create",
     ),
 ]
-
-# Ensure Arches core urls are superseded by project-level urls
-urlpatterns.append(path("", include("arches.urls")))
-
-# Adds URL pattern to serve media files during development
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
-# but handling i18n routes in multiple places causes application errors.
-if settings.ROOT_URLCONF == __name__:
-    if settings.SHOW_LANGUAGE_SWITCH is True:
-        urlpatterns = i18n_patterns(*urlpatterns)
-
-    urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
