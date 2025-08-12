@@ -26,7 +26,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     <InputText
         type="text"
         :fluid="true"
-        :model-value="value.node_value"
+        :model-value="value.node_value || ''"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
         @update:model-value="onUpdateModelValue($event)"
