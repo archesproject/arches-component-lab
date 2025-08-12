@@ -1,100 +1,100 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+// import { onMounted, ref } from "vue";
 
-import FileUpload from "primevue/fileupload";
+// import FileUpload from "primevue/fileupload";
 
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
-import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
-import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
+// import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
+// import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
+// import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import type { FormFieldResolverOptions } from "@primevue/forms";
-import type {
-    FileListCardXNodeXWidgetData,
-    FileListValue,
-    FileReference,
-} from "@/arches_component_lab/datatypes/file-list/types.ts";
-import type {
-    FileData,
-    PrimeVueFile,
-} from "@/arches_component_lab/widgets/FileListWidget/types.ts";
+// import type { FormFieldResolverOptions } from "@primevue/forms";
+// import type {
+//     FileListCardXNodeXWidgetData,
+//     FileListValue,
+//     FileReference,
+// } from "@/arches_component_lab/datatypes/file-list/types.ts";
+// import type {
+//     FileData,
+//     PrimeVueFile,
+// } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const props = defineProps<{
-    value: FileListValue;
-    nodeAlias: string;
-    cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-}>();
+// const props = defineProps<{
+//     value: FileListValue;
+//     nodeAlias: string;
+//     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
+// }>();
 
-const savedFiles = ref<FileReference[]>([]);
-const pendingFiles = ref<FileData[]>([]);
+// const savedFiles = ref<FileReference[]>([]);
+// const pendingFiles = ref<FileData[]>([]);
 
-const allowedFileTypes = ref();
-const currentValues = ref();
+// const allowedFileTypes = ref();
+// const currentValues = ref();
 
-onMounted(() => {
-    const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
-    allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
+// onMounted(() => {
+//     const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
+//     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    if (props.value) {
-        currentValues.value = props.value.node_value;
+//     if (props.value) {
+//         currentValues.value = props.value.node_value;
 
-        if (props.value.node_value) {
-            savedFiles.value = props.value.node_value.map((file) => {
-                return {
-                    ...file,
-                    node_id: props.cardXNodeXWidgetData.node.nodeid,
-                };
-            });
-        } else {
-            savedFiles.value = [];
-        }
-    }
-});
+//         if (props.value.node_value) {
+//             savedFiles.value = props.value.node_value.map((file) => {
+//                 return {
+//                     ...file,
+//                     node_id: props.cardXNodeXWidgetData.node.nodeid,
+//                 };
+//             });
+//         } else {
+//             savedFiles.value = [];
+//         }
+//     }
+// });
 
-function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
-    pendingFiles.value = event.files.map((file) => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        url: file.objectURL,
-        file: file,
-        node_id: props.cardXNodeXWidgetData.node.nodeid,
-    }));
+// function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
+//     pendingFiles.value = event.files.map((file) => ({
+//         name: file.name,
+//         size: file.size,
+//         type: file.type,
+//         url: file.objectURL,
+//         file: file,
+//         node_id: props.cardXNodeXWidgetData.node.nodeid,
+//     }));
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
-}
+//     (field as { onInput: (value: unknown) => void }).onInput({
+//         value: [...savedFiles.value, ...pendingFiles.value],
+//     });
+// }
 
-function onRemovePendingFile(
-    field: unknown,
-    fileIndex: number,
-    removeFileCallback: (index: number) => void,
-): void {
-    removeFileCallback(fileIndex);
-    pendingFiles.value.splice(fileIndex, 1);
+// function onRemovePendingFile(
+//     field: unknown,
+//     fileIndex: number,
+//     removeFileCallback: (index: number) => void,
+// ): void {
+//     removeFileCallback(fileIndex);
+//     pendingFiles.value.splice(fileIndex, 1);
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
-}
+//     (field as { onInput: (value: unknown) => void }).onInput({
+//         value: [...savedFiles.value, ...pendingFiles.value],
+//     });
+// }
 
-function onRemoveSavedFile(field: unknown, fileIndex: number): void {
-    savedFiles.value.splice(fileIndex, 1);
+// function onRemoveSavedFile(field: unknown, fileIndex: number): void {
+//     savedFiles.value.splice(fileIndex, 1);
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
-}
+//     (field as { onInput: (value: unknown) => void }).onInput({
+//         value: [...savedFiles.value, ...pendingFiles.value],
+//     });
+// }
 
-function transformValueForForm(event: FormFieldResolverOptions) {
-    return {
-        display_value: event.value,
-        node_value: event.value,
-        details: [],
-    };
-}
+// function transformValueForForm(event: FormFieldResolverOptions) {
+//     return {
+//         display_value: event.value,
+//         node_value: event.value,
+//         details: [],
+//     };
+// }
 </script>
-
+<!-- 
 <template>
     <GenericFormField
         v-bind="$attrs"
@@ -139,7 +139,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
             </FileUpload>
         </template>
     </GenericFormField>
-</template>
+</template> -->
 
 <style scoped>
 :deep(.p-fileupload-header) {

@@ -7,11 +7,8 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
-
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
@@ -25,6 +22,10 @@ const props = defineProps<{
     nodeAlias: string;
     graphSlug: string;
     value: ResourceInstanceListValue;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: ResourceInstanceListValue): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -134,86 +135,82 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function transformValueForForm(event: FormFieldResolverOptions) {
-    const options = event.value.map((resourceId: string) => {
+function onUpdateModelValue(updatedValue: string[]) {
+    const options = updatedValue.map((resourceId: string) => {
         return getOption(resourceId);
     });
-    return {
+
+    emit("update:value", {
         display_value: options
-            .map((option: ResourceInstanceReference) => option?.display_value)
+            .map((option: any) => option?.display_value)
             .join(", "),
-        node_value: event.value,
-        details: options,
-    };
+        node_value: updatedValue as any,
+        details: options as any,
+    });
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
+    <MultiSelect
+        display="chip"
+        option-label="display_value"
+        option-value="resource_id"
+        :filter="true"
+        :filter-placeholder="$gettext('Filter Resources')"
+        :fluid="true"
+        :loading="isLoading"
+        :model-value="initialValueFromTileData"
+        :options="options"
+        :placeholder="$gettext('Select Resources')"
+        :reset-filter-on-hide="true"
+        :virtual-scroller-options="{
+            itemSize: itemSize,
+            lazy: true,
+            loading: isLoading,
+            onLazyLoad: onLazyLoadResources,
+        }"
+        @filter="onFilter"
+        @before-show="getOptions(1)"
+        @update:model-value="onUpdateModelValue($event)"
     >
-        <MultiSelect
-            display="chip"
-            option-label="display_value"
-            option-value="resource_id"
-            :filter="true"
-            :filter-placeholder="$gettext('Filter Resources')"
-            :fluid="true"
-            :loading="isLoading"
-            :model-value="initialValueFromTileData"
-            :options="options"
-            :placeholder="$gettext('Select Resources')"
-            :reset-filter-on-hide="true"
-            :virtual-scroller-options="{
-                itemSize: itemSize,
-                lazy: true,
-                loading: isLoading,
-                onLazyLoad: onLazyLoadResources,
-            }"
-            @filter="onFilter"
-            @before-show="getOptions(1)"
-        >
-            <template #chip="slotProps">
-                <div style="width: 100%">
-                    <div class="chip-text">
-                        {{ getOption(slotProps.value)?.display_value }}
-                    </div>
+        <template #chip="slotProps">
+            <div style="width: 100%">
+                <div class="chip-text">
+                    {{ getOption(slotProps.value)?.display_value }}
                 </div>
-                <div class="button-container">
-                    <Button
-                        as="a"
-                        icon="pi pi-info-circle"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_report}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
-                        as="a"
-                        icon="pi pi-pencil"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
-                        icon="pi pi-times"
-                        variant="text"
-                        size="small"
-                        @click.stop="
-                            slotProps.removeCallback($event, slotProps.value)
-                        "
-                    />
-                </div>
-            </template>
-        </MultiSelect>
-    </GenericFormField>
+            </div>
+            <div class="button-container">
+                <Button
+                    as="a"
+                    icon="pi pi-info-circle"
+                    target="_blank"
+                    variant="text"
+                    size="small"
+                    style="text-decoration: none"
+                    :href="`${arches.urls.resource_report}${slotProps.value}`"
+                    @click.stop
+                />
+                <Button
+                    as="a"
+                    icon="pi pi-pencil"
+                    target="_blank"
+                    variant="text"
+                    size="small"
+                    style="text-decoration: none"
+                    :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                    @click.stop
+                />
+                <Button
+                    icon="pi pi-times"
+                    variant="text"
+                    size="small"
+                    @click.stop="
+                        slotProps.removeCallback($event, slotProps.value)
+                    "
+                />
+            </div>
+        </template>
+    </MultiSelect>
 </template>
 
 <style scoped>

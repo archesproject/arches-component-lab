@@ -4,11 +4,9 @@ import { ref, watchEffect } from "vue";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
 
 import DatePicker from "primevue/datepicker";
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     DateDatatypeCardXNodeXWidgetData,
     DateValue,
@@ -18,6 +16,10 @@ const props = defineProps<{
     value: DateValue;
     nodeAlias: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: DateValue): void;
 }>();
 
 type CoercedDate = Date | null;
@@ -35,8 +37,10 @@ watchEffect(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function transformValueForForm(event: FormFieldResolverOptions) {
-    const date = new Date(event.value);
+function onUpdateModelValue(updatedValue: string) {
+    const date = new Date(updatedValue);
+
+    let formValue;
 
     try {
         const formattedDate = formatDate(
@@ -44,36 +48,33 @@ function transformValueForForm(event: FormFieldResolverOptions) {
             props.cardXNodeXWidgetData.node.config.dateFormat,
         );
 
-        return {
+        formValue = {
             display_value: formattedDate,
             node_value: formattedDate,
             details: [],
         };
     } catch (_error) {
-        return {
-            display_value: event.value,
-            node_value: event.value,
+        formValue = {
+            display_value: updatedValue,
+            node_value: updatedValue,
             details: [],
         };
     }
+
+    emit("update:value", formValue);
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
-    >
-        <DatePicker
-            icon-display="input"
-            :date-format="dateFormat"
-            :fluid="true"
-            :manual-input="false"
-            :model-value="value.node_value as CoercedDate"
-            :show-time="shouldShowTime"
-            :show-seconds="shouldShowTime"
-            :show-icon="true"
-        />
-    </GenericFormField>
+    <DatePicker
+        icon-display="input"
+        :date-format="dateFormat"
+        :fluid="true"
+        :manual-input="false"
+        :model-value="value.node_value as CoercedDate"
+        :show-time="shouldShowTime"
+        :show-seconds="shouldShowTime"
+        :show-icon="true"
+        @update:model-value="onUpdateModelValue($event as unknown as string)"
+    />
 </template>
