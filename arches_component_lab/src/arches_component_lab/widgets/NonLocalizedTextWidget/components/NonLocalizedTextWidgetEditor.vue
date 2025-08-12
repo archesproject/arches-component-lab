@@ -14,9 +14,13 @@ const emit = defineEmits<{
 }>();
 
 function onUpdateModelValue(updatedValue: string | undefined) {
+    if (updatedValue === undefined) {
+        updatedValue = "";
+    }
+
     emit("update:value", {
-        display_value: updatedValue ?? "",
-        node_value: updatedValue ?? "",
+        display_value: updatedValue,
+        node_value: updatedValue,
         details: [],
     });
 }
