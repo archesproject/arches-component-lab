@@ -43,8 +43,9 @@ const {
 }>();
 
 const emit = defineEmits([
-    "update:widgetDirtyStates",
     "update:tileData",
+    "update:widgetDirtyStates",
+    "update:widgetFocusStates",
     "save",
     "reset",
 ]);
@@ -123,10 +124,13 @@ defineExpose({
                 :should-show-form-buttons="shouldShowFormButtons"
                 @save="emit('save', $event)"
                 @reset="emit('reset', $event)"
+                @update:tile-data="emit('update:tileData', $event)"
                 @update:widget-dirty-states="
                     emit('update:widgetDirtyStates', $event)
                 "
-                @update:tile-data="emit('update:tileData', $event)"
+                @update:widget-focus-states="
+                    emit('update:widgetFocusStates', $event)
+                "
             />
             <GenericCardViewer
                 v-else-if="mode === VIEW"

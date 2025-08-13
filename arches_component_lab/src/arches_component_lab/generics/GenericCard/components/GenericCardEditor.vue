@@ -55,8 +55,9 @@ const {
 }>();
 
 const emit = defineEmits([
-    "update:widgetDirtyStates",
     "update:tileData",
+    "update:widgetDirtyStates",
+    "update:widgetFocusStates",
     "save",
     "reset",
 ]);
@@ -85,6 +86,16 @@ const localWidgetDirtyStates = reactive(
             }
 
             return dirtyStatesMap;
+        },
+        {},
+    ),
+);
+
+const localWidgetFocusedStates = reactive(
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+        (focusedStatesMap, widgetDatum) => {
+            focusedStatesMap[widgetDatum.node.alias] = false;
+            return focusedStatesMap;
         },
         {},
     ),
@@ -141,8 +152,19 @@ watch(
     },
 );
 
+watch(
+    () => ({ ...localWidgetFocusedStates }),
+    (newFocusedMap) => {
+        emit("update:widgetFocusStates", newFocusedMap);
+    },
+);
+
 function onUpdateWidgetDirtyState(nodeAlias: string, isDirty: boolean) {
     localWidgetDirtyStates[nodeAlias] = isDirty;
+}
+
+function onUpdateWidgetFocusedState(nodeAlias: string, isFocused: boolean) {
+    localWidgetFocusedStates[nodeAlias] = isFocused;
 }
 
 function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
@@ -243,6 +265,12 @@ defineExpose({ save });
                     :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
                     @update:is-dirty="
                         onUpdateWidgetDirtyState(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
+                    @update:is-focused="
+                        onUpdateWidgetFocusedState(
                             cardXNodeXWidgetDatum.node.alias,
                             $event,
                         )

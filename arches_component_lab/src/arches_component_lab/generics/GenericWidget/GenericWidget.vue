@@ -41,7 +41,11 @@ const {
     value?: unknown | null | undefined;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits([
+    "update:isDirty",
+    "update:isFocused",
+    "update:value",
+]);
 
 const isLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
@@ -98,6 +102,8 @@ watchEffect(async () => {
         class="widget"
         :data-graph-slug="graphSlug"
         :data-node-alias="nodeAlias"
+        @focusin="() => emit('update:isFocused', true)"
+        @focusout="() => emit('update:isFocused', false)"
     >
         <Skeleton
             v-if="isLoading"
