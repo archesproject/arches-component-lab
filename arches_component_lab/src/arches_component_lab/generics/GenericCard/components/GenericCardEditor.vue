@@ -115,9 +115,9 @@ watch(
                 }
             }
 
-            await new Promise<void>((resolve) =>
-                requestAnimationFrame(() => resolve()),
-            );
+            await new Promise<void>((resolve) => {
+                return requestAnimationFrame(() => resolve());
+            });
         }
     },
     { immediate: true, flush: "post" },
