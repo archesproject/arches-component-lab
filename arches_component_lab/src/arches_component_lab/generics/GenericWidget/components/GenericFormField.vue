@@ -46,18 +46,10 @@ watch(
     (newValue, oldValue) => {
         if (newValue !== oldValue) {
             emit("update:value", newValue);
+            emit("update:isDirty", true);
         }
     },
     { deep: true },
-);
-
-watch(
-    () => formFieldRef.value?.field.states.dirty,
-    (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-            emit("update:isDirty", Boolean(newValue));
-        }
-    },
 );
 
 function markFormFieldAsDirty() {

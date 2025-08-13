@@ -22,6 +22,7 @@ const emit = defineEmits(["update:value"]);
 <template>
     <ResourceInstanceMultiselectWidgetEditor
         v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :value="value"

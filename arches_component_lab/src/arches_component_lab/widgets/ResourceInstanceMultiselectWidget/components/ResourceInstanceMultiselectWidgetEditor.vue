@@ -17,8 +17,10 @@ import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     value: ResourceInstanceListValue;
@@ -143,7 +145,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         return getOption(resourceId);
     });
 
-    const formattedValues = updatedValue.map((value) => {
+    const formattedNodeValues = updatedValue.map((value) => {
         return {
             inverseOntologyProperty: "",
             ontologyProperty: "",
@@ -152,13 +154,15 @@ function onUpdateModelValue(updatedValue: string[]) {
         };
     });
 
-    emit("update:value", {
+    const formattedValue = {
         display_value: options
             .map((option) => option?.display_value)
             .join(", "),
-        node_value: formattedValues,
+        node_value: formattedNodeValues,
         details: options ?? [],
-    });
+    };
+
+    emit("update:value", formattedValue);
 }
 </script>
 
@@ -170,6 +174,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
+        :input-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
         :model-value="initialValueFromTileData"
         :options="options"
