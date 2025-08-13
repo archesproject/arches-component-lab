@@ -12,17 +12,14 @@ import type {
     DateValue,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const props = defineProps<{
-    value: DateValue;
-    nodeAlias: string;
+const { value, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
+    value: DateValue;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DateValue): void;
 }>();
-
-type CoercedDate = Date | null;
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();
@@ -30,7 +27,7 @@ const dateFormat = ref();
 watchEffect(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            props.cardXNodeXWidgetData.node.config.dateFormat,
+            cardXNodeXWidgetData.node.config.dateFormat,
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
@@ -45,7 +42,7 @@ function onUpdateModelValue(updatedValue: string) {
     try {
         const formattedDate = formatDate(
             date,
-            props.cardXNodeXWidgetData.node.config.dateFormat,
+            cardXNodeXWidgetData.node.config.dateFormat,
         );
 
         formValue = {
@@ -70,8 +67,9 @@ function onUpdateModelValue(updatedValue: string) {
         icon-display="input"
         :date-format="dateFormat"
         :fluid="true"
+        :input-id="cardXNodeXWidgetData.node.alias"
         :manual-input="false"
-        :model-value="value.node_value as CoercedDate"
+        :model-value="new Date(value?.node_value as string) || null"
         :show-time="shouldShowTime"
         :show-seconds="shouldShowTime"
         :show-icon="true"

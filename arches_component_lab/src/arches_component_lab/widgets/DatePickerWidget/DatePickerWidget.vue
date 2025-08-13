@@ -25,7 +25,6 @@ const emit = defineEmits(["update:value"]);
     <DatePickerWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
     />
