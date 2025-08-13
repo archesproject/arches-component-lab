@@ -17,7 +17,10 @@ import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
@@ -118,7 +121,7 @@ watchEffect(async () => {
                 v-if="mode === EDIT"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
-                :value="widgetValue as any"
+                :value="widgetValue as AliasedNodeData"
                 @update:value="emit('update:value', $event)"
                 @update:is-dirty="emit('update:isDirty', $event)"
             >
