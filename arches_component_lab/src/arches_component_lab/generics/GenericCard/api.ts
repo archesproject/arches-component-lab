@@ -1,38 +1,29 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { extractFileEntriesFromPayload } from "@/arches_component_lab/cards/utils.ts";
+import { extractFileEntriesFromPayload } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
-
-export async function fetchTileStructure(
-    graphSlug: string,
-    nodegroupAlias: string,
-): Promise<AliasedTileData> {
-    const response = await fetch(
-        arches.urls.api_resource(graphSlug, nodegroupAlias),
-    );
-
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
-    }
-}
+import type {
+    AliasedTileData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export async function fetchTileData(
     graphSlug: string,
     nodegroupAlias: string,
-    tileId: string | null | undefined,
+    tileId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    const response = await fetch(
-        arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
-    );
+    let response;
+
+    if (tileId) {
+        response = await fetch(
+            arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
+        );
+    } else {
+        response = await fetch(
+            arches.urls.api_tile_blank(graphSlug, nodegroupAlias),
+        );
+    }
 
     try {
         const parsed = await response.json();
@@ -48,7 +39,7 @@ export async function fetchTileData(
 export async function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
     nodegroupAlias: string,
-): Promise<CardXNodeXWidget[]> {
+): Promise<CardXNodeXWidgetData[]> {
     const response = await fetch(
         arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
             graphSlug,

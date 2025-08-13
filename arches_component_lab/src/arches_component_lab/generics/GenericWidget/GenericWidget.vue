@@ -9,34 +9,35 @@ import {
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
-import GenericWidgetLabel from "@/arches_component_lab/generic/GenericWidget/components/GenericWidgetLabel.vue";
+import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/components/GenericWidgetLabel.vue";
 
-import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generic/GenericWidget/api.ts";
-import { getUpdatedComponentPath } from "@/arches_component_lab/generic/GenericWidget/utils.ts";
+import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
+
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const {
-    cardXNodeXWidgetData,
-    graphSlug,
-    mode,
-    nodeAlias,
-    shouldShowLabel = true,
-    value,
-} = defineProps<{
-    cardXNodeXWidgetData?: CardXNodeXWidget;
-    graphSlug: string;
-    mode: WidgetMode;
-    nodeAlias: string;
-    shouldShowLabel?: boolean;
-    value?: unknown | null | undefined;
-}>();
+const props = withDefaults(
+    defineProps<{
+        cardXNodeXWidgetData?: CardXNodeXWidgetData;
+        graphSlug: string;
+        mode: WidgetMode;
+        nodeAlias: string;
+        shouldShowLabel?: boolean;
+        value?: unknown | null | undefined;
+    }>(),
+    {
+        cardXNodeXWidgetData: undefined,
+        shouldShowLabel: true,
+        value: undefined,
+    },
+);
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const isLoading = ref(false);
-const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
+const resolvedCardXNodeXWidgetData = shallowRef(props.cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
 const widgetComponent = computed(() => {
@@ -44,13 +45,11 @@ const widgetComponent = computed(() => {
         return null;
     }
 
-    const updatedComponentPath = getUpdatedComponentPath(
-        resolvedCardXNodeXWidgetData.value.widget.component,
-    );
-
     return defineAsyncComponent(async () => {
         try {
-            return await import(`@/${updatedComponentPath}.vue`);
+            return await import(
+                `@/${removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component)}.vue`
+            );
         } catch (err) {
             configurationError.value = err as Error;
         }
@@ -58,8 +57,8 @@ const widgetComponent = computed(() => {
 });
 
 const widgetValue = computed(() => {
-    if (value !== undefined) {
-        return value;
+    if (props.value !== undefined) {
+        return props.value;
     } else if (resolvedCardXNodeXWidgetData.value) {
         return resolvedCardXNodeXWidgetData.value.config.defaultValue;
     } else {
@@ -76,8 +75,8 @@ watchEffect(async () => {
 
     try {
         resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            graphSlug,
-            nodeAlias,
+            props.graphSlug,
+            props.nodeAlias,
         );
     } catch (error) {
         configurationError.value = error as Error;
