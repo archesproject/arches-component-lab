@@ -2,9 +2,10 @@
 import InputText from "primevue/inputtext";
 
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-defineProps<{
-    nodeAlias: string;
+const { cardXNodeXWidgetData, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
     value: URLValue;
 }>();
 
@@ -13,9 +14,13 @@ const emit = defineEmits<{
 }>();
 
 function onUpdateModelValue(updatedValue: string | undefined) {
+    const formattedValue = {
+        url: updatedValue ?? "",
+        url_label: updatedValue ?? "",
+    };
     emit("update:value", {
-        display_value: updatedValue ?? "",
-        node_value: updatedValue ?? ("" as any),
+        display_value: JSON.stringify(formattedValue),
+        node_value: formattedValue,
         details: [],
     });
 }
@@ -26,6 +31,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         type="text"
         :fluid="true"
         :model-value="value.node_value?.url"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>
