@@ -92,32 +92,33 @@ const localWidgetDirtyStates = reactive(
 
 watch(
     () => selectedNodeAlias,
-    async () => {
+    async (nodeAlias) => {
+        if (!nodeAlias) return;
+
         await nextTick();
 
-        requestAnimationFrame(() => {
-            const widgetComponentRefs = genericWidgetRefs.value!;
-
-            if (!Array.isArray(widgetComponentRefs)) {
-                return;
-            }
+        // The loop guards against race conditions
+        for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
+            const widgetComponentRefs = genericWidgetRefs.value;
+            if (!Array.isArray(widgetComponentRefs)) return;
 
             for (const widgetComponentRef of widgetComponentRefs) {
                 const widgetRootElement = widgetComponentRef?.$el;
+                if (!widgetRootElement) continue;
 
-                if (
-                    widgetRootElement.getAttribute("data-node-alias") !==
-                    selectedNodeAlias
-                ) {
-                    continue;
-                }
-
-                const labeledControlElement = widgetRootElement.querySelector(
-                    `#${selectedNodeAlias}`,
+                const inputElementToFocus = widgetRootElement.querySelector(
+                    `#${nodeAlias}`,
                 );
-                labeledControlElement?.focus();
+                if (inputElementToFocus) {
+                    inputElementToFocus.focus();
+                    return;
+                }
             }
-        });
+
+            await new Promise<void>((resolve) =>
+                requestAnimationFrame(() => resolve()),
+            );
+        }
     },
     { immediate: true, flush: "post" },
 );
