@@ -34,35 +34,30 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        resources = ResourceInstance.objects.filter(graph_id__in=graphs).annotate(
-            order_field=Case(
-                When(resourceinstanceid__in=initial_values, then=Value(0)),
-                default=Value(1),
-            )
+        resources = ResourceInstance.objects.filter(graph_id__in=graphs).exclude(
+            resourceinstanceid__in=initial_values
         )
-
-        query_string = "descriptors__{}__name__icontains".format(language)
 
         if filter_term:
             resources = resources.filter(
-                Q(**{query_string: filter_term})
-                | Q(resourceinstanceid__in=initial_values)
+                Q(**{"descriptors__{}__name__icontains".format(language): filter_term})
             )
 
-        paginator = Paginator(
-            resources.order_by(
-                "order_field", "descriptors__{}__name".format(get_language())
-            ),
-            items_per_page,
-        )
-        page_object = paginator.get_page(page_number)
+        resources = resources.order_by("graph", "pk")
+        resources.count = lambda self=None: 1_000_000_000
+        paginator = Paginator(resources, items_per_page)
+
+        offset = (int(paginator.get_page(page_number).number) - 1) * int(items_per_page)
+        limit = (int(offset)) + int(items_per_page)
+
         data = [
             {
-                "resourceinstanceid": resource.resourceinstanceid,
-                "display_value": resource.descriptors[language]["name"],
-                "order_field": resource.order_field,
+                "resourceinstanceid": resource["resourceinstanceid"],
+                "display_value": resource["descriptors"][language]["name"],
             }
-            for resource in page_object
+            for resource in resources.order_by(
+                "descriptors__{}__name".format(language)
+            ).values("resourceinstanceid", "descriptors")[offset:limit]
         ]
 
         return JSONResponse(
