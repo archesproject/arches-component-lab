@@ -18,7 +18,7 @@ import type {
     ResourceInstanceResult,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const props = defineProps<{
+const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
     value: ResourceInstanceListValue;
@@ -41,8 +41,8 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (props.value?.details) {
-        return props.value.details.map((option) => {
+    if (value?.details) {
+        return value.details.map((option) => {
             return option.resource_id;
         });
     }
@@ -54,8 +54,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (props.value?.details) {
-        options.value = props.value.details;
+    if (value?.details) {
+        options.value = value.details;
     } else {
         options.value = [];
     }
@@ -68,11 +68,11 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
             page,
             filterTerm,
-            props.value?.details,
+            value?.details,
         );
 
         const references = resourceData.data.map(
@@ -131,8 +131,11 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceReference | undefined {
-    return options.value.find((option) => option.resource_id == value);
+function getOption(value: string): {
+    display_value: string;
+    resource_id: string;
+} {
+    return options.value.find((option) => option.resource_id == value)!;
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
@@ -140,12 +143,21 @@ function onUpdateModelValue(updatedValue: string[]) {
         return getOption(resourceId);
     });
 
+    const formattedValues = updatedValue.map((value) => {
+        return {
+            inverseOntologyProperty: "",
+            ontologyProperty: "",
+            resourceId: value ?? "",
+            resourceXresourceId: "",
+        };
+    });
+
     emit("update:value", {
         display_value: options
-            .map((option: any) => option?.display_value)
+            .map((option) => option?.display_value)
             .join(", "),
-        node_value: updatedValue as any,
-        details: options as any,
+        node_value: formattedValues,
+        details: options ?? [],
     });
 }
 </script>

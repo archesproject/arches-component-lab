@@ -16,7 +16,7 @@ defineProps<{
     value: ResourceInstanceValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>

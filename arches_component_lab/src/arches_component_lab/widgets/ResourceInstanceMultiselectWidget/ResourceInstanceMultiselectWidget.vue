@@ -16,7 +16,7 @@ defineProps<{
     value: ResourceInstanceListValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
@@ -26,7 +26,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
