@@ -1,3 +1,8 @@
+<!-- 
+ This is a one-off component because the Quill-based `Editor` 
+ component uses a non-labellable `div` for its input element
+ -->
+
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from "vue";
 
@@ -9,28 +14,31 @@ let removeWrapperFocusIn: (() => void) | null = null;
 let removeLabelPointerDown: (() => void) | null = null;
 
 function focusTextArea(wrapperElement: HTMLElement): void {
+    const maxFindFrames = 20;
     let framesTried = 0;
 
     const findTextArea = () => {
         const targetElement = wrapperElement.querySelector<HTMLElement>(
             '[contenteditable="true"]',
         );
-
         if (!targetElement) {
-            if (framesTried++ < 20) requestAnimationFrame(findTextArea);
+            if (framesTried++ < maxFindFrames)
+                requestAnimationFrame(findTextArea);
             return;
         }
 
         requestAnimationFrame(() => {
-            const selection = document.getSelection();
-            if (!selection) return;
+            requestAnimationFrame(() => {
+                const selection = document.getSelection();
+                if (!selection) return;
 
-            const range = document.createRange();
-            range.selectNodeContents(targetElement);
-            range.collapse(false);
+                const range = document.createRange();
+                range.selectNodeContents(targetElement);
+                range.collapse(false);
 
-            selection.removeAllRanges();
-            selection.addRange(range);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
         });
     };
 
