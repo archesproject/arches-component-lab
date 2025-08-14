@@ -2,7 +2,7 @@
 import { ref, watch, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import InputText from "primevue/inputtext";
+import Editor from "primevue/editor";
 import Select from "primevue/select";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
@@ -12,6 +12,7 @@ import type {
     Language,
 } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
+import FocusController from "./components/FocusController.vue";
 
 const { $gettext } = useGettext();
 
@@ -27,37 +28,41 @@ const emit = defineEmits<{
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
 const managedNodeValue = ref<StringValue["node_value"]>();
-const singleInputValue = ref<string>();
+const singleInputValue = ref<string>("");
 
 watchEffect(async () => {
     const response = (await fetchLanguages()) as {
         languages: Language[];
         request_language: string;
     };
+
     languages.value = response.languages;
+
     selectedLanguage.value =
-        languages.value.find(
-            (lang) => lang.code === response.request_language,
-        ) ?? response.languages[0];
+        languages.value.find((lang) => {
+            return lang.code === response.request_language;
+        }) ?? response.languages[0];
 });
 
 watch(languages, () => {
     const workingObject = { ...value.node_value };
-    for (const language of languages.value) {
-        if (!workingObject[language.code]) {
-            workingObject[language.code] = {
+
+    for (const knownLanguage of languages.value) {
+        if (!workingObject[knownLanguage.code]) {
+            workingObject[knownLanguage.code] = {
                 value: "",
-                direction: language.default_direction,
+                direction: knownLanguage.default_direction,
             };
         }
     }
+
     managedNodeValue.value = workingObject;
 });
 
 watch(selectedLanguage, () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
-            managedNodeValue.value[selectedLanguage.value.code].value;
+            managedNodeValue.value[selectedLanguage.value.code].value ?? "";
     } else {
         singleInputValue.value = "";
     }
@@ -83,7 +88,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <div style="display: flex; column-gap: 0.5rem">
+    <div style="display: flex; flex-direction: column; row-gap: 0.5rem">
         <Select
             v-model="selectedLanguage"
             :aria-label="$gettext('Select language for node value')"
@@ -95,16 +100,14 @@ function onUpdateModelValue(updatedValue: string | undefined) {
                 optionLabel: { style: { fontSize: '1rem' } },
             }"
         />
-        <InputText
-            type="text"
-            :fluid="true"
-            :form-input="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength"
-            :model-value="singleInputValue"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
-            :required="cardXNodeXWidgetData.node.isrequired"
-            @update:model-value="onUpdateModelValue($event)"
-        />
+        <FocusController :node-alias="cardXNodeXWidgetData.node.alias">
+            <Editor
+                :fluid="true"
+                :model-value="singleInputValue"
+                :placeholder="cardXNodeXWidgetData.config.placeholder ?? ''"
+                :required="cardXNodeXWidgetData.node.isrequired"
+                @update:model-value="onUpdateModelValue($event)"
+            />
+        </FocusController>
     </div>
 </template>
