@@ -5,29 +5,32 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
-
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
     ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
-    nodeAlias: string;
-    graphSlug: string;
-    value: ResourceInstanceValue | null | undefined;
-}>();
-
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeAlias: string;
+    graphSlug: string;
+    value: ResourceInstanceValue;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: ResourceInstanceValue): void;
+}>();
+
+const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -41,16 +44,6 @@ watchEffect(() => {
     getOptions(1);
 });
 
-function onFilter(event: SelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
-    } else {
-        options.value = [];
-    }
-
-    getOptions(1, event.value);
-}
-
 async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
@@ -60,7 +53,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details[0].resource_id,
+            value?.details?.[0]?.resource_id,
         );
 
         const references = resourceData.data.map(
@@ -85,6 +78,20 @@ async function getOptions(page: number, filterTerm?: string) {
     } finally {
         isLoading.value = false;
     }
+}
+
+function getOption(value: string): ResourceInstanceReference | undefined {
+    return options.value.find((option) => option.resource_id == value);
+}
+
+function onFilter(event: SelectFilterEvent) {
+    if (value?.details) {
+        options.value = value.details;
+    } else {
+        options.value = [];
+    }
+
+    getOptions(1, event.value);
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
@@ -119,42 +126,47 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceReference | undefined {
-    return options.value.find((option) => option.resource_id == value);
-}
+function onUpdateModelValue(updatedValue: string | null) {
+    const option = getOption(updatedValue!);
 
-function resolver(event: FormFieldResolverOptions) {
-    return getOption(event.value);
+    emit("update:value", {
+        display_value: option ? option.display_value : "",
+        node_value: updatedValue
+            ? {
+                  inverseOntologyProperty: "",
+                  ontologyProperty: "",
+                  resourceId: updatedValue,
+                  resourceXresourceId: "",
+              }
+            : null,
+        details: option ? [option] : [],
+    });
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :initial-value="value?.details[0].resource_id"
-        :resolver="resolver"
-    >
-        <Select
-            display="chip"
-            option-label="display_value"
-            option-value="resource_id"
-            :filter="true"
-            :filter-placeholder="$gettext('Filter Resources')"
-            :fluid="true"
-            :loading="isLoading"
-            :options="options"
-            :placeholder="$gettext('Select Resources')"
-            :reset-filter-on-hide="true"
-            :show-clear="true"
-            :virtual-scroller-options="{
-                itemSize: itemSize,
-                lazy: true,
-                loading: isLoading,
-                onLazyLoad: onLazyLoadResources,
-            }"
-            @filter="onFilter"
-            @before-show="getOptions(1)"
-        />
-    </GenericFormField>
+    <Select
+        display="chip"
+        option-label="display_value"
+        option-value="resource_id"
+        :filter="true"
+        :filter-placeholder="$gettext('Filter Resources')"
+        :fluid="true"
+        :label-id="cardXNodeXWidgetData.node.alias"
+        :loading="isLoading"
+        :model-value="value?.details?.[0]?.resource_id"
+        :options="options"
+        :placeholder="$gettext('Select Resources')"
+        :reset-filter-on-hide="true"
+        :show-clear="true"
+        :virtual-scroller-options="{
+            itemSize: itemSize,
+            lazy: true,
+            loading: isLoading,
+            onLazyLoad: onLazyLoadResources,
+        }"
+        @filter="onFilter"
+        @before-show="getOptions(1)"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 import FileUpload from "primevue/fileupload";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type {
     FileListCardXNodeXWidgetData,
     FileListValue,
+    FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type {
     FileData,
@@ -18,10 +17,16 @@ import type {
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: FileListValue | null | undefined;
+    value: FileListValue;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: FileListValue): void;
+}>();
+
+const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 
 const savedFiles = ref<FileReference[]>([]);
 const pendingFiles = ref<FileData[]>([]);
@@ -29,7 +34,7 @@ const pendingFiles = ref<FileData[]>([]);
 const allowedFileTypes = ref();
 const currentValues = ref();
 
-onMounted(() => {
+watchEffect(() => {
     const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
@@ -49,7 +54,20 @@ onMounted(() => {
     }
 });
 
-function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
+function emitUpdatedValue() {
+    const allFiles = [
+        ...savedFiles.value,
+        ...pendingFiles.value,
+    ] as FileReference[];
+
+    emit("update:value", {
+        display_value: JSON.stringify(allFiles),
+        node_value: allFiles,
+        details: [],
+    });
+}
+
+function onSelect(event: { files: PrimeVueFile[] }): void {
     pendingFiles.value = event.files.map((file) => ({
         name: file.name,
         size: file.size,
@@ -59,76 +77,66 @@ function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
         node_id: cardXNodeXWidgetData.node.nodeid,
     }));
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
+    emitUpdatedValue();
 }
 
 function onRemovePendingFile(
-    field: unknown,
     fileIndex: number,
     removeFileCallback: (index: number) => void,
 ): void {
     removeFileCallback(fileIndex);
     pendingFiles.value.splice(fileIndex, 1);
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
+    emitUpdatedValue();
 }
 
-function onRemoveSavedFile(field: unknown, fileIndex: number): void {
+function onRemoveSavedFile(fileIndex: number): void {
     savedFiles.value.splice(fileIndex, 1);
+    emitUpdatedValue();
+}
 
-    (field as { onInput: (value: unknown) => void }).onInput({
-        value: [...savedFiles.value, ...pendingFiles.value],
-    });
+function openFileChooser(): void {
+    // @ts-expect-error FileUpload does not have a type definition for $el
+    const rootElement = fileUploadRef.value?.$el;
+    rootElement?.querySelector('input[type="file"]')?.click();
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :initial-value="value?.node_value"
+    <FileUpload
+        ref="fileUploadRef"
+        :accept="allowedFileTypes"
+        :name="nodeAlias"
+        :model-value="value.node_value"
+        :multiple="true"
+        :show-cancel-button="false"
+        :show-upload-button="false"
+        :with-credentials="true"
+        :custom-upload="true"
+        @select="onSelect($event)"
     >
-        <template #default="$field">
-            <FileUpload
-                :accept="allowedFileTypes"
-                :name="nodeAlias"
-                :multiple="true"
-                :show-cancel-button="false"
-                :show-upload-button="false"
-                :with-credentials="true"
-                :custom-upload="true"
-                @select="onSelect($event, $field)"
-            >
-                <template #content="{ removeFileCallback }">
-                    <FileDropZone />
+        <template #content="{ removeFileCallback }">
+            <FileDropZone
+                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :open-file-chooser="openFileChooser"
+            />
 
-                    <FileList
-                        :files="pendingFiles as unknown as FileReference[]"
-                        @remove="
-                            (_fileReference, fileIndex) =>
-                                onRemovePendingFile(
-                                    $field,
-                                    fileIndex,
-                                    removeFileCallback,
-                                )
-                        "
-                    />
+            <FileList
+                :files="pendingFiles as unknown as FileReference[]"
+                @remove="
+                    (_fileReference, fileIndex) =>
+                        onRemovePendingFile(fileIndex, removeFileCallback)
+                "
+            />
 
-                    <FileList
-                        :files="savedFiles"
-                        @remove="
-                            (_fileReference, fileIndex) =>
-                                onRemoveSavedFile($field, fileIndex)
-                        "
-                    />
-                </template>
-            </FileUpload>
+            <FileList
+                :files="savedFiles"
+                @remove="
+                    (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
+                "
+            />
         </template>
-    </GenericFormField>
+    </FileUpload>
 </template>
 
 <style scoped>

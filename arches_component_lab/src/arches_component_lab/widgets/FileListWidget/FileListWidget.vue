@@ -15,10 +15,10 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-    value: FileListValue | null | undefined;
+    value: FileListValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
@@ -28,7 +28,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"

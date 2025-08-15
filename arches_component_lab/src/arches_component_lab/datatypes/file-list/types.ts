@@ -1,5 +1,5 @@
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 export interface FileReference {
     url: string;
@@ -20,8 +20,8 @@ export interface FileReference {
     description: string;
     title: string;
 }
-export interface FileListCardXNodeXWidgetData extends CardXNodeXWidget {
-    config: CardXNodeXWidget["config"] & {
+export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
         acceptedFiles: string;
         maxFiles: number;
         maxFilesize: number;
@@ -30,7 +30,7 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidget {
     };
 }
 
-export interface FileListValue extends AliasedTileNodeValue {
+export interface FileListValue extends AliasedNodeData {
     display_value: string;
     node_value: FileReference[];
     details: never[];

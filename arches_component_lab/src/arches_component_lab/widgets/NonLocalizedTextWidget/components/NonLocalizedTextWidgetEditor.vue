@@ -1,24 +1,38 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 
-import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-const { nodeAlias, value } = defineProps<{
-    nodeAlias: string;
-    value: NonLocalizedTextValue | null | undefined;
+const { cardXNodeXWidgetData, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    value: NonLocalizedTextValue;
 }>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: NonLocalizedTextValue): void;
+}>();
+
+function onUpdateModelValue(updatedValue: string | undefined) {
+    if (updatedValue === undefined) {
+        updatedValue = "";
+    }
+
+    emit("update:value", {
+        display_value: updatedValue,
+        node_value: updatedValue,
+        details: [],
+    });
+}
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :initial-value="value?.node_value"
-    >
-        <InputText
-            type="text"
-            :fluid="true"
-        />
-    </GenericFormField>
+    <InputText
+        type="text"
+        :fluid="true"
+        :model-value="value.node_value || ''"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>

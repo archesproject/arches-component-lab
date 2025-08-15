@@ -1,15 +1,32 @@
-export interface AliasedTileNodeValue {
+export interface AliasedNodeData {
     display_value: string;
     node_value: unknown;
     details: unknown[];
 }
 
-export interface CardXNodeXWidget {
+export type AliasedNodegroupData = AliasedTileData | AliasedTileData[] | null;
+
+export interface AliasedData {
+    [key: string]: AliasedNodeData | AliasedNodegroupData;
+}
+
+export interface AliasedTileData {
+    aliased_data: AliasedData;
+    nodegroup: string;
+    parenttile: string | null;
+    provisionaledits: object | null;
+    resourceinstance: string;
+    sortorder: number;
+    tileid: string | null;
+}
+
+export interface CardXNodeXWidgetData {
     card: {
         name: string;
     };
     config: {
         defaultValue: unknown | null;
+        placeholder?: string;
     };
     id: string;
     label: string;
@@ -21,7 +38,15 @@ export interface CardXNodeXWidget {
     sortorder: number;
     visible: boolean;
     widget: {
+        widgetid: string;
         component: string;
+    };
+}
+
+export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
+        maxLength: string | null;
+        placeholder: string | null;
     };
 }
 
@@ -33,19 +58,3 @@ export interface Language {
     name: string;
     scope: string;
 }
-
-export interface Label {
-    value: string;
-    language_id: string;
-    valuetype_id: string;
-}
-
-export interface WithLabels {
-    labels: Label[];
-}
-
-export interface WithValues {
-    values: Label[];
-}
-
-export type Labellable = WithLabels | WithValues;

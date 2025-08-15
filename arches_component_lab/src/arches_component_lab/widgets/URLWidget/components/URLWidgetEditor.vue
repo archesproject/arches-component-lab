@@ -4,59 +4,42 @@ import { useGettext } from "vue3-gettext";
 
 import InputText from "primevue/inputtext";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const { $gettext } = useGettext();
 
-const { nodeAlias, value } = defineProps<{
-    nodeAlias: string;
-    value: URLValue | null | undefined;
+const { cardXNodeXWidgetData, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    value: URLValue;
 }>();
 
 const url_label = ref(value?.node_value?.url_label || "");
 const url = ref(value?.node_value?.url || "");
 
-function resolver() {
-    if (!url.value) {
-        return null;
-    }
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: URLValue): void;
+}>();
 
-    return {
-        url_label: url_label.value,
-        url: url.value,
+function onUpdateModelValue(updatedValue: string | undefined) {
+    const formattedValue = {
+        url: updatedValue ?? "",
+        url_label: updatedValue ?? "",
     };
+    emit("update:value", {
+        display_value: JSON.stringify(formattedValue),
+        node_value: formattedValue,
+        details: [],
+    });
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :initial-value="value"
-        :resolver="resolver"
-    >
-        <div>url label</div>
-        <InputText
-            v-model="url_label"
-            type="text"
-            :placeholder="$gettext('Enter URL label...')"
-            :fluid="true"
-        />
-        <div>url</div>
-        <InputText
-            v-model="url"
-            type="text"
-            :required="true"
-            :placeholder="$gettext('Enter URL...')"
-            :fluid="true"
-        />
-        <div>preview</div>
-        <a
-            v-if="url"
-            :href="url"
-        >
-            {{ url_label || url }}
-        </a>
-    </GenericFormField>
+    <InputText
+        type="text"
+        :fluid="true"
+        :model-value="value.node_value?.url ?? ''"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>

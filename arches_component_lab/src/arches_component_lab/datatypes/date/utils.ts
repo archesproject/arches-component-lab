@@ -1,12 +1,13 @@
 import dayjs from "dayjs";
 
-export function formatDate(
-    date: Date | null,
-    dateFormat: string,
-): string | null {
+export function formatDate(date: Date | null, dateFormat: string): string {
     if (!date) {
-        return null;
+        return "";
     }
 
-    return dayjs(date).format(dateFormat);
+    if (isNaN(date.getTime())) {
+        throw new Error("Invalid date");
+    } else {
+        return dayjs(date).format(dateFormat);
+    }
 }
