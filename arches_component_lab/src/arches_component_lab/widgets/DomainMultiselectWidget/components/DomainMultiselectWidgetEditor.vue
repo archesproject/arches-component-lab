@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import Select from "primevue/select";
+import MultiSelect from "primevue/multiselect";
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
@@ -12,7 +12,7 @@ import type { DomainValue, DomainOption } from "@/arches_component_lab/datatypes
 const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
-    value: DomainValue;
+    value: DomainValue[];
 }>();
 
 const options = ref<DomainOption[]>(props.cardXNodeXWidgetData.node.config.options);
@@ -35,7 +35,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <Select
+    <MultiSelect
         option-value="id"
         option-label="text"
         :options="options"

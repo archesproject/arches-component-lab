@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import Select from "primevue/select";
+import RadioButton from 'primevue/radiobutton';
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
@@ -35,13 +35,15 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <Select
-        option-value="id"
-        option-label="text"
-        :options="options"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
-        :fluid="true"
-        :model-value="value.node_value"
-        @update:model-value="onUpdateModelValue($event)"
-    />
+    <div class="flex flex-wrap gap-4">
+        <div v-for="option in options" :key="option.id">
+            <RadioButton
+                :input-id="option.id"
+                name="dynamic"
+                :model-value="option.id"
+                @update:model-value="onUpdateModelValue($event)"
+            />
+            <label :for="option.id">{{ option.text }}</label>
+        </div>
+    </div>
 </template>

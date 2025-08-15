@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import Select from "primevue/select";
+import Checkbox from 'primevue/checkbox';
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
@@ -35,13 +35,15 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <Select
-        option-value="id"
-        option-label="text"
-        :options="options"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
-        :fluid="true"
-        :model-value="value.node_value"
-        @update:model-value="onUpdateModelValue($event)"
-    />
+    <div class="flex flex-wrap gap-4">
+        <div v-for="option of options" :key="option.id" class="flex items-center gap-2">
+            <Checkbox
+                :input-id="option.id"
+                name="option"
+                :model-value="option.id"
+                @update:model-value="onUpdateModelValue($event)"
+            />
+            <label :for="option.id">{{ option.text }}</label>
+        </div>
+    </div>
 </template>
