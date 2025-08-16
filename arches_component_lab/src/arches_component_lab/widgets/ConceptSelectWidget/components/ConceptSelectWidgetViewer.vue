@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import { computed } from "vue";
+import { useGettext } from "vue3-gettext";
 
 const props = defineProps<{
-    value?: ConceptValue | string;
+    value?: ConceptValue;
 }>();
+
+const { $gettext } = useGettext();
 
 const dataValue = computed(() =>
     !props.value
-        ? { display_value: "Unknown", node_value: "Unknown" }
-        : typeof props.value === "string"
-          ? { display_value: props.value, node_value: props.value }
-          : (props.value as ConceptValue),
+        ? {
+              display_value: $gettext("Unknown"),
+              node_value: $gettext("Unknown"),
+          }
+        : (props.value as ConceptValue),
 );
 </script>
 <template>

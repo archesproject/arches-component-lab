@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import { fetchConcepts } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     ConceptValue,
-    ConceptOption,
     ConceptFetchResult,
+    CollectionItem,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
-import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
+import {
+    convertConceptOptionToFormValue,
+    flattenCollectionItems,
+} from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
@@ -27,7 +30,7 @@ const flexDirection = computed(() =>
     props.groupDirection === "column" ? "flex-column" : "flex-row gap-2",
 );
 
-const options = ref<ConceptOption[]>([]);
+const options = ref<CollectionItem[]>([]);
 const selectedId = ref<string | null>(
     !props.value
         ? null
@@ -37,36 +40,23 @@ const selectedId = ref<string | null>(
 );
 
 const isLoading = ref(false);
-const optionsPage = ref(0);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
-const hasMore = ref<boolean>(true);
 
-onMounted(async () => {
-    while (hasMore.value) await getOptions(optionsPage.value + 1);
+watchEffect(() => {
+    getOptions();
 });
 
-async function getOptions(page: number, filterTerm?: string) {
+async function getOptions() {
     try {
         isLoading.value = true;
-        const fetchedData: ConceptFetchResult = await fetchConcepts(
+        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
             props.graphSlug,
             props.nodeAlias,
-            page,
-            filterTerm,
         );
 
-        if (optionsPage.value === 0) {
-            options.value = fetchedData.results as ConceptOption[];
-            optionsPage.value = 1;
-        } else {
-            options.value = [
-                ...options.value,
-                ...(fetchedData.results as ConceptOption[]),
-            ];
-        }
+        options.value = flattenCollectionItems(fetchedData.results);
 
-        hasMore.value = fetchedData.more;
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -95,15 +85,15 @@ function transformValueForForm(
         >
             <div
                 v-for="option in options"
-                :key="option.id"
+                :key="option.key"
                 class="flex items-center gap-2 flex-row"
             >
                 <RadioButton
-                    :input-id="option.id"
-                    :value="option.id"
+                    :input-id="option.key"
+                    :value="option.key"
                     size="small"
                 />
-                <label :for="option.id">{{ option.text }}</label>
+                <label :for="option.key">{{ option.label }}</label>
             </div>
         </RadioButtonGroup>
     </GenericFormField>

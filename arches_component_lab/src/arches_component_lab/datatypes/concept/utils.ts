@@ -1,49 +1,63 @@
-import type { ConceptOption, CollectionItem } from "./types";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type { CollectionItem, ConceptListValue } from "./types";
 
 function getOption(
     value: string,
-    options: ConceptOption[] | CollectionItem[],
-): ConceptOption | CollectionItem | null | undefined {
-    if (!Object.hasOwn(options[0], "key")) {
-        return options.find((option) => (option as ConceptOption).id == value);
-    } // It's a collectionItem
-    else {
-        function findNode(
-            tree: CollectionItem[],
-            predicate: (object: CollectionItem) => boolean,
-        ): CollectionItem | null {
-            for (const node of tree) {
-                if (predicate(node)) return node;
-                if (node.children) {
-                    const result = findNode(node.children, predicate);
-                    if (result) return result;
-                }
+    options: CollectionItem[],
+): CollectionItem | null | undefined {
+    function findNode(
+        tree: CollectionItem[],
+        predicate: (object: CollectionItem) => boolean,
+    ): CollectionItem | null {
+        for (const node of tree) {
+            if (predicate(node)) return node;
+            if (node.children) {
+                const result = findNode(node.children, predicate);
+                if (result) return result;
             }
-            return null;
         }
-        return findNode(
-            options as CollectionItem[],
-            (option: CollectionItem) => option.key == value,
-        );
+        return null;
     }
+    return findNode(
+        options as CollectionItem[],
+        (option: CollectionItem) => option.key == value,
+    );
 }
 
 export function convertConceptOptionToFormValue(
     conceptOptionId: string,
-    options: ConceptOption[] | CollectionItem[],
-): AliasedNodeData {
+    options: CollectionItem[],
+): ConceptListValue {
     const option = getOption(conceptOptionId, options);
 
-    return Object.hasOwn(options[0], "id")
-        ? {
-              display_value: option ? (option as ConceptOption).text : "",
-              node_value: conceptOptionId ? [conceptOptionId] : [],
-              details: option ? [option] : [],
-          }
-        : {
-              display_value: option ? (option as CollectionItem).label : "",
-              node_value: conceptOptionId ? [conceptOptionId] : [],
-              details: option ? [option] : [],
-          };
+    return {
+        display_value: option ? (option as CollectionItem).label : "",
+        node_value: conceptOptionId ? [conceptOptionId] : [],
+        details: option ? [option] : [],
+    };
+}
+
+
+/**
+ * Flatten a tree of CollectionItem objects into a single array.
+ *
+ * @param items - The hierarchical list.
+ * @returns A flat array of all items (with empty children arrays).
+ */
+export function flattenCollectionItems(items: CollectionItem[]): CollectionItem[] {
+    const result: CollectionItem[] = [];
+
+    function recurse(nodes: CollectionItem[]): void {
+        for (const node of nodes) {
+            // Push a copy without the original children
+            const { children, ...rest } = node;
+            result.push({ ...rest, children: [] });
+
+            if (children && children.length > 0) {
+                recurse(children);
+            }
+        }
+    }
+
+    recurse(items);
+    return result;
 }

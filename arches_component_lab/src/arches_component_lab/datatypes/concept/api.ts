@@ -1,62 +1,16 @@
 import arches from "arches";
 
-import type {
-    ConceptFetchResult,
-    ConceptOption,
-} from "@/arches_component_lab/datatypes/concept/types.ts";
-
-export const fetchConcepts = async (
-    graphSlug: string,
-    nodeAlias: string,
-    page: number,
-    filterTerm?: string,
-    initialValues?: ConceptOption[] | null | undefined,
-): Promise<ConceptFetchResult> => {
-    const params = new URLSearchParams();
-
-    params.append("page", page.toString());
-    if (filterTerm) {
-        params.append("filter_term", filterTerm);
-    }
-    initialValues?.forEach((initialValue) =>
-        params.append("initialValue", initialValue.id),
-    );
-    const response = await fetch(
-        `${arches.urls.api_concepts_flat(graphSlug, nodeAlias)}?${params}`,
-    );
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return ({ total_results: parsed.length } = parsed);
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
-    }
-};
-
+import type { ConceptFetchResult } from "@/arches_component_lab/datatypes/concept/types.ts";
 /*
- * @todo - Currently not paging results
  * @param graphSlug
  * @param nodeAlias
- * @param page
- * @param filterTerm
- * @param initialValues
  */
 export const fetchConceptsTree = async (
     graphSlug: string,
     nodeAlias: string,
-    page: number,
-    filterTerm?: string,
 ): Promise<ConceptFetchResult> => {
-    const params = new URLSearchParams();
-
-    // params.append("page", page.toString());
-    if (filterTerm) {
-        params.append("filter_term", filterTerm);
-    }
     const response = await fetch(
-        `${arches.urls.api_concepts_tree(graphSlug, nodeAlias)}?${params}`,
+        `${arches.urls.api_concepts_tree(graphSlug, nodeAlias)}`,
     );
 
     const parsed = await response.json();
