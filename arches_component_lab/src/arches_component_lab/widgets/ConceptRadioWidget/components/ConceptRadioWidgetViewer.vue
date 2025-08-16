@@ -2,18 +2,20 @@
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import { computed } from "vue";
 
+import { useGettext } from "vue3-gettext";
+
 const props = defineProps<{
-    value?: string | ConceptValue | null;
+    value?:  ConceptValue;
 }>();
+
+const { $gettext } = useGettext();
 
 const dataValue = computed(() =>
     !props.value
-        ? { display_value: "Unknown", node_value: "Unknown" }
-        : typeof props.value === "string"
-          ? { display_value: props.value, node_value: props.value }
-          : (props.value as ConceptValue),
+        ? { display_value: $gettext("Unknown"), node_value: $gettext("Unknown") }
+          : props.value
 );
 </script>
 <template>
-    <div :key="dataValue.node_value?.[0]">{{ dataValue.display_value }}</div>
+    <div :key="dataValue.node_value">{{ dataValue.display_value }}</div>
 </template>

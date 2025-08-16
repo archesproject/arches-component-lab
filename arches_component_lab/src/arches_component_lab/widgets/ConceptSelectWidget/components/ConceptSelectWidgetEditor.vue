@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
@@ -22,44 +22,36 @@ const props = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     multiSelect?: boolean;
-    value?: ConceptValue | string;
+    value?: ConceptValue;
 }>();
 
 const { $gettext } = useGettext();
 
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
-const optionsPage = ref(0);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
-const hasMore = ref<boolean>(true);
 
-watchEffect(() => {
-    getOptions(1);
+const initialValue = computed<Record<string, boolean>>(() => {
+    if (options.value.length === 0 || !props?.value?.node_value) return {};
+    return { [props?.value?.node_value]: true };
 });
 
-async function getOptions(page: number, filterTerm?: string) {
+watchEffect(() => {
+    getOptions();
+});
+
+async function getOptions() {
     try {
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
             props.graphSlug,
             props.nodeAlias,
-            page,
-            filterTerm,
         );
 
-        if (optionsPage.value == 0) {
-            options.value = fetchedData.results as CollectionItem[];
-            optionsPage.value = 1;
-        } else {
-            options.value = [
-                ...options.value,
-                ...(fetchedData.results as CollectionItem[]),
-            ];
-        }
+        options.value = fetchedData.results as CollectionItem[];
 
-        hasMore.value = fetchedData.more;
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -95,6 +87,7 @@ function transformValueForForm(
             selection-mode="single"
             :fluid="true"
             :loading="isLoading"
+            :model-value="initialValue"
             :options
             :placeholder="$gettext('Select Concept')"
             :reset-filter-on-hide="true"

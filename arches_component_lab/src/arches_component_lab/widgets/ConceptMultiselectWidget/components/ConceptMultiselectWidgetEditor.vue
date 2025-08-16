@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import type { Ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
@@ -16,12 +16,11 @@ import type {
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    value?: ConceptListValue | string[] | null | undefined;
+    value?: ConceptListValue;
 }>();
 
 const selectedConcepts = ref<string[]>([]);
@@ -38,37 +37,39 @@ const { $gettext } = useGettext();
 
 const options: Ref<CollectionItem[]> = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
-const optionsPage = ref(0);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const hasMore = ref<boolean>(true);
 
-watchEffect(() => {
-    getOptions(1);
+const initialValue = computed<Record<string, boolean>>(() => {
+    if (options.value.length == 0) return {};
+    return props?.value?.node_value
+        ? props.value.node_value.reduce(
+              (acc: Record<string, boolean>, item: string) => {
+                  acc[item] = true;
+                  return acc;
+              },
+              {},
+          )
+        : {};
 });
 
-async function getOptions(page: number, filterTerm?: string) {
+watchEffect(() => {
+    getOptions();
+});
+
+async function getOptions() {
     try {
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
             props.graphSlug,
             props.nodeAlias,
-            page,
-            filterTerm,
         );
 
-        if (optionsPage.value == 0) {
-            options.value = fetchedData.results as CollectionItem[];
-            optionsPage.value = 1;
-        } else {
-            options.value = [
-                ...options.value,
-                ...(fetchedData.results as CollectionItem[]),
-            ];
-        }
+        options.value = fetchedData.results as CollectionItem[];
 
-        hasMore.value = fetchedData.more;
+        hasMore.value = false;
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -79,7 +80,7 @@ async function getOptions(page: number, filterTerm?: string) {
 
 function transformValueForForm(
     event: FormFieldResolverOptions,
-): AliasedNodeData {
+): ConceptListValue {
     if (!event.value || Object.keys(event.value).length == 0) {
         return {
             display_value: "",
@@ -87,14 +88,14 @@ function transformValueForForm(
             details: [],
         };
     }
-    const allOptions: AliasedNodeData[] = Object.keys(event.value).map(
+    const allOptions: ConceptListValue[] = Object.keys(event.value).map(
         (key) => {
             return convertConceptOptionToFormValue(key, options.value);
         },
     );
     return {
         display_value: allOptions
-            .map((option: AliasedNodeData) => option.display_value)
+            .map((option: ConceptListValue) => option.display_value)
             .join(", "),
         node_value: allOptions.map(
             (option) => (option.node_value as string[])[0],
@@ -115,6 +116,7 @@ function transformValueForForm(
             selection-mode="multiple"
             :fluid="true"
             :loading="isLoading"
+            :model-value="initialValue"
             :options
             :placeholder="$gettext('Select Concepts')"
         >

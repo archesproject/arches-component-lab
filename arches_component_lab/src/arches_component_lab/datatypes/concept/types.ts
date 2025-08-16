@@ -2,18 +2,8 @@ import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 export interface ConceptFetchResult {
     more: boolean;
-    results: ConceptOption[] | CollectionItem[];
+    results: CollectionItem[];
     total_results: number;
-}
-// For v7 Concepts
-export interface ConceptOption {
-    collector: string;
-    conceptid: string;
-    depth: number;
-    id: string;
-    language: string;
-    text: string;
-    type: string;
 }
 
 export interface CollectionItem {
