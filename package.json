@@ -22,7 +22,8 @@
         "@primevue/forms": "4.3.3",
         "arches": "archesproject/arches#dev/8.0.x",
         "dayjs": "^1.11.13",
-        "quill": "2.0.3"
+        "quill": "2.0.3",
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.0.x"

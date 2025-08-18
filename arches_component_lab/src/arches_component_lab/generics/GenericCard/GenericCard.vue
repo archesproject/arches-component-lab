@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { v4 as uuidv4 } from "uuid";
 import { ref, useTemplateRef, watchEffect } from "vue";
 
 import Message from "primevue/message";
@@ -78,6 +79,7 @@ watchEffect(async () => {
             );
             if (!tileId && resourceInstanceId) {
                 aliasedTileData.value.resourceinstance = resourceInstanceId;
+                aliasedTileData.value.tileid = uuidv4();
             }
         }
 
