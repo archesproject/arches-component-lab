@@ -3,7 +3,7 @@ import type { CollectionItem, ConceptValue } from "@/arches_component_lab/dataty
 export function getOption(
     value: string,
     options: CollectionItem[],
-): CollectionItem | null | undefined {
+): CollectionItem | null {
     function findNode(
         tree: CollectionItem[],
         predicate: (object: CollectionItem) => boolean,
@@ -24,15 +24,15 @@ export function getOption(
 }
 
 export function convertConceptOptionToFormValue(
-    conceptOptionId: string | null,
+    conceptOptionId: Record<string, boolean> | null,
     options: CollectionItem[],
 ): ConceptValue {
-    if (!conceptOptionId) return blankConceptValue();
-    const option = getOption(conceptOptionId, options);
+    if (!conceptOptionId || !Object.keys(conceptOptionId).length) return blankConceptValue();
+    const option = getOption(Object.keys(conceptOptionId)[0], options);
 
     return {
         display_value: option ? (option as CollectionItem).label : "",
-        node_value: conceptOptionId,
+        node_value: option?.key ?? null,
         details: option ? [option] : [],
     };
 }
