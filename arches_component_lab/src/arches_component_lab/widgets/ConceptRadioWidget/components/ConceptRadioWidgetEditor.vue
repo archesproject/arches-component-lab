@@ -77,13 +77,13 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     <RadioButtonGroup
         :model-value="selectedId"
         :name="nodeAlias"
-        :class="['flex flex-wrap', flexDirection]"
+        :class="['button-group', flexDirection]"
         @update:model-value="onUpdateModelValue"
     >
         <div
             v-for="option in options"
             :key="option.key"
-            class="flex items-center gap-2 flex-row"
+            class="radio-options"
         >
             <RadioButton
                 :input-id="option.key"
@@ -96,14 +96,33 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
 </template>
 
 <style scoped>
+.p-radiobutton {
+    margin-right: 0.5rem;
+}
+
+label {
+    all: unset;
+}
+.button-group {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1.5rem;
+    row-gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.radio-options {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
 .flex-column {
     flex-direction: column;
 }
 .flex-row {
     flex-direction: row;
-    margin-right: 1rem;
+    align-items: center;
 }
-
 .flex-row > .p-radiobutton,
 .flex-column > .p-radiobutton {
     vertical-align: top;
