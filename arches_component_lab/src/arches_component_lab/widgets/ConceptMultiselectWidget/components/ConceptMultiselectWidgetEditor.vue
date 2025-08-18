@@ -29,29 +29,20 @@ const { $gettext } = useGettext();
 
 const options: Ref<CollectionItem[]> = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
+const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
 
 const initialValue = computed<string[]>(() => {
     if (!options.value || options.value.length === 0) return [];
-    // const selectedConcepts = props.value.node_value || [];
     return (props.aliasedNodeData.node_value || []);
-    // return selectedConcepts.reduce(
-    //           (acc: Record<string, boolean>, item: string) => {
-    //               acc[item] = true;
-    //               return acc;
-    //           },
-    //           {},
-    //       );
 });
-
-// watchEffect(() => {
-//     getOptions();
-// });
 
 async function getOptions() {
     try {
+        if (optionsLoaded.value)
+            return;
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
@@ -66,6 +57,7 @@ async function getOptions() {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        optionsLoaded.value = true;
     }
 }
 

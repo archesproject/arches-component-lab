@@ -1,4 +1,7 @@
-import type { CollectionItem, ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type {
+    CollectionItem,
+    ConceptValue,
+} from "@/arches_component_lab/datatypes/concept/types.ts";
 
 export function getOption(
     value: string,
@@ -24,11 +27,17 @@ export function getOption(
 }
 
 export function convertConceptOptionToFormValue(
-    conceptOptionId: Record<string, boolean> | null,
+    conceptOption: Record<string, boolean> | string | null,
     options: CollectionItem[],
 ): ConceptValue {
-    if (!conceptOptionId || !Object.keys(conceptOptionId).length) return blankConceptValue();
-    const option = getOption(Object.keys(conceptOptionId)[0], options);
+    const conceptOptionId =
+        typeof conceptOption === "string" ||
+        typeof conceptOption === "undefined"
+            ? conceptOption
+            : Object.keys(conceptOption as Record<string, boolean>)?.[0];
+    if (!conceptOptionId)
+        return blankConceptValue();
+    const option = getOption(conceptOptionId, options);
 
     return {
         display_value: option ? (option as CollectionItem).label : "",

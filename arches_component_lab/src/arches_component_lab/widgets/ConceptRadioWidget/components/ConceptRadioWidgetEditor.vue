@@ -35,6 +35,7 @@ const options = ref<CollectionItem[]>([]);
 const selectedId = ref<string | null>(props.aliasedNodeData.node_value);
 
 const isLoading = ref(false);
+const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
@@ -44,6 +45,8 @@ watchEffect(() => {
 
 async function getOptions() {
     try {
+        if (optionsLoaded.value)
+            return;
         isLoading.value = true;
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
             props.graphSlug,
@@ -57,10 +60,11 @@ async function getOptions() {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        optionsLoaded.value = true;
     }
 }
 
-function onUpdateModelValue(selectedOption: string | null) {
+function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     const formattedValue: ConceptValue = convertConceptOptionToFormValue(
         selectedOption,
         options.value,

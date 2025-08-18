@@ -29,28 +29,19 @@ const { $gettext } = useGettext();
 
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
+const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-// const initialValue = computed<Record<string, boolean>>(() => {
-//     if (options.value.length === 0 || !props?.value?.node_value) return {};
-//     return { [props?.value?.node_value]: true };
-// });
-
-// const initialValue = ref<string | null>(null);
-const initialValue = computed<string>(() => {
-    if (options.value.length === 0 || !aliasedNodeData?.node_value) return null;
-    return aliasedNodeData.node_value;
-});
-
-watchEffect(() => {
-    getOptions();
-    // if (options.value.length > 0 || !aliasedNodeData?.node_value)
-    //     initialValue.value =  aliasedNodeData.node_value;
+const initialValue = computed<Record<string, boolean>>(() => {
+    if (options.value.length === 0 || !aliasedNodeData?.node_value) return {};
+    return { [aliasedNodeData.node_value]: true };
 });
 
 async function getOptions() {
     try {
+        if (optionsLoaded.value)
+            return;
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
@@ -65,10 +56,11 @@ async function getOptions() {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        optionsLoaded.value = true;
     }
 }
 
-function onUpdateModelValue(selectedOption: string | null) {
+function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     const formattedValue =  convertConceptOptionToFormValue(selectedOption, options.value);
     emit("update:value", formattedValue);
 }
@@ -86,6 +78,7 @@ function onUpdateModelValue(selectedOption: string | null) {
         :placeholder="$gettext('Select Concept')"
         :reset-filter-on-hide="true"
         @update:model-value="onUpdateModelValue"
+        @before-show="getOptions"
     >
     </TreeSelect>
 </template>
