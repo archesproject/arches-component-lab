@@ -139,6 +139,7 @@ watchEffect(async () => {
                     :mode="mode"
                     :node-alias="nodeAlias"
                     :aliased-node-data="widgetValue"
+                    v-bind="$attrs"
                     @update:value="emit('update:value', $event)"
                     @update:is-dirty="emit('update:isDirty', $event)"
                 />
@@ -153,6 +154,7 @@ watchEffect(async () => {
                 :mode="mode"
                 :node-alias="nodeAlias"
                 :aliased-node-data="widgetValue"
+                v-bind="$attrs"
             />
         </template>
     </div>
