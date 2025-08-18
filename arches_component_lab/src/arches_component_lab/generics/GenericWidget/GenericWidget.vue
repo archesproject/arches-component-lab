@@ -22,6 +22,7 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import { loadWidget } from "@/arches_component_lab/generics/GenericWidget/vite-widget-loader.ts";
 
 const {
     cardXNodeXWidgetData,
@@ -58,11 +59,20 @@ const widgetComponent = computed(() => {
 
     return defineAsyncComponent(async () => {
         try {
+            // This only works for Webpack. Make this the default
             return await import(
                 `@/${removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component)}.vue`
             );
         } catch (err) {
             configurationError.value = err as Error;
+        } catch (err1) {
+            // If we can't use webpack, try Vite
+            try {
+                return await loadWidget(removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component));
+            } catch (err) {
+                // For now let's throw the webpack error as that's primarily used.
+                configurationError.value = err1 as Error;
+            }
         }
     });
 });
