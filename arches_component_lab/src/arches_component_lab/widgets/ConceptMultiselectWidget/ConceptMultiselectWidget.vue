@@ -5,39 +5,31 @@ import ConceptMultiSelectWidgetViewer from "@/arches_component_lab/widgets/Conce
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-        value?: ConceptListValue | string[] | null | undefined;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        value: undefined,
-    },
-);
+defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    aliasedNodeData: ConceptListValue;
+}>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
     <ConceptMultiSelectWidgetEditor
         v-if="mode === EDIT"
-        :card-x-node-x-widget-data="props.cardXNodeXWidgetData"
-        :graph-slug="props.graphSlug"
-        :node-alias="props.nodeAlias"
-        :value="props.value"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+        :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ConceptMultiSelectWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="props.cardXNodeXWidgetData"
-        :value="props.value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>

@@ -1,6 +1,6 @@
-import type { CollectionItem, ConceptListValue } from "./types";
+import type { CollectionItem, ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-function getOption(
+export function getOption(
     value: string,
     options: CollectionItem[],
 ): CollectionItem | null | undefined {
@@ -24,18 +24,18 @@ function getOption(
 }
 
 export function convertConceptOptionToFormValue(
-    conceptOptionId: string,
+    conceptOptionId: string | null,
     options: CollectionItem[],
-): ConceptListValue {
+): ConceptValue {
+    if (!conceptOptionId) return blankConceptValue();
     const option = getOption(conceptOptionId, options);
 
     return {
         display_value: option ? (option as CollectionItem).label : "",
-        node_value: conceptOptionId ? [conceptOptionId] : [],
+        node_value: conceptOptionId,
         details: option ? [option] : [],
     };
 }
-
 
 /**
  * Flatten a tree of CollectionItem objects into a single array.
@@ -43,7 +43,9 @@ export function convertConceptOptionToFormValue(
  * @param items - The hierarchical list.
  * @returns A flat array of all items (with empty children arrays).
  */
-export function flattenCollectionItems(items: CollectionItem[]): CollectionItem[] {
+export function flattenCollectionItems(
+    items: CollectionItem[],
+): CollectionItem[] {
     const result: CollectionItem[] = [];
 
     function recurse(nodes: CollectionItem[]): void {
@@ -60,4 +62,12 @@ export function flattenCollectionItems(items: CollectionItem[]): CollectionItem[
 
     recurse(items);
     return result;
+}
+
+export function blankConceptValue() {
+    return {
+        display_value: "",
+        node_value: null,
+        details: [],
+    };
 }

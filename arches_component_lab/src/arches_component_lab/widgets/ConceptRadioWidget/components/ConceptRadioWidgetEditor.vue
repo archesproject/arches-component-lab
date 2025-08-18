@@ -5,25 +5,26 @@ import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     ConceptValue,
     ConceptFetchResult,
     CollectionItem,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 import {
     convertConceptOptionToFormValue,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    value?: string | ConceptValue | null;
+    aliasedNodeData: ConceptValue;
     groupDirection: string;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: ConceptValue): void;
 }>();
 
 const flexDirection = computed(() =>
@@ -31,13 +32,7 @@ const flexDirection = computed(() =>
 );
 
 const options = ref<CollectionItem[]>([]);
-const selectedId = ref<string | null>(
-    !props.value
-        ? null
-        : typeof props.value == "string"
-          ? props.value
-          : props.value.node_value,
-);
+const selectedId = ref<string | null>(props.aliasedNodeData.node_value);
 
 const isLoading = ref(false);
 const optionsTotalCount = ref(0);
@@ -65,38 +60,35 @@ async function getOptions() {
     }
 }
 
-function transformValueForForm(
-    event: FormFieldResolverOptions,
-): AliasedNodeData {
-    return convertConceptOptionToFormValue(event.value, options.value);
+function onUpdateModelValue(selectedOption: string | null) {
+    const formattedValue: ConceptValue = convertConceptOptionToFormValue(
+        selectedOption,
+        options.value,
+    );
+    emit("update:value", formattedValue);
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
+    <RadioButtonGroup
+        :model-value="selectedId"
+        :name="nodeAlias"
+        :class="['flex flex-wrap', flexDirection]"
+        @update:model-value="onUpdateModelValue"
     >
-        <RadioButtonGroup
-            v-model="selectedId"
-            :name="nodeAlias"
-            :class="['flex flex-wrap', flexDirection]"
+        <div
+            v-for="option in options"
+            :key="option.key"
+            class="flex items-center gap-2 flex-row"
         >
-            <div
-                v-for="option in options"
-                :key="option.key"
-                class="flex items-center gap-2 flex-row"
-            >
-                <RadioButton
-                    :input-id="option.key"
-                    :value="option.key"
-                    size="small"
-                />
-                <label :for="option.key">{{ option.label }}</label>
-            </div>
-        </RadioButtonGroup>
-    </GenericFormField>
+            <RadioButton
+                :input-id="option.key"
+                :value="option.key"
+                size="small"
+            />
+            <label :for="option.key">{{ option.label }}</label>
+        </div>
+    </RadioButtonGroup>
 </template>
 
 <style scoped>

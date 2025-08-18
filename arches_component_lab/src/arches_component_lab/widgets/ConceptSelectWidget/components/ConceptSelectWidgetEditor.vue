@@ -6,7 +6,6 @@ import TreeSelect from "primevue/treeselect";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
 
-import type { FormFieldResolverOptions } from "@primevue/forms";
 
 import type {
     CollectionItem,
@@ -14,15 +13,16 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
-const props = defineProps<{
+const {graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    multiSelect?: boolean;
-    value?: ConceptValue;
+    aliasedNodeData: ConceptValue;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: ConceptValue): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -32,13 +32,21 @@ const isLoading = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean>>(() => {
-    if (options.value.length === 0 || !props?.value?.node_value) return {};
-    return { [props?.value?.node_value]: true };
+// const initialValue = computed<Record<string, boolean>>(() => {
+//     if (options.value.length === 0 || !props?.value?.node_value) return {};
+//     return { [props?.value?.node_value]: true };
+// });
+
+// const initialValue = ref<string | null>(null);
+const initialValue = computed<string>(() => {
+    if (options.value.length === 0 || !aliasedNodeData?.node_value) return null;
+    return aliasedNodeData.node_value;
 });
 
 watchEffect(() => {
     getOptions();
+    // if (options.value.length > 0 || !aliasedNodeData?.node_value)
+    //     initialValue.value =  aliasedNodeData.node_value;
 });
 
 async function getOptions() {
@@ -46,8 +54,8 @@ async function getOptions() {
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
         );
 
         options.value = fetchedData.results as CollectionItem[];
@@ -60,38 +68,24 @@ async function getOptions() {
     }
 }
 
-function transformValueForForm(
-    event: FormFieldResolverOptions,
-): AliasedNodeData {
-    if (!event.value || Object.keys(event.value).length == 0) {
-        return {
-            display_value: "",
-            node_value: [],
-            details: [],
-        };
-    }
-    const id = Object.keys(event.value)[0];
-    return convertConceptOptionToFormValue(id, options.value);
+function onUpdateModelValue(selectedOption: string | null) {
+    const formattedValue =  convertConceptOptionToFormValue(selectedOption, options.value);
+    emit("update:value", formattedValue);
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
+    <TreeSelect
+        :id="`${graphSlug}-${nodeAlias}-input`"
+        data-key="key"
+        selection-mode="single"
+        :fluid="true"
+        :loading="isLoading"
+        :model-value="initialValue"
+        :options="options"
+        :placeholder="$gettext('Select Concept')"
+        :reset-filter-on-hide="true"
+        @update:model-value="onUpdateModelValue"
     >
-        <TreeSelect
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
-            data-key="key"
-            selection-mode="single"
-            :fluid="true"
-            :loading="isLoading"
-            :model-value="initialValue"
-            :options
-            :placeholder="$gettext('Select Concept')"
-            :reset-filter-on-hide="true"
-        >
-        </TreeSelect>
-    </GenericFormField>
+    </TreeSelect>
 </template>

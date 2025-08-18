@@ -39,12 +39,7 @@ urlpatterns = [
         name="api-card-x-node-x-widget-list-from-nodegroup",
     ),
     path(
-        "arches-component-lab/api/concepts_for_node/<slug:graph_slug>/<slug:node_alias>",
-        ConceptsFlatView.as_view(),
-        name="api-concepts-flat",
-    ),
-    path(
-        "arches-component-lab/api/concepts/<slug:graph_slug>/<slug:node_alias>",
+        "api/concepts/<slug:graph_slug>/<slug:node_alias>",
         ConceptsTreeView.as_view(),
         name="api-concepts-tree",
     ),

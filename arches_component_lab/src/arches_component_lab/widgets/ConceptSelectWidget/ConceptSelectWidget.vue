@@ -8,36 +8,28 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-        value?: ConceptValue | string;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        value: undefined,
-    },
-);
+defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData: ConceptValue;
+}>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
     <ConceptSelectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="props.graphSlug"
-        :node-alias="props.nodeAlias"
-        :value="props.value"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+        :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ConceptSelectWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="props.value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>

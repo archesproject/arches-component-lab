@@ -8,21 +8,14 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
         cardXNodeXWidgetData?: CardXNodeXWidgetData;
-        value?: string | ConceptValue | null;
+        aliasedNodeData: ConceptValue;
         groupDirection?: string;
-    }>(),
-    {
-        groupDirection: "column",
-        value: null,
-        cardXNodeXWidgetData: undefined,
-    },
-);
+    }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
@@ -30,18 +23,16 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 <template>
     <ConceptRadioWidgetEditor
         v-if="mode === EDIT"
-        :card-x-node-x-widget-data="props.cardXNodeXWidgetData"
-        :graph-slug="props.graphSlug"
-        :node-alias="props.nodeAlias"
-        :value="props.value"
-        :group-direction="props.groupDirection"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+        :aliased-node-data="aliasedNodeData"
+        :group-direction="groupDirection"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ConceptRadioWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="props.value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>
 
