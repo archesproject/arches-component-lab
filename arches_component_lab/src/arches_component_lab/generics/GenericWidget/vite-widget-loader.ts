@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 type Loader = () => Promise<unknown>;
 type Registry = Record<string, Loader>;
 
