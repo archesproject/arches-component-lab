@@ -63,14 +63,13 @@ const widgetComponent = computed(() => {
             return await import(
                 `@/${removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component)}.vue`
             );
-        } catch (err) {
-            configurationError.value = err as Error;
         } catch (err1) {
             // If we can't use webpack, try Vite
             try {
                 return await loadWidget(removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component));
             } catch (err) {
                 // For now let's throw the webpack error as that's primarily used.
+                console.log(err);
                 configurationError.value = err1 as Error;
             }
         }
