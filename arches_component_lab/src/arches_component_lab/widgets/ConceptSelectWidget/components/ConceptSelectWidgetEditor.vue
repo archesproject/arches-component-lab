@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
