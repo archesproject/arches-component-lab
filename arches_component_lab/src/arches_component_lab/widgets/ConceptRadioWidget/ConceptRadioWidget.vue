@@ -27,7 +27,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
-        :group-direction="groupDirection"
+        :group-direction="groupDirection ?? 'row'"
         @update:value="emit('update:value', $event)"
     />
     <ConceptRadioWidgetViewer
