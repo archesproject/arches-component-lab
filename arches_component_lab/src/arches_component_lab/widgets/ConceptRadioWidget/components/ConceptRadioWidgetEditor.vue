@@ -15,20 +15,24 @@ import {
     convertConceptOptionToFormValue,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
+import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, groupDirection } = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    aliasedNodeData: ConceptValue;
-    groupDirection: string;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug: string;
+        nodeAlias: string;
+        aliasedNodeData: ConceptValue;
+        cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptValue): void;
 }>();
 
 const flexDirection = computed(() =>
-    groupDirection === "column" ? "flex-column" : "flex-row gap-2",
+    cardXNodeXWidgetData.config.groupDirection === "column"
+        ? "flex-column"
+        : "flex-row",
 );
 
 const options = ref<CollectionItem[]>([]);

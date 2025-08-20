@@ -6,7 +6,7 @@ const { aliasedNodeData } = defineProps<{
 }>();
 </script>
 <template>
-    <div :key="aliasedNodeData.node_value.join(',')">
+    <div>
         {{ aliasedNodeData.display_value }}
     </div>
 </template>
