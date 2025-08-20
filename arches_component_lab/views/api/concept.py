@@ -43,6 +43,4 @@ class ConceptsTreeView(View, CardNodeWidgetConfigMixin):
         total_count = count_results(results_tree)
         data = results_tree
 
-        return JSONResponse(
-            {"results": data, "more": False, "total_results": total_count}
-        )
+        return JSONResponse({"results": data, "total_results": total_count})
