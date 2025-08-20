@@ -4,7 +4,7 @@ import ConceptRadioWidgetViewer from "@/arches_component_lab/widgets/ConceptRadi
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -12,7 +12,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
     aliasedNodeData: ConceptValue;
     groupDirection?: string;
 }>();
