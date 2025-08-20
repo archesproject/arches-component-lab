@@ -7,7 +7,7 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
 )
-from arches_component_lab.views.api.concept import ConceptsFlatView, ConceptsTreeView
+from arches_component_lab.views.api.concept import ConceptsTreeView
 
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileBlankView,
