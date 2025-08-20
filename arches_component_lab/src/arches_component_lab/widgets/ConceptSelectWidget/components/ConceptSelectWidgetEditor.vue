@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
@@ -35,6 +35,10 @@ const fetchError = ref<string | null>(null);
 const initialValue = computed<Record<string, boolean>>(() => {
     if (options.value.length === 0 || !aliasedNodeData?.node_value) return {};
     return { [aliasedNodeData.node_value]: true };
+});
+
+watchEffect(() => {
+    getOptions();
 });
 
 async function getOptions() {
@@ -79,7 +83,6 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         :placeholder="$gettext('Select Concept')"
         :reset-filter-on-hide="true"
         @update:model-value="onUpdateModelValue"
-        @before-show="getOptions"
     >
     </TreeSelect>
 </template>

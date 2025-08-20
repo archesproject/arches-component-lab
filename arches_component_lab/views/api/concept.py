@@ -8,18 +8,6 @@ class ConceptsTreeView(View, CardNodeWidgetConfigMixin):
     def get(self, request, graph_slug, node_alias):
         cnw_config = self.get_card_x_node_x_widget(graph_slug, node_alias)
 
-        if (
-            not cnw_config.node.datatype.startswith("concept")
-            or "rdmCollection" not in cnw_config.node.config
-        ):
-            return JSONResponse(
-                {
-                    "error": f"Invalid node datatype",
-                    "details": f"Node {node_alias} must have a concept or concept-list datatype, not {cnw_config.node.datatype}.",
-                },
-                status=500,
-            )
-
         concept_id = cnw_config.node.config["rdmCollection"]
         results_tree = Concept().get_e55_domain(concept_id)
 

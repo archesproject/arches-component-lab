@@ -6,6 +6,8 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializ
 
 
 class CardNodeWidgetConfigMixin:
+    # Mixin for standard handling of card_x_node_x_widget data. Centralizes logic required to handle
+    # Arches Core 7 & 8 version model differences.
     @staticmethod
     def get_card_x_node_x_widget(graph_slug, node_alias):
         query_filter = Q(

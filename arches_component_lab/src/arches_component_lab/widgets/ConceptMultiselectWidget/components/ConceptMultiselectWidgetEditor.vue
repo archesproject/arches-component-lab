@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import type { Ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
@@ -35,6 +35,10 @@ const fetchError = ref<string | null>(null);
 const initialValue = computed<string[]>(() => {
     if (!options.value || options.value.length === 0) return [];
     return aliasedNodeData.node_value || [];
+});
+
+watchEffect(() => {
+    getOptions();
 });
 
 async function getOptions() {
@@ -78,7 +82,6 @@ function onUpdateModelValue(selectedConcepts: string[]) {
         :options="options"
         :placeholder="$gettext('Select Concepts')"
         @update:model-value="onUpdateModelValue"
-        @before-show="getOptions"
     >
     </TreeSelect>
 </template>
