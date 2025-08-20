@@ -14,7 +14,6 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
     aliasedNodeData: ConceptValue;
-    groupDirection?: string;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -27,7 +26,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
-        :group-direction="groupDirection ?? 'row'"
         @update:value="emit('update:value', $event)"
     />
     <ConceptRadioWidgetViewer
