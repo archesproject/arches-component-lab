@@ -45,8 +45,7 @@ watchEffect(() => {
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value)
-            return;
+        if (optionsLoaded.value) return;
         isLoading.value = true;
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
             props.graphSlug,
@@ -107,7 +106,7 @@ label {
     display: flex;
     flex-direction: row;
     column-gap: 1.5rem;
-    row-gap: .5rem;
+    row-gap: 0.5rem;
     flex-wrap: wrap;
 }
 

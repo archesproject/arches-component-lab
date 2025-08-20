@@ -9,7 +9,6 @@ const props = defineProps<{
 const key = computed(() => {
     return props.aliasedNodeData.node_value ?? "";
 });
-
 </script>
 <template>
     <div :key="key">

@@ -6,7 +6,6 @@ import TreeSelect from "primevue/treeselect";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
 
-
 import type {
     CollectionItem,
     ConceptValue,
@@ -15,7 +14,7 @@ import type {
 
 import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
-const {graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
+const { graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     aliasedNodeData: ConceptValue;
@@ -40,8 +39,7 @@ const initialValue = computed<Record<string, boolean>>(() => {
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value)
-            return;
+        if (optionsLoaded.value) return;
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
@@ -61,7 +59,10 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
-    const formattedValue =  convertConceptOptionToFormValue(selectedOption, options.value);
+    const formattedValue = convertConceptOptionToFormValue(
+        selectedOption,
+        options.value,
+    );
     emit("update:value", formattedValue);
 }
 </script>

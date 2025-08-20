@@ -33,16 +33,14 @@ const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-
 const initialValue = computed<string[]>(() => {
     if (!options.value || options.value.length === 0) return [];
-    return (props.aliasedNodeData.node_value || []);
+    return props.aliasedNodeData.node_value || [];
 });
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value)
-            return;
+        if (optionsLoaded.value) return;
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
@@ -62,7 +60,10 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(selectedConcepts: string[]) {
-    const formattedValue: ConceptListValue = convertSelectionToModelValue(selectedConcepts, options.value);
+    const formattedValue: ConceptListValue = convertSelectionToModelValue(
+        selectedConcepts,
+        options.value,
+    );
     emit("update:value", formattedValue);
 }
 </script>

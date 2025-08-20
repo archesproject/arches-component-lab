@@ -8,14 +8,14 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-        aliasedNodeData: ConceptValue;
-        groupDirection?: string;
-    }>();
+defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData: ConceptValue;
+    groupDirection?: string;
+}>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>

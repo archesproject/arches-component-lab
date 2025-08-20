@@ -4,7 +4,6 @@ import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-
 defineProps<{
     aliasedNodeData: ConceptListValue;
 }>();
-
 </script>
 <template>
     <div :key="aliasedNodeData.node_value.join(',')">
