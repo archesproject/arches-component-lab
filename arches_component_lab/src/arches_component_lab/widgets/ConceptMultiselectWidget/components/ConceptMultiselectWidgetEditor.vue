@@ -14,8 +14,7 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-defineOptions({ inheritAttrs: false }); // <— critical
-const props = defineProps<{
+const { graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     aliasedNodeData: ConceptListValue;
@@ -35,7 +34,7 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<string[]>(() => {
     if (!options.value || options.value.length === 0) return [];
-    return props.aliasedNodeData.node_value || [];
+    return aliasedNodeData.node_value || [];
 });
 
 async function getOptions() {
@@ -44,8 +43,8 @@ async function getOptions() {
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
         );
 
         options.value = fetchedData.results as CollectionItem[];

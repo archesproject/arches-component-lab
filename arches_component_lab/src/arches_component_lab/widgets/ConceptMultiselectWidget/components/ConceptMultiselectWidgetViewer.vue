@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 
-defineProps<{
+const { aliasedNodeData } = defineProps<{
     aliasedNodeData: ConceptListValue;
 }>();
 </script>

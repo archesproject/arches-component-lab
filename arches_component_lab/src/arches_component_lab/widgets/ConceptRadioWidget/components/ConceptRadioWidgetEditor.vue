@@ -16,7 +16,7 @@ import {
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
-const props = defineProps<{
+const { graphSlug, nodeAlias, aliasedNodeData, groupDirection } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     aliasedNodeData: ConceptValue;
@@ -28,11 +28,11 @@ const emit = defineEmits<{
 }>();
 
 const flexDirection = computed(() =>
-    props.groupDirection === "column" ? "flex-column" : "flex-row gap-2",
+    groupDirection === "column" ? "flex-column" : "flex-row gap-2",
 );
 
 const options = ref<CollectionItem[]>([]);
-const selectedId = ref<string | null>(props.aliasedNodeData.node_value);
+const selectedId = ref<string | null>(aliasedNodeData.node_value);
 
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
@@ -48,8 +48,8 @@ async function getOptions() {
         if (optionsLoaded.value) return;
         isLoading.value = true;
         const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
         );
 
         options.value = flattenCollectionItems(fetchedData.results);
