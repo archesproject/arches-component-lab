@@ -33,7 +33,6 @@ const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const selectedOptions = ref<Record<string, boolean>>({});
 const initialValue = computed<Record<string, boolean>>((): Record<string, boolean> => {
     if (!aliasedNodeData?.node_value) return {};
     return { [aliasedNodeData.node_value]: true };
@@ -41,7 +40,6 @@ const initialValue = computed<Record<string, boolean>>((): Record<string, boolea
 
 watchEffect(() => {
     getOptions();
-    if (aliasedNodeData?.node_value) selectedOptions.value = { [aliasedNodeData.node_value]: true };
 });
 
 async function getOptions() {
@@ -70,7 +68,6 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         selectedOption,
         options.value,
     );
-    console.warn(`Emitting value: ${JSON.stringify(formattedValue)}`)
     emit("update:value", formattedValue);
 }
 </script>
@@ -82,7 +79,7 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         selection-mode="single"
         :fluid="true"
         :loading="isLoading"
-        :model-value="selectedOptions"
+        :model-value="initialValue"
         :options="options as TreeNode[]"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
