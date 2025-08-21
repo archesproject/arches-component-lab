@@ -15,28 +15,35 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    aliasedNodeData: ConceptListValue;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug: string;
+        nodeAlias: string;
+        aliasedNodeData: ConceptListValue;
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptListValue): void;
 }>();
 
-const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(null);
+const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
+    null,
+);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string,boolean>>(() => {
-    return aliasedNodeData.node_value.reduce( (acc: Record<string,boolean>, value: string) => {
-        return {...acc, [value]: true};
-    }, {}) || {};
+const initialValue = computed<Record<string, boolean>>(() => {
+    return (
+        aliasedNodeData.node_value.reduce(
+            (acc: Record<string, boolean>, value: string) => {
+                return { ...acc, [value]: true };
+            },
+            {},
+        ) || {}
+    );
 });
 
 watchEffect(() => {
@@ -67,7 +74,7 @@ async function getOptions() {
 function onUpdateModelValue(selectedConcepts: string[]) {
     const formattedValue: ConceptListValue = convertSelectionToModelValue(
         selectedConcepts,
-        options.value?? [] as CollectionItem[],
+        options.value ?? ([] as CollectionItem[]),
     );
     emit("update:value", formattedValue);
 }

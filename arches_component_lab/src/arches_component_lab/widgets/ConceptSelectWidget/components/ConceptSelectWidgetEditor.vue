@@ -15,28 +15,32 @@ import type {
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    aliasedNodeData: ConceptValue;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug: string;
+        nodeAlias: string;
+        aliasedNodeData: ConceptValue;
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptValue): void;
 }>();
 
-const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(null);
+const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
+    null,
+);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean>>((): Record<string, boolean> => {
-    if (!aliasedNodeData?.node_value) return {};
-    return { [aliasedNodeData.node_value]: true };
-});
+const initialValue = computed<Record<string, boolean>>(
+    (): Record<string, boolean> => {
+        if (!aliasedNodeData?.node_value) return {};
+        return { [aliasedNodeData.node_value]: true };
+    },
+);
 
 watchEffect(() => {
     getOptions();
@@ -66,7 +70,7 @@ async function getOptions() {
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     const formattedValue = convertConceptOptionToFormValue(
         selectedOption,
-        options.value?? [] as CollectionItem[],
+        options.value ?? ([] as CollectionItem[]),
     );
     emit("update:value", formattedValue);
 }
