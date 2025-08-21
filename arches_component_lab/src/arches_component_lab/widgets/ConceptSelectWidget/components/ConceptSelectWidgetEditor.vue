@@ -66,7 +66,7 @@ async function getOptions() {
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     const formattedValue = convertConceptOptionToFormValue(
         selectedOption,
-        options.value,
+        options.value?? [] as CollectionItem[],
     );
     emit("update:value", formattedValue);
 }

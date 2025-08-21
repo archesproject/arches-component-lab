@@ -67,7 +67,7 @@ async function getOptions() {
 function onUpdateModelValue(selectedConcepts: string[]) {
     const formattedValue: ConceptListValue = convertSelectionToModelValue(
         selectedConcepts,
-        options.value,
+        options.value?? [] as CollectionItem[],
     );
     emit("update:value", formattedValue);
 }
