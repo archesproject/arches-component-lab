@@ -12,7 +12,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ConceptValue;
 }>();
 

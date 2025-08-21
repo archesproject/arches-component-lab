@@ -10,7 +10,7 @@ export const fetchConceptsTree = async (
     nodeAlias: string,
 ): Promise<ConceptFetchResult> => {
     const response = await fetch(
-        `${arches.urls.api_concepts_tree(graphSlug, nodeAlias)}`,
+        arches.urls.api_concepts_tree(graphSlug, nodeAlias),
     );
 
     const parsed = await response.json();

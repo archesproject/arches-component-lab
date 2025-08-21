@@ -33,12 +33,3 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :aliased-node-data="aliasedNodeData"
     />
 </template>
-
-<style scoped>
-.widget {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-}
-</style>

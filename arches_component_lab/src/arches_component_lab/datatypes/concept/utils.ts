@@ -30,11 +30,18 @@ export function convertConceptOptionToFormValue(
     conceptOption: Record<string, boolean> | string | null,
     options: CollectionItem[],
 ): ConceptValue {
-    const conceptOptionId =
+    let conceptOptionId: string | null = null;
+    if (
         typeof conceptOption === "string" ||
         typeof conceptOption === "undefined"
-            ? conceptOption
-            : Object.keys(conceptOption as Record<string, boolean>)?.[0];
+    ) {
+        conceptOptionId = conceptOption;
+    } else {
+        conceptOptionId = Object.keys(
+            conceptOption as Record<string, boolean>,
+        )?.[0];
+    }
+
     if (!conceptOptionId) return blankConceptValue();
     const option = getOption(conceptOptionId, options);
 

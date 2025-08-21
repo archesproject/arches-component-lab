@@ -2,11 +2,12 @@
 import { computed, ref, watchEffect } from "vue";
 import type { Ref } from "vue";
 
-import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
+import type { TreeNode } from "primevue/treenode";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
 import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-list/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import { convertSelectionToModelValue } from "@/arches_component_lab/datatypes/concept-list/utils.ts";
 
 import type {
@@ -14,27 +15,28 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
+
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     aliasedNodeData: ConceptListValue;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptListValue): void;
 }>();
 
-const { $gettext } = useGettext();
-
-const options: Ref<CollectionItem[]> = ref<CollectionItem[]>([]);
+const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(null);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<string[]>(() => {
-    if (!options.value || options.value.length === 0) return [];
-    return aliasedNodeData.node_value || [];
+const initialValue = computed<Record<string,boolean>>(() => {
+    return aliasedNodeData.node_value.reduce( (acc: Record<string,boolean>, value: string) => {
+        return {...acc, [value]: true};
+    }, {}) || {};
 });
 
 watchEffect(() => {
@@ -73,14 +75,13 @@ function onUpdateModelValue(selectedConcepts: string[]) {
 
 <template>
     <TreeSelect
-        :id="`${graphSlug}-${nodeAlias}-input`"
+        :id="nodeAlias"
         selection-mode="multiple"
         :fluid="true"
         :loading="isLoading"
-        :value="initialValue"
         :model-value="initialValue"
-        :options="options"
-        :placeholder="$gettext('Select Concepts')"
+        :options="options as TreeNode[]"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
         @update:model-value="onUpdateModelValue"
     >
     </TreeSelect>

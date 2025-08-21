@@ -1,44 +1,47 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue";
+import type { Ref } from "vue";
 
-import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
+import type { TreeNode } from "primevue/treenode";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
 import type {
     CollectionItem,
     ConceptValue,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     aliasedNodeData: ConceptValue;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptValue): void;
 }>();
 
-const { $gettext } = useGettext();
-
-const options = ref<CollectionItem[]>([]);
+const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(null);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean>>(() => {
-    if (options.value.length === 0 || !aliasedNodeData?.node_value) return {};
+const selectedOptions = ref<Record<string, boolean>>({});
+const initialValue = computed<Record<string, boolean>>((): Record<string, boolean> => {
+    if (!aliasedNodeData?.node_value) return {};
     return { [aliasedNodeData.node_value]: true };
 });
 
 watchEffect(() => {
     getOptions();
+    if (aliasedNodeData?.node_value) selectedOptions.value = { [aliasedNodeData.node_value]: true };
 });
 
 async function getOptions() {
@@ -67,20 +70,21 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         selectedOption,
         options.value,
     );
+    console.warn(`Emitting value: ${JSON.stringify(formattedValue)}`)
     emit("update:value", formattedValue);
 }
 </script>
 
 <template>
     <TreeSelect
-        :id="`${graphSlug}-${nodeAlias}-input`"
+        :id="nodeAlias"
         data-key="key"
         selection-mode="single"
         :fluid="true"
         :loading="isLoading"
-        :model-value="initialValue"
-        :options="options"
-        :placeholder="$gettext('Select Concept')"
+        :model-value="selectedOptions"
+        :options="options as TreeNode[]"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
         @update:model-value="onUpdateModelValue"
     >
