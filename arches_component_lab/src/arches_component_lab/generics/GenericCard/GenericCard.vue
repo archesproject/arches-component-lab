@@ -72,7 +72,7 @@ watchEffect(async () => {
         if (tileData) {
             aliasedTileData.value = tileData;
             if (!tileId) {
-                aliasedTileData.value.tileid = generate();
+                aliasedTileData.value.tileid = "new-" + generate();
             }
         } else {
             aliasedTileData.value = await fetchTileData(
@@ -82,7 +82,7 @@ watchEffect(async () => {
             );
             if (!tileId && resourceInstanceId) {
                 aliasedTileData.value.resourceinstance = resourceInstanceId;
-                aliasedTileData.value.tileid = generate();
+                aliasedTileData.value.tileid = "new-" + generate();
             }
         }
 

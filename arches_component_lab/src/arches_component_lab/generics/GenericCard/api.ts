@@ -97,7 +97,12 @@ export async function upsertTileAsJson(
     const urlSegments = [graphSlug, nodegroupAlias];
     let endpointUrl;
 
-    if (tileId) {
+    const isCreate = !tileId || tileId.startsWith("new-");
+    if (tileId?.startsWith("new-")) {
+        payload.tileid = tileId.split("new-")[1];
+    }
+
+    if (!isCreate) {
         urlSegments.push(tileId);
         endpointUrl = arches.urls.api_tile(...urlSegments);
     } else if (resourceInstanceId) {
@@ -105,7 +110,7 @@ export async function upsertTileAsJson(
         endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
     }
 
-    const httpMethod = tileId ? "PATCH" : "POST";
+    const httpMethod = isCreate ? "POST" : "PATCH";
 
     const response = await fetch(endpointUrl, {
         method: httpMethod,
