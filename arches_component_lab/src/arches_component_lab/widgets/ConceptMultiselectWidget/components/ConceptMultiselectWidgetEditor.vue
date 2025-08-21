@@ -85,6 +85,7 @@ function onUpdateModelValue(selectedConcepts: string[]) {
         :id="nodeAlias"
         selection-mode="multiple"
         :fluid="true"
+        filter
         :loading="isLoading"
         :model-value="initialValue"
         :options="options as TreeNode[]"

@@ -81,6 +81,7 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         :id="nodeAlias"
         data-key="key"
         selection-mode="single"
+        filter
         :fluid="true"
         :loading="isLoading"
         :model-value="initialValue"
