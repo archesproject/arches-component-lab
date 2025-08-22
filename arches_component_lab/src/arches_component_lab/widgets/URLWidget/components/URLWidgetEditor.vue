@@ -14,17 +14,37 @@ const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     aliasedNodeData: URLValue;
 }>();
 
-const url_label = ref(aliasedNodeData?.node_value?.url_label || "");
-const url = ref(aliasedNodeData?.node_value?.url || "");
+const url_label = ref(aliasedNodeData?.node_value?.url_label);
+const url = ref(aliasedNodeData?.node_value?.url);
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLValue): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string | undefined) {
+function onUpdateURLValue(updatedValue: string | undefined) {
+    if (!updatedValue) {
+        updatedValue = "";
+    }
+    url.value = updatedValue;
     const formattedValue = {
-        url: updatedValue ?? "",
-        url_label: updatedValue ?? "",
+        url: url.value,
+        url_label: url_label.value,
+    };
+    emit("update:value", {
+        display_value: JSON.stringify(formattedValue),
+        node_value: formattedValue,
+        details: [],
+    });
+}
+
+function onUpdateURLLabelValue(updatedValue: string | undefined) {
+    if (!updatedValue) {
+        updatedValue = "";
+    }
+    url_label.value = updatedValue;
+    const formattedValue = {
+        url: url.value,
+        url_label: url_label.value,
     };
     emit("update:value", {
         display_value: JSON.stringify(formattedValue),
@@ -35,11 +55,27 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
+    <div>url label</div>
     <InputText
         type="text"
         :fluid="true"
-        :model-value="aliasedNodeData.node_value?.url ?? ''"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
-        @update:model-value="onUpdateModelValue($event)"
+        :model-value="url_label"
+        :placeholder="$gettext('Enter URL Label...')"
+        @update:model-value="onUpdateURLLabelValue($event)"
     />
+    <div>url</div>
+    <InputText
+        type="text"
+        :fluid="true"
+        :model-value="url"
+        :placeholder="$gettext('Enter URL...')"
+        @update:model-value="onUpdateURLValue($event)"
+    />
+    <div>preview</div>
+    <a
+        v-if="aliasedNodeData.node_value.url"
+        :href="aliasedNodeData.node_value.url"
+    >
+        {{ aliasedNodeData.node_value.url_label || aliasedNodeData.node_value.url }}
+    </a>
 </template>
