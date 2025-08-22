@@ -4,7 +4,10 @@ import { ref } from "vue";
 import MultiSelect from "primevue/multiselect";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { DomainValueList, DomainOption } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type {
+    DomainValueList,
+    DomainOption,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
@@ -12,19 +15,28 @@ const props = defineProps<{
     aliasedNodeData: DomainValueList;
 }>();
 console.log(props.aliasedNodeData);
-const options = ref<DomainOption>(props.cardXNodeXWidgetData.node.config.options);
+const options = ref<DomainOption>(
+    props.cardXNodeXWidgetData.node.config.options,
+);
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValueList): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string | undefined) {
+function onUpdateModelValue(updatedValue: string[] | undefined) {
     if (updatedValue === undefined) {
-        updatedValue = "";
+        updatedValue = [];
     }
 
+    const updatedDisplayValue = updatedValue
+        .map(
+            (domain) =>
+                options.value.find((option) => option.id === domain)?.text,
+        )
+        .join(", ");
+
     emit("update:value", {
-        display_value: updatedValue,
+        display_value: updatedDisplayValue,
         node_value: updatedValue,
         details: [],
     });
