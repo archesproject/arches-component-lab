@@ -14,15 +14,15 @@ const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     aliasedNodeData: URLValue;
 }>();
 
-const url_label = ref(aliasedNodeData?.node_value?.url_label);
-const url = ref(aliasedNodeData?.node_value?.url);
+const url_label = ref(aliasedNodeData?.node_value?.url_label || "");
+const url = ref(aliasedNodeData?.node_value?.url || "");
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLValue): void;
 }>();
 
 function onUpdateURLValue(updatedValue: string | undefined) {
-    if (!updatedValue) {
+    if (updatedValue === undefined) {
         updatedValue = "";
     }
     url.value = updatedValue;
@@ -38,7 +38,7 @@ function onUpdateURLValue(updatedValue: string | undefined) {
 }
 
 function onUpdateURLLabelValue(updatedValue: string | undefined) {
-    if (!updatedValue) {
+    if (updatedValue === undefined) {
         updatedValue = "";
     }
     url_label.value = updatedValue;
@@ -66,6 +66,7 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
     <div>url</div>
     <InputText
         type="text"
+        required="true"
         :fluid="true"
         :model-value="url"
         :placeholder="$gettext('Enter URL...')"
@@ -73,9 +74,9 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
     />
     <div>preview</div>
     <a
-        v-if="aliasedNodeData.node_value.url"
-        :href="aliasedNodeData.node_value.url"
+        v-if="aliasedNodeData?.node_value?.url"
+        :href="aliasedNodeData?.node_value?.url"
     >
-        {{ aliasedNodeData.node_value.url_label || aliasedNodeData.node_value.url }}
+        {{ aliasedNodeData?.node_value?.url_label || aliasedNodeData?.node_value?.url }}
     </a>
 </template>
