@@ -9,13 +9,13 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: URLValue;
+    aliasedNodeData: URLValue;
 }>();
 
-const url_label = ref(value?.node_value?.url_label || "");
-const url = ref(value?.node_value?.url || "");
+const url_label = ref(aliasedNodeData?.node_value?.url_label || "");
+const url = ref(aliasedNodeData?.node_value?.url || "");
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLValue): void;
@@ -38,7 +38,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     <InputText
         type="text"
         :fluid="true"
-        :model-value="value.node_value?.url ?? ''"
+        :model-value="aliasedNodeData.node_value?.url ?? ''"
         :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
         @update:model-value="onUpdateModelValue($event)"
     />

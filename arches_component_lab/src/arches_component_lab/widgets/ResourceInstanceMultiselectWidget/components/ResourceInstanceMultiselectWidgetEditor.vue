@@ -12,19 +12,23 @@ import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resour
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 import type {
+    ResourceInstanceListValue,
     ResourceInstanceReference,
-    ResourceInstanceResult,
-} from "@/arches_component_lab/datatypes/resource-instance/types.ts";
+} from "@/arches_component_lab/datatypes/resource-instance-list/types";
+import type {
+    ResourceInstanceListOption,
+    ResourceInstanceDataItem,
+} from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeAlias: string;
-    graphSlug: string;
-    value: ResourceInstanceListValue;
-}>();
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
+    defineProps<{
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+        nodeAlias: string;
+        graphSlug: string;
+        aliasedNodeData: ResourceInstanceListValue;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ResourceInstanceListValue): void;
@@ -34,7 +38,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceReference[]>([]);
+const options = ref<ResourceInstanceListOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -43,8 +47,8 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (value?.details) {
-        return value.details.map((option) => {
+    if (aliasedNodeData?.details) {
+        return aliasedNodeData.details.map((option) => {
             return option.resource_id;
         });
     }
@@ -56,8 +60,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (aliasedNodeData?.details) {
+        options.value = aliasedNodeData.details;
     } else {
         options.value = [];
     }
@@ -74,13 +78,13 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details,
+            aliasedNodeData?.details,
         );
 
         const references = resourceData.data.map(
             (
-                resourceRecord: ResourceInstanceResult,
-            ): ResourceInstanceReference => ({
+                resourceRecord: ResourceInstanceDataItem,
+            ): ResourceInstanceListOption => ({
                 display_value: resourceRecord.display_value,
                 resource_id: resourceRecord.resourceinstanceid,
             }),
@@ -145,14 +149,16 @@ function onUpdateModelValue(updatedValue: string[]) {
         return getOption(resourceId);
     });
 
-    const formattedNodeValues = updatedValue.map((value) => {
-        return {
-            inverseOntologyProperty: "",
-            ontologyProperty: "",
-            resourceId: value ?? "",
-            resourceXresourceId: "",
-        };
-    });
+    const formattedNodeValues: ResourceInstanceReference[] = updatedValue.map(
+        (value) => {
+            return {
+                inverseOntologyProperty: "",
+                ontologyProperty: "",
+                resourceId: value ?? "",
+                resourceXresourceId: "",
+            } as ResourceInstanceReference;
+        },
+    );
 
     const formattedValue = {
         display_value: options

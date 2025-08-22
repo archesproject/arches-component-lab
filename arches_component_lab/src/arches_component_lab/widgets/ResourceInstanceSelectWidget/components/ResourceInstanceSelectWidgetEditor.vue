@@ -12,19 +12,20 @@ import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 import type {
-    ResourceInstanceReference,
-    ResourceInstanceResult,
+    ResourceInstanceDataItem,
+    ResourceInstanceSelectOption,
     ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeAlias: string;
-    graphSlug: string;
-    value: ResourceInstanceValue;
-}>();
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
+    defineProps<{
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+        nodeAlias: string;
+        graphSlug: string;
+        aliasedNodeData: ResourceInstanceValue;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ResourceInstanceValue): void;
@@ -32,7 +33,7 @@ const emit = defineEmits<{
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceReference[]>([]);
+const options = ref<ResourceInstanceSelectOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -53,13 +54,13 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details?.[0]?.resource_id,
+            aliasedNodeData?.details?.[0]?.resource_id,
         );
 
         const references = resourceData.data.map(
             (
-                resourceRecord: ResourceInstanceResult,
-            ): ResourceInstanceReference => ({
+                resourceRecord: ResourceInstanceDataItem,
+            ): ResourceInstanceSelectOption => ({
                 display_value: resourceRecord.display_value,
                 resource_id: resourceRecord.resourceinstanceid,
             }),
@@ -80,13 +81,13 @@ async function getOptions(page: number, filterTerm?: string) {
     }
 }
 
-function getOption(value: string): ResourceInstanceReference | undefined {
+function getOption(value: string): ResourceInstanceSelectOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
 function onFilter(event: SelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (aliasedNodeData?.details) {
+        options.value = aliasedNodeData.details;
     } else {
         options.value = [];
     }
@@ -140,7 +141,7 @@ function onUpdateModelValue(updatedValue: string | null) {
               }
             : null,
         details: option ? [option] : [],
-    });
+    } as ResourceInstanceValue);
 }
 </script>
 
@@ -154,7 +155,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="value?.details?.[0]?.resource_id"
+        :model-value="aliasedNodeData?.details?.[0]?.resource_id"
         :options="options"
         :placeholder="$gettext('Select Resources')"
         :reset-filter-on-hide="true"
