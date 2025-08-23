@@ -23,19 +23,13 @@ const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValueList): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string[] | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = [];
-    }
-
-    const updatedDisplayValue = updatedValue
-        .map(
-            (domain) =>
-                options.value.find(
-                    (option: DomainOption) => option.id === domain,
-                )?.text,
-        )
-        .join(", ");
+function onUpdateModelValue(updatedValue: string[] | null) {
+    const updatedDisplayValue = updatedValue?.map(
+        (domain) =>
+            options.value.find(
+                (option: DomainOption) => option.id === domain,
+            )?.text,
+    ).join(", ");
 
     emit("update:value", {
         display_value: updatedDisplayValue,
@@ -52,7 +46,7 @@ function onUpdateModelValue(updatedValue: string[] | undefined) {
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"
-        :model-value="aliasedNodeData.node_value"
+        :model-value="aliasedNodeData.node_value || []"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>
