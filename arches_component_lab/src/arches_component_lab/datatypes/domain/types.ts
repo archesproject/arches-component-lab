@@ -3,7 +3,7 @@ import type { AliasedNodeData, CardXNodeXWidgetData } from "@/arches_component_l
 export interface DomainDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
         config: {
-            options: string[];
+            options: DomainOption[];
         };
     };
 }
