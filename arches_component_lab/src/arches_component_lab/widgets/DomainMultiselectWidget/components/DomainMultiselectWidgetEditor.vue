@@ -15,7 +15,7 @@ const props = defineProps<{
     aliasedNodeData: DomainValueList;
 }>();
 
-const options = ref<[DomainOption[]]>(
+const options = ref<DomainOption[]>(
     props.cardXNodeXWidgetData.node.config.options,
 );
 
@@ -29,12 +29,12 @@ function onUpdateModelValue(updatedValue: string[] | null) {
     }
     const updatedDisplayValue =
         updatedValue
-            ?.map(
-                (domain) =>
-                    options.value.find(
-                        (option: DomainOption) => option.id === domain,
-                    )?.text,
-            )
+            ?.map((domain) => {
+                const currentOption = options.value.find(
+                    (option: DomainOption) => option.id === domain,
+                );
+                return currentOption.text;
+            })
             .join(", ") || "";
 
     emit("update:value", {
