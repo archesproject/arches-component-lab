@@ -1,6 +1,10 @@
-import type { AliasedNodeData, CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
-export interface DomainDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
+export interface DomainDatatypeCardXNodeXWidgetData
+    extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
         config: {
             options: DomainOption[];
