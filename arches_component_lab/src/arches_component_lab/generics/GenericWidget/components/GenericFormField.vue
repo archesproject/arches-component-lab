@@ -66,8 +66,8 @@ function markFormFieldAsDirty() {
 function resolver(
     updatedAliasedNodeData: FormFieldResolverOptions,
 ): AliasedNodeData {
-    validate(updatedAliasedNodeData as AliasedNodeData);
-    return updatedAliasedNodeData as AliasedNodeData;
+    validate(updatedAliasedNodeData as unknown as AliasedNodeData);
+    return updatedAliasedNodeData as unknown as AliasedNodeData;
 }
 
 function validate(aliasedNodeData: AliasedNodeData) {
