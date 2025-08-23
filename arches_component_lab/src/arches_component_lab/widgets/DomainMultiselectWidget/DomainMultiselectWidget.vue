@@ -4,16 +4,15 @@ import DomainMultiselectWidgetViewer from "@/arches_component_lab/widgets/Domain
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainDatatypeCardXNodeXWidgetData, DomainValueList } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: DomainValue;
+    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
+    aliasedNodeData: DomainValueList;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
