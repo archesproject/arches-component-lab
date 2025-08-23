@@ -33,7 +33,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
                 const currentOption = options.value.find(
                     (option: DomainOption) => option.id === domain,
                 );
-                return currentOption.text;
+                return currentOption?.text;
             })
             .join(", ") || "";
 
