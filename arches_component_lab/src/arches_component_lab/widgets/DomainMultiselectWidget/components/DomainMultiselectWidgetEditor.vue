@@ -27,12 +27,15 @@ function onUpdateModelValue(updatedValue: string[] | null) {
     if (updatedValue?.length === 0) {
         updatedValue = null;
     }
-    const updatedDisplayValue = updatedValue?.map(
-        (domain) =>
-            options.value.find(
-                (option: DomainOption) => option.id === domain,
-            )?.text,
-    ).join(", ") || "";
+    const updatedDisplayValue =
+        updatedValue
+            ?.map(
+                (domain) =>
+                    options.value.find(
+                        (option: DomainOption) => option.id === domain,
+                    )?.text,
+            )
+            .join(", ") || "";
 
     emit("update:value", {
         display_value: updatedDisplayValue,

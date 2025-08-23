@@ -4,7 +4,10 @@ import DomainSelectWidgetViewer from "@/arches_component_lab/widgets/DomainSelec
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { DomainDatatypeCardXNodeXWidgetData, DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type {
+    DomainDatatypeCardXNodeXWidgetData,
+    DomainValue,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
