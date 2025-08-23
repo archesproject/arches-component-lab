@@ -3,14 +3,14 @@ import { ref } from "vue";
 
 import Select from "primevue/select";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
+    DomainDatatypeCardXNodeXWidgetData,
     DomainValue,
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const props = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
     nodeAlias: string;
     aliasedNodeData: DomainValue;
 }>();
