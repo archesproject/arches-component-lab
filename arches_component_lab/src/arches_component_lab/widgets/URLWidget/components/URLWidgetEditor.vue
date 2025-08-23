@@ -5,12 +5,10 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+const { aliasedNodeData } = defineProps<{
     aliasedNodeData: URLValue;
 }>();
 
@@ -77,6 +75,9 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
         v-if="aliasedNodeData?.node_value?.url"
         :href="aliasedNodeData?.node_value?.url"
     >
-        {{ aliasedNodeData?.node_value?.url_label || aliasedNodeData?.node_value?.url }}
+        {{
+            aliasedNodeData?.node_value?.url_label ||
+            aliasedNodeData?.node_value?.url
+        }}
     </a>
 </template>
