@@ -23,11 +23,7 @@ const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValue): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
-
+function onUpdateModelValue(updatedValue: string | null) {
     const updatedDisplayValue = options.value.find(
         (option: DomainOption) => option.id === updatedValue,
     )?.text;
