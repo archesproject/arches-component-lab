@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef, watchEffect, watch } from "vue";
 
-import { FormField } from "@primevue/forms";
+import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
 
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
@@ -63,7 +63,9 @@ function markFormFieldAsDirty() {
     formFieldRef.value.field.states.touched = true;
 }
 
-function resolver(updatedAliasedNodeData: AliasedNodeData): AliasedNodeData {
+function resolver(
+    updatedAliasedNodeData: FormFieldResolverOptions,
+): AliasedNodeData {
     validate(updatedAliasedNodeData);
     return updatedAliasedNodeData;
 }
