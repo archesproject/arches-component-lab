@@ -19,7 +19,7 @@
         "vitest": "vitest --run --coverage"
     },
     "dependencies": {
-        "@primevue/forms": "4.3.3",
+        "@primevue/forms": "^4.3.7",
         "arches": "archesproject/arches#dev/8.0.x",
         "dayjs": "^1.11.13",
         "quill": "2.0.3"
@@ -29,7 +29,6 @@
     },
     "nodeModulesPaths": {},
     "overrides": {
-        "@primeuix/themes": "1.0.1",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7",
