@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { generate } from "uuid";
 import { ref, useTemplateRef, watchEffect } from "vue";
 
 import Message from "primevue/message";
@@ -70,6 +71,9 @@ watchEffect(async () => {
 
         if (tileData) {
             aliasedTileData.value = tileData;
+            if (!tileId) {
+                aliasedTileData.value.tileid = "new-" + generate();
+            }
         } else {
             aliasedTileData.value = await fetchTileData(
                 graphSlug,
@@ -78,6 +82,7 @@ watchEffect(async () => {
             );
             if (!tileId && resourceInstanceId) {
                 aliasedTileData.value.resourceinstance = resourceInstanceId;
+                aliasedTileData.value.tileid = "new-" + generate();
             }
         }
 
