@@ -7,8 +7,7 @@ import Drawer from 'primevue/drawer';
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EdtfValue } from "@/arches_component_lab/datatypes/edtf/types";
 
-//const text = ref('');
-const visible = ref(false); // IMPORTANT: This must be a ref
+const visible = ref(false);
 
 const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
