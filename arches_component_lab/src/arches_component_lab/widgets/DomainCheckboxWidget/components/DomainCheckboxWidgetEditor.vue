@@ -23,7 +23,10 @@ const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValueList): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string[] | undefined) {
+function onUpdateModelValue(updatedValue: string[] | null) {
+    if (updatedValue?.length === 0) {
+        updatedValue = null;
+    }
     const updatedDisplayValue =
         updatedValue
             ?.map((domain) => {
@@ -44,7 +47,7 @@ function onUpdateModelValue(updatedValue: string[] | undefined) {
 
 <template>
     <CheckboxGroup
-        :model-value="aliasedNodeData.node_value"
+        :model-value="aliasedNodeData.node_value || []"
         :name="nodeAlias"
         class="button-group"
         @update:model-value="onUpdateModelValue($event)"
@@ -57,7 +60,6 @@ function onUpdateModelValue(updatedValue: string[] | undefined) {
             <Checkbox
                 :input-id="option.id"
                 :value="option.id"
-                @update:model-value="onUpdateModelValue($event)"
             />
             <label :for="option.id">{{ option.text }}</label>
         </div>
