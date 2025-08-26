@@ -45,8 +45,8 @@ export interface CardXNodeXWidgetData {
 
 export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
-        maxLength: string | null;
-        placeholder: string | null;
+        maxLength: number | undefined;
+        placeholder: string | undefined;
     };
 }
 
