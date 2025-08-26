@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import Checkbox from 'primevue/checkbox';
-import CheckboxGroup from 'primevue/checkboxgroup';
+import Checkbox from "primevue/checkbox";
+import CheckboxGroup from "primevue/checkboxgroup";
 
 import type {
     DomainDatatypeCardXNodeXWidgetData,
     DomainValueList,
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
-import type {  } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { cardXNodeXWidgetData, nodeAlias, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
