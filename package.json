@@ -20,9 +20,9 @@
     },
     "dependencies": {
         "@primevue/forms": "^4.3.7",
-        "arches": "archesproject/arches#dev/8.0.x",
+        "arches": "archesproject/arches#cbyrd-fix-primevue-deps",
         "dayjs": "^1.11.13",
-        "quill": "2.0.3"
+        "quill": "^2.0.3"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.0.x"
