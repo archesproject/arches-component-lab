@@ -4,15 +4,17 @@ import DomainRadioWidgetViewer from "@/arches_component_lab/widgets/DomainRadioW
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type {
+    DomainDatatypeCardXNodeXWidgetData,
+    DomainValue,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
     aliasedNodeData: DomainValue;
 }>();
 

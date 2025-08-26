@@ -4,11 +4,14 @@ import { ref } from "vue";
 import RadioButton from 'primevue/radiobutton';
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { DomainValue, DomainOption } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type {
+    DomainDatatypeCardXNodeXWidgetData,
+    DomainValue,
+    DomainOption,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { cardXNodeXWidgetData, nodeAlias, aliasedNodeData } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
     nodeAlias: string;
     aliasedNodeData: DomainValue;
 }>();
