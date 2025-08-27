@@ -35,5 +35,4 @@ function onUpdateModelValue(updatedValue: number | null) {
         :max="cardXNodeXWidgetData.config.max"
         @update:model-value="onUpdateModelValue($event)"
     />
-    <pre>{{ cardXNodeXWidgetData.config }}</pre>
 </template>

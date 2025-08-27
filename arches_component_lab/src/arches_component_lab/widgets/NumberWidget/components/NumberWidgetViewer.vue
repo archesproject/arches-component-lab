@@ -3,7 +3,7 @@ import type {
     NumberValue
  } from "@/arches_component_lab/datatypes/number/types";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+defineProps<{
     aliasedNodeData: NumberValue | undefined;
 }>();
 </script>
