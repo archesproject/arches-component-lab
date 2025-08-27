@@ -1,5 +1,5 @@
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-import type { CardXNodeXWidgetData } From "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 export interface NumberCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
