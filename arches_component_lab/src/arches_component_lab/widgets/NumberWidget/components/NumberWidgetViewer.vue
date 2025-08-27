@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { 
-    NumberValue,
-    NumberCardXNodeXWidgetData
+    NumberValue
  } from "@/arches_component_lab/datatypes/number/types";
 
 const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     aliasedNodeData: NumberValue | undefined;
-    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
 }>();
 </script>
 
