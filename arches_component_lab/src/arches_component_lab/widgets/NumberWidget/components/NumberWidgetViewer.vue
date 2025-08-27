@@ -4,7 +4,7 @@ import type {
  } from "@/arches_component_lab/datatypes/number/types";
 
 defineProps<{
-    aliasedNodeData: NumberValue | undefined;
+    aliasedNodeData: NumberValue;
 }>();
 </script>
 

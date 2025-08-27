@@ -14,8 +14,8 @@ const emit = defineEmits<{
 
 function onUpdateModelValue(updatedValue: number | null) {
     emit("update:value", {
-        display_value: updatedValue ?? null,
-        node_value: updatedValue ?? null,
+        display_value: updatedValue !== null ? updatedValue.toString() : null,,
+        node_value: updatedValue,
         details: [],
     });
 }
@@ -29,8 +29,8 @@ function onUpdateModelValue(updatedValue: number | null) {
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :prefix="cardXNodeXWidgetData.config.prefix ?? ''"
         :suffix="cardXNodeXWidgetData.config.suffix ?? ''"
-        :min-fraction-digits="+cardXNodeXWidgetData.config.precision || 0"
-        :max-fraction-digits="+cardXNodeXWidgetData.config.precision || 0"
+        :min-fraction-digits="cardXNodeXWidgetData.config.precision ?? 0"
+        :max-fraction-digits="cardXNodeXWidgetData.config.precision ?? 0"
         :min="cardXNodeXWidgetData.config.min"
         :max="cardXNodeXWidgetData.config.max"
         @update:model-value="onUpdateModelValue($event)"
