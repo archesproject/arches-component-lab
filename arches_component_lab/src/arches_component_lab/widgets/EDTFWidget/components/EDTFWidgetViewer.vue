@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { EdtfValue } from "@/arches_component_lab/datatypes/edtf/types";
-import Inplace from 'primevue/inplace';
 
 defineProps<{
     value: EdtfValue;
