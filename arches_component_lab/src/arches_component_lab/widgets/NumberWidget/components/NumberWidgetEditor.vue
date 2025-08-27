@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 function onUpdateModelValue(updatedValue: number | null) {
     emit("update:value", {
-        display_value: updatedValue !== null ? updatedValue.toString() : null,,
+        display_value: updatedValue !== null ? updatedValue.toString() : null,
         node_value: updatedValue,
         details: [],
     });
