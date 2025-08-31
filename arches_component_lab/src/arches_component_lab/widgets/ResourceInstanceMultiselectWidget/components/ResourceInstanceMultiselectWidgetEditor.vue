@@ -164,7 +164,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         display_value: options
             .map((option) => option?.display_value)
             .join(", "),
-        node_value: formattedNodeValues,
+        node_value: updatedValue.length ? formattedNodeValues : null,
         details: options ?? [],
     };
 

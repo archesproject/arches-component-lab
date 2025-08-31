@@ -64,19 +64,32 @@ watch(selectedLanguage, () => {
 });
 
 function onUpdateModelValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
+    const normalizedValue = updatedValue ?? "";
+    const currentLanguage = selectedLanguage.value;
+    if (!currentLanguage) return;
+
+    const combinedNodeValue: StringValue["node_value"] = {
+        ...(aliasedNodeData.node_value ?? {}),
+        ...(managedNodeValue.value ?? {}),
+    };
+
+    combinedNodeValue[currentLanguage.code] = {
+        value: normalizedValue,
+        direction: currentLanguage.default_direction,
+    };
+
+    const filteredNodeValue = Object.fromEntries(
+        Object.entries(combinedNodeValue).filter(([, languageEntry]) => {
+            return (
+                typeof languageEntry?.value === "string" &&
+                languageEntry.value !== ""
+            );
+        }),
+    ) as StringValue["node_value"];
 
     emit("update:value", {
-        display_value: updatedValue,
-        node_value: {
-            ...managedNodeValue.value,
-            [selectedLanguage.value!.code]: {
-                value: updatedValue,
-                direction: selectedLanguage.value!.default_direction,
-            },
-        },
+        display_value: normalizedValue,
+        node_value: filteredNodeValue,
         details: [],
     });
 }
@@ -99,7 +112,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             type="text"
             :fluid="true"
             :form-input="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength"
+            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
             :model-value="singleInputValue"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
