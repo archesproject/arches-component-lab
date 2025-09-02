@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import EdtfWidgetEditor from "@/arches_component_lab/widgets/EdtfWidget/components/EDTFWidgetEditor.vue";
-import EdtfWidgetViewer from "@/arches_component_lab/widgets/EdtfWidget/components/EDTFWidgetViewer.vue";
+import EDTFWidgetEditor from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor.vue";
+import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
