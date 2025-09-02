@@ -2,10 +2,10 @@
 import type { EdtfValue } from "@/arches_component_lab/datatypes/edtf/types";
 
 defineProps<{
-    value: EdtfValue;
+    aliasedNodeData: EdtfValue;
 }>();
 </script>
 
 <template>
-    <div>{{ value?.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>
