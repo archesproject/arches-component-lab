@@ -20,7 +20,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <EdtfWidgetEditor
+    <EDTFWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
