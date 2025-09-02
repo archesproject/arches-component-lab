@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import InputNumber from 'primevue/inputnumber';
+import InputNumber from "primevue/inputnumber";
 
-import type { NumberCardXNodeXWidgetData, NumberValue } from "@/arches_component_lab/datatypes/number/types.ts";
+import type {
+    NumberCardXNodeXWidgetData,
+    NumberValue,
+} from "@/arches_component_lab/datatypes/number/types.ts";
 
 const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
-  cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-  aliasedNodeData: NumberValue;
+    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+    aliasedNodeData: NumberValue;
 }>();
 
 const emit = defineEmits<{
-  (event: "update:value", updatedValue: NumberValue): void;
+    (event: "update:value", updatedValue: NumberValue): void;
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
@@ -22,16 +25,20 @@ function onUpdateModelValue(updatedValue: number | null) {
 </script>
 
 <template>
-  <pre>{{ cardXNodeXWidgetData.config }}</pre>
-    <InputNumber 
+    <pre>{{ cardXNodeXWidgetData.config }}</pre>
+    <InputNumber
         :model-value="aliasedNodeData?.node_value ?? null"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :prefix="cardXNodeXWidgetData.config.prefix ?? ''"
         :suffix="cardXNodeXWidgetData.config.suffix ?? ''"
-        :min-fraction-digits="Number(cardXNodeXWidgetData.config.precision) || 0"
-        :max-fraction-digits="Number(cardXNodeXWidgetData.config.precision) || 0"
+        :min-fraction-digits="
+            Number(cardXNodeXWidgetData.config.precision) || 0
+        "
+        :max-fraction-digits="
+            Number(cardXNodeXWidgetData.config.precision) || 0
+        "
         :min="cardXNodeXWidgetData.config.min"
         :max="cardXNodeXWidgetData.config.max"
         @update:model-value="onUpdateModelValue($event)"
