@@ -29,7 +29,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         @update:value="emit('update:value', $event)"
         @update:is-dirty="emit('update:isDirty', $event)"
     />
-    <EdtfWidgetViewer
+    <EDTFWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
