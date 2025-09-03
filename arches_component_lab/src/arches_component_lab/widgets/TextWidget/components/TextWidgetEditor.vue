@@ -64,32 +64,19 @@ watch(selectedLanguage, () => {
 });
 
 function onUpdateModelValue(updatedValue: string | undefined) {
-    const normalizedValue = updatedValue ?? "";
-    const currentLanguage = selectedLanguage.value;
-    if (!currentLanguage) return;
-
-    const combinedNodeValue: StringValue["node_value"] = {
-        ...(aliasedNodeData.node_value ?? {}),
-        ...(managedNodeValue.value ?? {}),
-    };
-
-    combinedNodeValue[currentLanguage.code] = {
-        value: normalizedValue,
-        direction: currentLanguage.default_direction,
-    };
-
-    const filteredNodeValue = Object.fromEntries(
-        Object.entries(combinedNodeValue).filter(([, languageEntry]) => {
-            return (
-                typeof languageEntry?.value === "string" &&
-                languageEntry.value !== ""
-            );
-        }),
-    ) as StringValue["node_value"];
+    if (updatedValue === undefined) {
+        updatedValue = "";
+    }
 
     emit("update:value", {
-        display_value: normalizedValue,
-        node_value: filteredNodeValue,
+        display_value: updatedValue,
+        node_value: {
+            ...managedNodeValue.value,
+            [selectedLanguage.value!.code]: {
+                value: updatedValue,
+                direction: selectedLanguage.value!.default_direction,
+            },
+        },
         details: [],
     });
 }
