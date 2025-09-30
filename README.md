@@ -36,8 +36,8 @@ For projects using Arches >= 8.x also add "pgtrigger" as follows:
 3. Next ensure arches and arches_component_lab are included as dependencies in package.json
     ```
     "dependencies": {
-        "arches": "archesproject/arches#dev/8.0.x",
-        "arches_component_lab": "archesproject/arches-component-lab#main"
+        "arches": "archesproject/arches#stable/8.0.4",
+        "arches_component_lab": "archesproject/arches-component-lab#alpha/0.0.1a3"
     }
     ```
 
