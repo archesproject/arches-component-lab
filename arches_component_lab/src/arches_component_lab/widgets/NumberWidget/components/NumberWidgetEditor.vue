@@ -18,7 +18,7 @@ const emit = defineEmits<{
 function onUpdateModelValue(updatedValue: number | null) {
     emit("update:value", {
         display_value: updatedValue !== null ? updatedValue.toString() : "",
-        node_value: updatedValue ?? 0,
+        node_value: updatedValue,
         details: [],
     });
 }
@@ -27,7 +27,7 @@ function onUpdateModelValue(updatedValue: number | null) {
 <template>
     <pre>{{ cardXNodeXWidgetData.config }}</pre>
     <InputNumber
-        :model-value="aliasedNodeData?.node_value ?? null"
+        :model-value="aliasedNodeData?.node_value"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
