@@ -25,7 +25,6 @@ function onUpdateModelValue(updatedValue: number | null) {
 </script>
 
 <template>
-    <pre>{{ cardXNodeXWidgetData.config }}</pre>
     <InputNumber
         :model-value="aliasedNodeData?.node_value"
         :fluid="true"
