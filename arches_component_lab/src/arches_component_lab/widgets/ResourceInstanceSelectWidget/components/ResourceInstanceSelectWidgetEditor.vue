@@ -19,12 +19,13 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, compact } =
     defineProps<{
         cardXNodeXWidgetData: CardXNodeXWidgetData;
         nodeAlias: string;
         graphSlug: string;
         aliasedNodeData: ResourceInstanceValue;
+        compact: boolean;
     }>();
 
 const emit = defineEmits<{
@@ -130,18 +131,22 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 function onUpdateModelValue(updatedValue: string | null) {
     const option = getOption(updatedValue!);
 
-    emit("update:value", {
-        display_value: option ? option.display_value : "",
-        node_value: updatedValue
-            ? {
-                  inverseOntologyProperty: "",
-                  ontologyProperty: "",
-                  resourceId: updatedValue,
-                  resourceXresourceId: "",
-              }
-            : null,
-        details: option ? [option] : [],
-    } as ResourceInstanceValue);
+    if (compact) {
+        emit("update:value", updatedValue);
+    } else {
+        emit("update:value", {
+            display_value: option ? option.display_value : "",
+            node_value: updatedValue
+                ? {
+                      inverseOntologyProperty: "",
+                      ontologyProperty: "",
+                      resourceId: updatedValue,
+                      resourceXresourceId: "",
+                  }
+                : null,
+            details: option ? [option] : [],
+        } as ResourceInstanceValue);
+    }
 }
 </script>
 

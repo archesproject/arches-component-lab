@@ -22,12 +22,13 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, compact } =
     defineProps<{
         cardXNodeXWidgetData: CardXNodeXWidgetData;
         nodeAlias: string;
         graphSlug: string;
         aliasedNodeData: ResourceInstanceListValue;
+        compact: boolean;
     }>();
 
 const emit = defineEmits<{
@@ -160,15 +161,19 @@ function onUpdateModelValue(updatedValue: string[]) {
         },
     );
 
-    const formattedValue = {
-        display_value: options
-            .map((option) => option?.display_value)
-            .join(", "),
-        node_value: formattedNodeValues,
-        details: options ?? [],
-    };
+    if (compact) {
+        emit("update:value", updatedValue);
+    } else {
+        const formattedValue = {
+            display_value: options
+                .map((option) => option?.display_value)
+                .join(", "),
+            node_value: formattedNodeValues,
+            details: options ?? [],
+        };
 
-    emit("update:value", formattedValue);
+        emit("update:value", formattedValue);
+    }
 }
 </script>
 
