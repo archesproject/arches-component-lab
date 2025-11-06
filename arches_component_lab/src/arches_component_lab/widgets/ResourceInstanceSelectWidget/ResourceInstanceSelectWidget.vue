@@ -23,7 +23,6 @@ const {
     aliasedNodeData: ResourceInstanceValue;
     compact: boolean;
 }>();
-console.log("compact prop in ResourceInstanceSelectWidget.vue", compact);
 
 const emit = defineEmits(["update:value"]);
 </script>

@@ -32,7 +32,10 @@ const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, compact } =
     }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceListValue): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceListValue | string[],
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -162,7 +165,7 @@ function onUpdateModelValue(updatedValue: string[]) {
     );
 
     if (compact) {
-        emit("update:value", updatedValue);
+        emit("update:value", updatedValue as string[]);
     } else {
         const formattedValue = {
             display_value: options

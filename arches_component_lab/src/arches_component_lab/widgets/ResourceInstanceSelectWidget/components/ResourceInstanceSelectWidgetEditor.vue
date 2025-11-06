@@ -29,7 +29,7 @@ const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, compact } =
     }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceValue): void;
+    (event: "update:value", updatedValue: ResourceInstanceValue | string): void;
 }>();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
@@ -132,7 +132,7 @@ function onUpdateModelValue(updatedValue: string | null) {
     const option = getOption(updatedValue!);
 
     if (compact) {
-        emit("update:value", updatedValue);
+        emit("update:value", updatedValue as string);
     } else {
         emit("update:value", {
             display_value: option ? option.display_value : "",
