@@ -15,13 +15,17 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData, compact } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     aliasedNodeData: StringValue;
+    compact: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: StringValue): void;
+    (
+        event: "update:value",
+        updatedValue: StringValue | Record<Language.code, string>,
+    ): void;
 }>();
 
 const languages = ref<Language[]>([]);
@@ -68,17 +72,21 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
 
-    emit("update:value", {
-        display_value: updatedValue,
-        node_value: {
-            ...managedNodeValue.value,
-            [selectedLanguage.value!.code]: {
-                value: updatedValue,
-                direction: selectedLanguage.value!.default_direction,
+    if (compact) {
+        emit("update:value", { [selectedLanguage.value!.code]: updatedValue });
+    } else {
+        emit("update:value", {
+            display_value: updatedValue,
+            node_value: {
+                ...managedNodeValue.value,
+                [selectedLanguage.value!.code]: {
+                    value: updatedValue,
+                    direction: selectedLanguage.value!.default_direction,
+                },
             },
-        },
-        details: [],
-    });
+            details: [],
+        });
+    }
 }
 </script>
 
