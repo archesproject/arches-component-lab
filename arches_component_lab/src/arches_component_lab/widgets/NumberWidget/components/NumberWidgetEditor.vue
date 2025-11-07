@@ -13,7 +13,7 @@ const { cardXNodeXWidgetData, aliasedNodeData, compact } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: NumberValue | number): void;
+    (event: "update:value", updatedValue: NumberValue | number | null): void;
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
