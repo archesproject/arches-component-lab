@@ -24,7 +24,7 @@ const { cardXNodeXWidgetData, aliasedNodeData, compact } = defineProps<{
 const emit = defineEmits<{
     (
         event: "update:value",
-        updatedValue: StringValue | Record<Language.code, string>,
+        updatedValue: StringValue | Record<Language["code"], string>,
     ): void;
 }>();
 
