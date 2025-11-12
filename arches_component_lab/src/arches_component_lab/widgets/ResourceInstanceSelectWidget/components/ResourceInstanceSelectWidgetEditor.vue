@@ -52,6 +52,7 @@ const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
+const emptyFilterMessage = ref($gettext("Search returned no results"));
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
@@ -66,6 +67,7 @@ const onFilter = debounce((event: SelectFilterEvent) => {
 async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
+        emptyFilterMessage.value = $gettext("Searching...");
 
         const resourceData = await fetchRelatableResources(
             graphSlug,
@@ -96,6 +98,9 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (options.value.length - (aliasedNodeData?.details?.length ?? 0) == 0) {
+            emptyFilterMessage.value = $gettext("Search returned no results");
+        }
     }
 }
 
@@ -171,6 +176,8 @@ function onUpdateModelValue(updatedValue: string | null) {
         option-value="resource_id"
         style="min-height: 3rem"
         :filter="true"
+        :filter-fields="['display_value', 'resource_id']"
+        :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"
