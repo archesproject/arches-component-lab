@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 import Checkbox from "primevue/checkbox";
 import CheckboxGroup from "primevue/checkboxgroup";
 
@@ -16,7 +14,7 @@ const { cardXNodeXWidgetData, nodeAlias, aliasedNodeData } = defineProps<{
     aliasedNodeData: DomainValueList;
 }>();
 
-const options = ref<DomainOption[]>(cardXNodeXWidgetData.node.config.options);
+const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValueList): void;
@@ -29,7 +27,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
     const updatedDisplayValue =
         updatedValue
             ?.map((domain) => {
-                const currentOption = options.value.find(
+                const currentOption = options.find(
                     (option: DomainOption) => option.id === domain,
                 );
                 return currentOption?.text;

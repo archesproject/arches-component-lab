@@ -18,7 +18,7 @@ defineProps<{
     aliasedNodeData: DomainValueList;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
@@ -29,7 +29,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <DomainCheckboxWidgetViewer
         v-if="mode === VIEW"
