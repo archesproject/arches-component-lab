@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 import MultiSelect from "primevue/multiselect";
 
 import type {
@@ -9,15 +7,12 @@ import type {
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const props = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeAlias: string;
     aliasedNodeData: DomainValueList;
 }>();
 
-const options = ref<DomainOption[]>(
-    props.cardXNodeXWidgetData.node.config.options,
-);
+const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValueList): void;
@@ -30,7 +25,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
     const updatedDisplayValue =
         updatedValue
             ?.map((domain) => {
-                const currentOption = options.value.find(
+                const currentOption = options.find(
                     (option: DomainOption) => option.id === domain,
                 );
                 return currentOption?.text;

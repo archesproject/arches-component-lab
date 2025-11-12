@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 import Select from "primevue/select";
 
 import type {
@@ -9,15 +7,12 @@ import type {
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const props = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeAlias: string;
     aliasedNodeData: DomainValue;
 }>();
 
-const options = ref<DomainOption[]>(
-    props.cardXNodeXWidgetData.node.config.options,
-);
+const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValue): void;
@@ -25,7 +20,7 @@ const emit = defineEmits<{
 
 function onUpdateModelValue(updatedValue: string | null) {
     const updatedDisplayValue =
-        options.value.find((option: DomainOption) => option.id === updatedValue)
+        options.find((option: DomainOption) => option.id === updatedValue)
             ?.text || "";
 
     emit("update:value", {
