@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
@@ -16,7 +14,7 @@ const { cardXNodeXWidgetData, nodeAlias, aliasedNodeData } = defineProps<{
     aliasedNodeData: DomainValue;
 }>();
 
-const options = ref<DomainOption[]>(cardXNodeXWidgetData.node.config.options);
+const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: DomainValue): void;
@@ -24,7 +22,7 @@ const emit = defineEmits<{
 
 function onUpdateModelValue(updatedValue: string | null) {
     const updatedDisplayValue =
-        options.value.find((option: DomainOption) => option.id === updatedValue)
+        options.find((option: DomainOption) => option.id === updatedValue)
             ?.text || "";
 
     emit("update:value", {
