@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { NumberValue } from "@/arches_component_lab/datatypes/number/types";
+import type { DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 defineProps<{
-    aliasedNodeData: NumberValue | null;
+    aliasedNodeData: DomainValue | null;
 }>();
 </script>
 
