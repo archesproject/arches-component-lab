@@ -34,7 +34,10 @@ const {
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceValue | string): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceValue | string[],
+    ): void;
 }>();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
@@ -134,10 +137,17 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
-    const option = getOption(updatedValue!);
+    const selectedValue = updatedValue ?? "";
+
+    const option = getOption(selectedValue);
 
     if (shouldEmitSimplifiedValue) {
-        emit("update:value", [updatedValue]);
+        if (updatedValue === null) {
+            emit("update:value", []);
+        } else {
+            emit("update:value", [selectedValue]);
+        }
+        return;
     } else {
         emit("update:value", {
             display_value: option ? option.display_value : "",
@@ -145,7 +155,7 @@ function onUpdateModelValue(updatedValue: string | null) {
                 ? {
                       inverseOntologyProperty: "",
                       ontologyProperty: "",
-                      resourceId: updatedValue,
+                      resourceId: selectedValue,
                       resourceXresourceId: "",
                   }
                 : null,
