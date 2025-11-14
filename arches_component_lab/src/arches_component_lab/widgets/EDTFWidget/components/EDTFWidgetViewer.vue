@@ -2,7 +2,7 @@
 import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
 
 defineProps<{
-    aliasedNodeData: EDTFValue;
+    aliasedNodeData: EDTFValue | null;
 }>();
 </script>
 

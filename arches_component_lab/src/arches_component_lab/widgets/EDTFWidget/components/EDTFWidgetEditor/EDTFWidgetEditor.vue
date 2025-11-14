@@ -3,30 +3,28 @@ import { ref } from "vue";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 
-import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/ETDFHelpDrawer.vue";
+import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
 
-const visible = ref(false);
-
 const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EDTFValue;
+    aliasedNodeData: EDTFValue | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: EDTFValue): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
+const shouldShowHelpDrawer = ref(false);
+
+function handleUpdateModelValue(updatedValue: string | undefined) {
+    const normalizedValue = updatedValue ?? "";
 
     emit("update:value", {
-        display_value: updatedValue,
-        node_value: updatedValue,
+        display_value: normalizedValue,
+        node_value: normalizedValue,
         details: [],
     });
 }
@@ -38,19 +36,21 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             class="flex-input"
             type="text"
             :fluid="true"
-            :model-value="aliasedNodeData.node_value"
+            :model-value="aliasedNodeData?.node_value"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
-            @update:model-value="onUpdateModelValue($event)"
+            @update:model-value="handleUpdateModelValue"
         />
         <Button
             class="p-button-text custom-text-button"
-            @click="visible = true"
+            @click="shouldShowHelpDrawer = true"
         >
             {{ $gettext("EDTF Formatting") }}
         </Button>
 
-        <EDTFHelpDrawer v-model:visible="visible" />
+        <EDTFHelpDrawer
+            v-model:should-show-help-drawer="shouldShowHelpDrawer"
+        />
     </div>
 </template>
 
@@ -58,7 +58,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 .field-with-button {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* space between input and button */
+    gap: 0.5rem;
     width: 100%;
 }
 
