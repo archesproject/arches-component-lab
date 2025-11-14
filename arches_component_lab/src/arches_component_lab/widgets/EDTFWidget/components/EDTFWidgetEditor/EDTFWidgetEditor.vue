@@ -3,7 +3,7 @@ import { ref } from "vue";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 
-import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/ETDFHelpDrawer.vue"
+import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/ETDFHelpDrawer.vue";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
