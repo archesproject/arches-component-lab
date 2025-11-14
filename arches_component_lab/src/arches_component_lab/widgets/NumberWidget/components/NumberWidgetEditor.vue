@@ -6,10 +6,10 @@ import type {
     NumberValue,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, compact } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } = defineProps<{
     cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
     aliasedNodeData: NumberValue;
-    compact: boolean;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
-    if (compact) {
+    if (shouldEmitSimplifiedValue) {
         emit("update:value", updatedValue);
     } else {
         emit("update:value", {

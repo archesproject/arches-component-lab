@@ -14,7 +14,7 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: NumberValue;
-    compact: boolean;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -27,7 +27,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
-        :compact="compact"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <NumberWidgetViewer

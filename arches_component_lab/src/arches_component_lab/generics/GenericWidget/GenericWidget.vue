@@ -31,7 +31,7 @@ const {
     nodeAlias,
     shouldShowLabel = true,
     aliasedNodeData,
-    compact = false,
+    shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     graphSlug: string;
@@ -40,7 +40,7 @@ const {
     nodeAlias: string;
     shouldShowLabel?: boolean;
     aliasedNodeData?: unknown | null | undefined;
-    compact?: boolean;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits([
@@ -142,7 +142,7 @@ watchEffect(async () => {
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
-                    :compact="compact"
+                    :should-emit-simplified-value="shouldEmitSimplifiedValue"
                     :aliased-node-data="widgetValue"
                     @update:value="onUpdateValue($event)"
                 />
@@ -166,6 +166,5 @@ watchEffect(async () => {
 .widget {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
 }
 </style>

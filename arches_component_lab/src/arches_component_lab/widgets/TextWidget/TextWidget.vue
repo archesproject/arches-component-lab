@@ -12,12 +12,12 @@ const {
     mode,
     cardXNodeXWidgetData,
     aliasedNodeData,
-    compact = false,
+    shouldEmitSimplifiedValue = false,
 } = defineProps<{
     mode: WidgetMode;
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     aliasedNodeData: StringValue;
-    compact: boolean;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -28,7 +28,7 @@ const emit = defineEmits(["update:value"]);
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
-        :compact="compact"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <TextWidgetViewer

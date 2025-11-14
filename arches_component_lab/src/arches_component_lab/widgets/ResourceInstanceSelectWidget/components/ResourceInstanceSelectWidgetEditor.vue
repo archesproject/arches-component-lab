@@ -19,13 +19,13 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, compact } =
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, shouldEmitSimplifiedValue } =
     defineProps<{
         cardXNodeXWidgetData: CardXNodeXWidgetData;
         nodeAlias: string;
         graphSlug: string;
         aliasedNodeData: ResourceInstanceValue;
-        compact: boolean;
+        shouldEmitSimplifiedValue: boolean;
     }>();
 
 const emit = defineEmits<{
@@ -62,7 +62,7 @@ async function getOptions(page: number, filterTerm?: string) {
             (
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceSelectOption => ({
-                display_value: resourceRecord.display_value,
+                display_value: resourceRecord.display_value ?? "",
                 resource_id: resourceRecord.resourceinstanceid,
             }),
         );
@@ -131,8 +131,8 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 function onUpdateModelValue(updatedValue: string | null) {
     const option = getOption(updatedValue!);
 
-    if (compact) {
-        emit("update:value", updatedValue as string);
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", [updatedValue]);
     } else {
         emit("update:value", {
             display_value: option ? option.display_value : "",
@@ -155,6 +155,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
+        style="min-height: 3rem;"
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"

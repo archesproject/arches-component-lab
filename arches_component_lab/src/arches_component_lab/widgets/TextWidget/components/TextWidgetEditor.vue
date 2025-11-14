@@ -15,10 +15,10 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData, compact } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     aliasedNodeData: StringValue;
-    compact: boolean;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -72,7 +72,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
 
-    if (compact) {
+    if (shouldEmitSimplifiedValue) {
         emit("update:value", { [selectedLanguage.value!.code]: updatedValue });
     } else {
         emit("update:value", {

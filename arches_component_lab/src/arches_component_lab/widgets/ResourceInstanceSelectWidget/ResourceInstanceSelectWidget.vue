@@ -14,14 +14,14 @@ const {
     graphSlug,
     cardXNodeXWidgetData,
     aliasedNodeData,
-    compact = false,
+    shouldEmitSimplifiedValue = false,
 } = defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ResourceInstanceValue;
-    compact: boolean;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -34,7 +34,7 @@ const emit = defineEmits(["update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
-        :compact="compact"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceSelectWidgetViewer
