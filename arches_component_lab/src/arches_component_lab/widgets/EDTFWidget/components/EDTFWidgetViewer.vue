@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { EdtfValue } from "@/arches_component_lab/datatypes/edtf/types";
+import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
 
 defineProps<{
-    aliasedNodeData: EdtfValue;
+    aliasedNodeData: EDTFValue;
 }>();
 </script>
 
