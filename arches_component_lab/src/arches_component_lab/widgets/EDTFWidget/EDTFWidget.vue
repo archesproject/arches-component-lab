@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EDTFWidgetEditor from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor.vue";
+import EDTFWidgetEditor from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/EDTFWidgetEditor.vue";
 import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
@@ -27,7 +27,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"
