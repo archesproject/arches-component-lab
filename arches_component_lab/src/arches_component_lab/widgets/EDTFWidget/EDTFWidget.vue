@@ -5,7 +5,7 @@ import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { EdtfValue } from "@/arches_component_lab/datatypes/edtf/types.ts";
+import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EdtfValue;
+    aliasedNodeData: EDTFValue;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
