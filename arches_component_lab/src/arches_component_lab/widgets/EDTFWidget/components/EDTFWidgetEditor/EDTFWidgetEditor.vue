@@ -43,11 +43,14 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
             @update:model-value="onUpdateModelValue($event)"
         />
-        <Button class="p-button-text custom-text-button" @click="visible = true"> 
-            {{ $gettext('EDTF Formatting') }}
+        <Button
+            class="p-button-text custom-text-button"
+            @click="visible = true"
+        >
+            {{ $gettext("EDTF Formatting") }}
         </Button>
-        
-        <EDTFHelpDrawer v-model:visible="visible"/>
+
+        <EDTFHelpDrawer v-model:visible="visible" />
     </div>
 </template>
 
