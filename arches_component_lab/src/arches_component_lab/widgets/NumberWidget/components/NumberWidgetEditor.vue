@@ -6,11 +6,12 @@ import type {
     NumberValue,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } = defineProps<{
-    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-    aliasedNodeData: NumberValue;
-    shouldEmitSimplifiedValue: boolean;
-}>();
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
+    defineProps<{
+        cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+        aliasedNodeData: NumberValue;
+        shouldEmitSimplifiedValue: boolean;
+    }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: NumberValue | number | null): void;

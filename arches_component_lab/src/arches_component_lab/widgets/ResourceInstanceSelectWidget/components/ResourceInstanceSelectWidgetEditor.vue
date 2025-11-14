@@ -19,14 +19,19 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, shouldEmitSimplifiedValue } =
-    defineProps<{
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-        nodeAlias: string;
-        graphSlug: string;
-        aliasedNodeData: ResourceInstanceValue;
-        shouldEmitSimplifiedValue: boolean;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    graphSlug,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeAlias: string;
+    graphSlug: string;
+    aliasedNodeData: ResourceInstanceValue;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ResourceInstanceValue | string): void;
@@ -155,7 +160,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
-        style="min-height: 3rem;"
+        style="min-height: 3rem"
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"

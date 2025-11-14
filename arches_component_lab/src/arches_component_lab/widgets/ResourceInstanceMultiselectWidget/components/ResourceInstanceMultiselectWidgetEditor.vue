@@ -22,14 +22,19 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData, shouldEmitSimplifiedValue } =
-    defineProps<{
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-        nodeAlias: string;
-        graphSlug: string;
-        aliasedNodeData: ResourceInstanceListValue;
-        shouldEmitSimplifiedValue: boolean;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    graphSlug,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeAlias: string;
+    graphSlug: string;
+    aliasedNodeData: ResourceInstanceListValue;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
     (
@@ -185,7 +190,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
-        style="min-height: 3rem;"
+        style="min-height: 3rem"
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"

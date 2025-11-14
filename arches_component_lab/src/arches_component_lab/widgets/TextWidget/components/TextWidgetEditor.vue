@@ -15,11 +15,12 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } = defineProps<{
-    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue;
-    shouldEmitSimplifiedValue: boolean;
-}>();
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
+    defineProps<{
+        cardXNodeXWidgetData: StringCardXNodeXWidgetData;
+        aliasedNodeData: StringValue;
+        shouldEmitSimplifiedValue: boolean;
+    }>();
 
 const emit = defineEmits<{
     (
