@@ -15,13 +15,18 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
-    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue;
-}>();
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
+    defineProps<{
+        cardXNodeXWidgetData: StringCardXNodeXWidgetData;
+        aliasedNodeData: StringValue | null;
+        shouldEmitSimplifiedValue: boolean;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: StringValue): void;
+    (
+        event: "update:value",
+        updatedValue: StringValue | Record<Language["code"], string>,
+    ): void;
 }>();
 
 const languages = ref<Language[]>([]);
@@ -42,7 +47,7 @@ watchEffect(async () => {
 });
 
 watch(languages, () => {
-    const workingObject = { ...aliasedNodeData.node_value };
+    const workingObject = { ...aliasedNodeData?.node_value };
     for (const language of languages.value) {
         if (!workingObject[language.code]) {
             workingObject[language.code] = {
@@ -68,17 +73,21 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
 
-    emit("update:value", {
-        display_value: updatedValue,
-        node_value: {
-            ...managedNodeValue.value,
-            [selectedLanguage.value!.code]: {
-                value: updatedValue,
-                direction: selectedLanguage.value!.default_direction,
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", { [selectedLanguage.value!.code]: updatedValue });
+    } else {
+        emit("update:value", {
+            display_value: updatedValue,
+            node_value: {
+                ...managedNodeValue.value,
+                [selectedLanguage.value!.code]: {
+                    value: updatedValue,
+                    direction: selectedLanguage.value!.default_direction,
+                },
             },
-        },
-        details: [],
-    });
+            details: [],
+        });
+    }
 }
 </script>
 
@@ -98,8 +107,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         <InputText
             type="text"
             :fluid="true"
-            :form-input="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength || Infinity"
+            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
             :model-value="singleInputValue"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"

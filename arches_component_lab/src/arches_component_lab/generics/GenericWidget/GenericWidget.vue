@@ -25,20 +25,24 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
     cardXNodeXWidgetData,
+    cardXNodeXWidgetDataOverrides,
     graphSlug,
     isDirty = false,
     mode,
     nodeAlias,
     shouldShowLabel = true,
     aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    cardXNodeXWidgetDataOverrides?: CardXNodeXWidgetData;
     graphSlug: string;
     isDirty?: boolean;
     mode: WidgetMode;
     nodeAlias: string;
     shouldShowLabel?: boolean;
     aliasedNodeData?: unknown | null | undefined;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits([
@@ -69,9 +73,10 @@ const widgetComponent = computed(() => {
 
 const widgetValue = computed(() => {
     if (aliasedNodeData !== undefined) {
-        return aliasedNodeData;
-    } else if (resolvedCardXNodeXWidgetData.value) {
-        return resolvedCardXNodeXWidgetData.value.config.defaultValue;
+        return aliasedNodeData as AliasedNodeData;
+    } else if (resolvedCardXNodeXWidgetData.value?.config?.defaultValue) {
+        return resolvedCardXNodeXWidgetData.value.config
+            .defaultValue as AliasedNodeData;
     } else {
         return null;
     }
@@ -89,6 +94,15 @@ watchEffect(async () => {
             graphSlug,
             nodeAlias,
         );
+        if (
+            cardXNodeXWidgetDataOverrides &&
+            resolvedCardXNodeXWidgetData.value
+        ) {
+            resolvedCardXNodeXWidgetData.value = {
+                ...resolvedCardXNodeXWidgetData.value,
+                ...cardXNodeXWidgetDataOverrides,
+            };
+        }
     } catch (error) {
         configurationError.value = error as Error;
     } finally {
@@ -126,9 +140,11 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :aliased-node-data="widgetValue as AliasedNodeData"
+                :aliased-node-data="widgetValue!"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
+                @update:is-dirty="emit('update:isDirty', $event)"
+                @update:value="emit('update:value', $event)"
             >
                 <component
                     :is="widgetComponent"
@@ -137,6 +153,7 @@ watchEffect(async () => {
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
+                    :should-emit-simplified-value="shouldEmitSimplifiedValue"
                     :aliased-node-data="widgetValue"
                     @update:value="onUpdateValue($event)"
                 />
@@ -160,6 +177,5 @@ watchEffect(async () => {
 .widget {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
 }
 </style>

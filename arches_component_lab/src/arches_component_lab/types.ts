@@ -34,6 +34,7 @@ export interface CardXNodeXWidgetData {
         alias: string;
         isrequired: boolean;
         nodeid: string;
+        datatype: string;
     };
     sortorder: number;
     visible: boolean;
@@ -47,6 +48,12 @@ export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
         maxLength: string | null;
         placeholder: string | null;
+    };
+}
+
+export interface ConceptRadioCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
+        groupDirection: string | null;
     };
 }
 
