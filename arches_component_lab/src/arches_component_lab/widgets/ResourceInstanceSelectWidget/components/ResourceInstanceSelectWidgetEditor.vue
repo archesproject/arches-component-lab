@@ -6,18 +6,19 @@ import { useGettext } from "vue3-gettext";
 import Select from "primevue/select";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 import type {
+    ResourceInstanceValue,
+    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
-    ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { $gettext } = useGettext();
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const {
     cardXNodeXWidgetData,
@@ -40,9 +41,13 @@ const emit = defineEmits<{
     ): void;
 }>();
 
+const { $gettext } = useGettext();
+
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceSelectOption[]>([]);
+const options = ref<ResourceInstanceReference[]>(
+    aliasedNodeData?.details || [],
+);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -53,6 +58,10 @@ const resourceResultsCurrentCount = computed(() => options.value.length);
 watchEffect(() => {
     getOptions(1);
 });
+
+const onFilter = debounce((event: SelectFilterEvent) => {
+    getOptions(1, event.value);
+}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
@@ -90,20 +99,6 @@ async function getOptions(page: number, filterTerm?: string) {
     }
 }
 
-function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id == value);
-}
-
-function onFilter(event: SelectFilterEvent) {
-    if (aliasedNodeData?.details) {
-        options.value = aliasedNodeData.details;
-    } else {
-        options.value = [];
-    }
-
-    getOptions(1, event.value);
-}
-
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     if (isLoading.value) {
         return;
@@ -134,6 +129,10 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     await getOptions((resourceResultsPage.value || 0) + 1);
+}
+
+function getOption(value: string): ResourceInstanceSelectOption | undefined {
+    return options.value.find((option) => option.resource_id == value);
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
