@@ -26,18 +26,7 @@ function onUpdateURLValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
     url.value = updatedValue;
-    const formattedValue = {
-        url: url.value,
-        url_label: url_label.value,
-    };
-    const displayValue = url_label.value
-        ? `{url_label.value}({url.value})`
-        : url.value;
-    emit("update:value", {
-        display_value: displayValue,
-        node_value: formattedValue,
-        details: [],
-    });
+    updateValue();
 }
 
 function onUpdateURLLabelValue(updatedValue: string | undefined) {
@@ -45,12 +34,19 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
     url_label.value = updatedValue;
+    updateValue();
+}
+
+function updateValue() {
     const formattedValue = {
         url: url.value,
         url_label: url_label.value,
     };
+    const displayValue = url_label.value
+        ? `${url_label.value}(${url.value})`
+        : url.value;
     emit("update:value", {
-        display_value: JSON.stringify(formattedValue),
+        display_value: displayValue,
         node_value: formattedValue,
         details: [],
     });
@@ -63,6 +59,7 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
         type="text"
         :fluid="true"
         :model-value="url_label"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias + '-url-label' } }"
         :placeholder="$gettext('Enter URL Label...')"
         @update:model-value="onUpdateURLLabelValue($event)"
     />
@@ -72,18 +69,13 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
         required="true"
         :fluid="true"
         :model-value="url"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias + '-url' } }"
         :placeholder="$gettext('Enter URL...')"
         @update:model-value="onUpdateURLValue($event)"
     />
-    <div>preview</div>
-    <a
-        v-if="aliasedNodeData?.node_value?.url"
-        :href="aliasedNodeData?.node_value?.url"
-    >
-        {{
-            aliasedNodeData?.node_value?.url_label ||
-            aliasedNodeData?.node_value?.url
-        }}
-    </a>
+    <div>{{ $gettext("Preview") }}</div>
+    <div>
+        <a v-if="url" :href="url">{{ url_label || url }}</a>
+        <span v-else>{{ url_label }}</span>
+    </div>
 </template>
