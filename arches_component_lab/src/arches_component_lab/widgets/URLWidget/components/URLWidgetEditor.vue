@@ -14,8 +14,8 @@ const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     aliasedNodeData: URLValue | null;
 }>();
 
-const url_label = ref(aliasedNodeData.node_value?.url_label || "");
-const url = ref(aliasedNodeData.node_value?.url || "");
+const url_label = ref(aliasedNodeData!.node_value?.url_label || "");
+const url = ref(aliasedNodeData!.node_value?.url || "");
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLValue): void;
