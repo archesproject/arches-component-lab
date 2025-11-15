@@ -75,7 +75,11 @@ function updateValue() {
     />
     <div>{{ $gettext("Preview") }}</div>
     <div>
-        <a v-if="url" :href="url">{{ url_label || url }}</a>
+        <a
+            v-if="url"
+            :href="url"
+            >{{ url_label || url }}</a
+        >
         <span v-else>{{ url_label }}</span>
     </div>
 </template>
