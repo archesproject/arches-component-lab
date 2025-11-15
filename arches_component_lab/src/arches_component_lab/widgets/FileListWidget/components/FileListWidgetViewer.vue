@@ -5,7 +5,7 @@ import { Image, Galleria } from "primevue";
 import type { FileListValue } from "@/arches_component_lab/datatypes/file-list/types";
 
 const props = defineProps<{
-    value: FileListValue;
+    value: FileListValue | null;
 }>();
 
 const imageData = computed(() => {
@@ -62,5 +62,10 @@ const showThumbnails = computed(() => {
 
 :deep(.thumbnailImage img) {
     max-height: 5rem;
+}
+
+:deep(.p-galleria-thumbnail-item) {
+    overflow: hidden;
+    cursor: pointer;
 }
 </style>

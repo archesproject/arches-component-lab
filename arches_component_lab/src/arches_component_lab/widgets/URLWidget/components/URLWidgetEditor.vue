@@ -11,7 +11,7 @@ const { $gettext } = useGettext();
 
 const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: URLValue;
+    aliasedNodeData: URLValue | null;
 }>();
 
 const url_label = ref(aliasedNodeData.node_value?.url_label || "");
