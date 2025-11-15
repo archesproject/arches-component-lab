@@ -1,3 +1,4 @@
+import uuid
 from django.core.paginator import Paginator
 from django.views import View
 from django.utils.translation import get_language
@@ -48,9 +49,15 @@ class RelatableResourcesView(View):
         ) if int(page_number) == 1 else []
 
         if filter_term:
-            resources = resources.filter(
-                Q(**{"display_value__icontains": filter_term})
-            )
+            try:
+                uuid.UUID(str(filter_term))
+                resources = resources.filter(
+                    Q(resourceinstanceid=str(filter_term))
+                )
+            except ValueError:
+                resources = resources.filter(
+                    Q(**{"display_value__icontains": filter_term})
+                )
 
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
