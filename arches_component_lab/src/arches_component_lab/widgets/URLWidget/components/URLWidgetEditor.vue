@@ -38,11 +38,16 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
 }
 
 function updateValue() {
+    let displayValue;
+    if (urlLabel.value) {
+        displayValue = `${urlLabel.value}(${url.value})`;
+    } else {
+        displayValue = url.value;
+    }
     const formattedValue = {
         url: url.value,
         url_label: urlLabel.value,
     };
-    const displayValue = urlLabel.value ? `${urlLabel.value}(${url.value})` : url.value;
     emit("update:value", {
         display_value: displayValue,
         node_value: formattedValue,
