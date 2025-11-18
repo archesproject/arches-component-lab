@@ -47,7 +47,7 @@ function onUpdateModelValue(updatedValue: string) {
 
         formValue = {
             display_value: formattedDate,
-            node_value: formattedDate,
+            node_value: updatedValue,
             details: [],
         };
     } catch (_error) {
