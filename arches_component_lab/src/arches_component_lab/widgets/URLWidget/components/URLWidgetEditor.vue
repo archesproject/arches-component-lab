@@ -5,20 +5,25 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { URL, URLValue } from "@/arches_component_lab/datatypes/url/types";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue=false
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: URLValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const urlLabel = ref(aliasedNodeData!.node_value?.url_label || "");
 const url = ref(aliasedNodeData!.node_value?.url || "");
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: URLValue): void;
+    (event: "update:value", updatedValue: URLValue | URL): void;
 }>();
 
 function onUpdateURLValue(updatedValue: string | undefined) {
@@ -48,11 +53,15 @@ function updateValue() {
         url: url.value,
         url_label: urlLabel.value,
     };
-    emit("update:value", {
-        display_value: displayValue,
-        node_value: formattedValue,
-        details: [],
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", formattedValue);
+    } else {
+        emit("update:value", {
+            display_value: displayValue,
+            node_value: formattedValue,
+            details: [],
+        });
+    }
 }
 </script>
 
