@@ -12,7 +12,7 @@ const { $gettext } = useGettext();
 const {
     cardXNodeXWidgetData,
     aliasedNodeData,
-    shouldEmitSimplifiedValue=false
+    shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: URLValue | null;
