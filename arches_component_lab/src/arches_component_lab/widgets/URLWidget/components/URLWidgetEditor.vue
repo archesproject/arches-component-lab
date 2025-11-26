@@ -71,7 +71,6 @@ function updateValue() {
         type="text"
         :fluid="true"
         :model-value="urlLabel"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias + '-url-label' } }"
         :placeholder="$gettext('Enter URL Label...')"
         @update:model-value="onUpdateURLLabelValue($event)"
     />
@@ -81,7 +80,7 @@ function updateValue() {
         required="true"
         :fluid="true"
         :model-value="url"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias + '-url' } }"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
         :placeholder="$gettext('Enter URL...')"
         @update:model-value="onUpdateURLValue($event)"
     />
@@ -90,6 +89,9 @@ function updateValue() {
         <a
             v-if="url"
             :href="url"
+            tabindex="-1"
+            target="_blank"
+            rel="noopener noreferrer"
             >{{ urlLabel || url }}</a
         >
         <span v-else>{{ urlLabel }}</span>
