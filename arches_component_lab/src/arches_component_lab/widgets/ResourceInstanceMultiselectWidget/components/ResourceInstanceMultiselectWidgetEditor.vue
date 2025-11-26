@@ -8,6 +8,7 @@ import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
+import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
@@ -17,8 +18,8 @@ import type {
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 import type {
-    ResourceInstanceListOption,
     ResourceInstanceDataItem,
+    ResourceInstanceListOption,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
@@ -47,14 +48,16 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceListOption[]>([]);
+const options = ref<{ display_value: string; resource_id: string }[]>(
+    aliasedNodeData?.details || [],
+);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
+const emptyFilterMessage = ref($gettext("Search returned no results"));
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-
 const initialValueFromTileData = computed(() => {
     if (aliasedNodeData?.details) {
         return aliasedNodeData.details.map((option) => {
@@ -68,19 +71,14 @@ watchEffect(() => {
     getOptions(1);
 });
 
-function onFilter(event: MultiSelectFilterEvent) {
-    if (aliasedNodeData?.details) {
-        options.value = aliasedNodeData.details;
-    } else {
-        options.value = [];
-    }
-
+const onFilter = debounce((event: MultiSelectFilterEvent) => {
     getOptions(1, event.value);
-}
+}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
+        emptyFilterMessage.value = $gettext("Searching...");
 
         const resourceData = await fetchRelatableResources(
             graphSlug,
@@ -111,6 +109,12 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (
+            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
+            0
+        ) {
+            emptyFilterMessage.value = $gettext("Search returned no results");
+        }
     }
 }
 
@@ -146,11 +150,8 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): {
-    display_value: string;
-    resource_id: string;
-} {
-    return options.value.find((option) => option.resource_id == value)!;
+function getOption(value: string): ResourceInstanceListOption | undefined {
+    return options.value.find((option) => option.resource_id == value);
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
@@ -178,7 +179,7 @@ function onUpdateModelValue(updatedValue: string[]) {
                 .join(", "),
             node_value: formattedNodeValues,
             details: options ?? [],
-        };
+        } as ResourceInstanceListValue;
 
         emit("update:value", formattedValue);
     }
@@ -192,6 +193,8 @@ function onUpdateModelValue(updatedValue: string[]) {
         option-value="resource_id"
         style="min-height: 3rem"
         :filter="true"
+        :filter-fields="['display_value', 'resource_id']"
+        :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"

@@ -6,18 +6,18 @@ import { useGettext } from "vue3-gettext";
 import Select from "primevue/select";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 import type {
+    ResourceInstanceValue,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
-    ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { $gettext } = useGettext();
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const {
     cardXNodeXWidgetData,
@@ -40,13 +40,18 @@ const emit = defineEmits<{
     ): void;
 }>();
 
+const { $gettext } = useGettext();
+
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceSelectOption[]>([]);
+const options = ref<{ display_value: string; resource_id: string }[]>(
+    aliasedNodeData?.details || [],
+);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
+const emptyFilterMessage = ref($gettext("Search returned no results"));
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
@@ -54,9 +59,14 @@ watchEffect(() => {
     getOptions(1);
 });
 
+const onFilter = debounce((event: SelectFilterEvent) => {
+    getOptions(1, event.value);
+}, 600);
+
 async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
+        emptyFilterMessage.value = $gettext("Searching...");
 
         const resourceData = await fetchRelatableResources(
             graphSlug,
@@ -87,21 +97,13 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (
+            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
+            0
+        ) {
+            emptyFilterMessage.value = $gettext("Search returned no results");
+        }
     }
-}
-
-function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id == value);
-}
-
-function onFilter(event: SelectFilterEvent) {
-    if (aliasedNodeData?.details) {
-        options.value = aliasedNodeData.details;
-    } else {
-        options.value = [];
-    }
-
-    getOptions(1, event.value);
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
@@ -134,6 +136,10 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     await getOptions((resourceResultsPage.value || 0) + 1);
+}
+
+function getOption(value: string): ResourceInstanceSelectOption | undefined {
+    return options.value.find((option) => option.resource_id == value);
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
@@ -172,6 +178,8 @@ function onUpdateModelValue(updatedValue: string | null) {
         option-value="resource_id"
         style="min-height: 3rem"
         :filter="true"
+        :filter-fields="['display_value', 'resource_id']"
+        :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"

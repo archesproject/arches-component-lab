@@ -1,13 +1,12 @@
+import uuid
 from django.core.paginator import Paginator
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.utils.translation import get_language
 from arches.app.models.models import Node, ResourceInstance, GraphModel
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches import VERSION as arches_version
-from arches.app.utils.decorators import user_can_read_resource
-from django.db.models import Value, Case, When, Q
+from django.db.models import Q, F
 
 
 class RelatableResourcesView(View):
@@ -34,36 +33,41 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        resources = ResourceInstance.objects.filter(graph_id__in=graphs).annotate(
-            order_field=Case(
-                When(resourceinstanceid__in=initial_values, then=Value(0)),
-                default=Value(1),
-            )
+        resources = (
+            ResourceInstance.objects.filter(graph_id__in=graphs)
+            .exclude(resourceinstanceid__in=initial_values)
+            .values("resourceinstanceid")
+            .annotate(display_value=F("descriptors__{}__name".format(language)))
+            .order_by("graph", "pk")
         )
 
-        query_string = "descriptors__{}__name__icontains".format(language)
+        selected_resources = (
+            (
+                ResourceInstance.objects.filter(resourceinstanceid__in=initial_values)
+                .values("resourceinstanceid")
+                .annotate(display_value=F("descriptors__{}__name".format(language)))
+                .order_by("graph", "pk")
+            )
+            if int(page_number) == 1
+            else []
+        )
 
         if filter_term:
-            resources = resources.filter(
-                Q(**{query_string: filter_term})
-                | Q(resourceinstanceid__in=initial_values)
-            )
+            try:
+                uuid.UUID(str(filter_term))
+                resources = resources.filter(Q(resourceinstanceid=str(filter_term)))
+            except ValueError:
+                resources = resources.filter(
+                    Q(**{"display_value__icontains": filter_term})
+                )
 
-        paginator = Paginator(
-            resources.order_by(
-                "order_field", "descriptors__{}__name".format(get_language())
-            ),
-            items_per_page,
+        resources.count = lambda self=None: 1_000_000_000
+        paginator = Paginator(resources, items_per_page)
+
+        data = list(selected_resources) + sorted(
+            paginator.get_page(page_number).object_list,
+            key=lambda r: r.get("display_value", "").lower(),
         )
-        page_object = paginator.get_page(page_number)
-        data = [
-            {
-                "resourceinstanceid": resource.resourceinstanceid,
-                "display_value": resource.descriptors[language]["name"],
-                "order_field": resource.order_field,
-            }
-            for resource in page_object
-        ]
 
         return JSONResponse(
             {
