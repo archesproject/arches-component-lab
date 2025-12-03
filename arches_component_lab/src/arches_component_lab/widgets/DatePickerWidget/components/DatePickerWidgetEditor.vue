@@ -46,8 +46,8 @@ function onUpdateModelValue(updatedValue: string) {
         let simplifiedDate;
         try {
             const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add 1 to month and pad
-            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Add 1 to month and pad
+            const day = date.getDate().toString().padStart(2, "0");
             simplifiedDate = Number(`${year}${month}${day}`);
         } catch (_error) {
             simplifiedDate = updatedValue;
