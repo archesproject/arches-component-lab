@@ -85,7 +85,7 @@ increment_version_and_pr:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Derive base branch (change 'main' if your default is different)
-          BASE_BRANCH="dev/1.1.x"
+          BASE_BRANCH="main"
           HEAD_BRANCH="${GITHUB_REF_NAME}"
 
           existing_pr=$(gh pr list \
