@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "arches>=7.6.9",
-    "arches-querysets[drf]@ git+https://github.com/archesproject/arches-querysets@dev/1.0.x",
+    "arches_querysets[drf]==1.0.0",
 ]
 dynamic = []
 
