@@ -3,7 +3,7 @@ name: Prepare release
 on:
   push:
     branches:
-      - 'release_alpha*'
+      - 'release_alpha'
 
 permissions:
   contents: write
