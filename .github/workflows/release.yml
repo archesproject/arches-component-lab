@@ -3,7 +3,7 @@ name: Prepare release
 on:
   push:
     branches:
-      - '*release_alpha*'
+      - 'release_alpha*'
 
 permissions:
   contents: write
@@ -79,7 +79,7 @@ increment_version_and_pr:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Derive base branch (change 'main' if your default is different)
-          BASE_BRANCH="main"
+          BASE_BRANCH=${{ github.event.repository.default_branch }}
           HEAD_BRANCH="${GITHUB_REF_NAME}"
 
           existing_pr=$(gh pr list \
