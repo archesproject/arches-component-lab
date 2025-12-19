@@ -31,7 +31,7 @@ dependencies = [
     "arches>=7.6.9",
     "arches_querysets[drf] @ git+https://github.com/archesproject/arches-querysets@dev/1.0.x",
 ]
-version = "0.0.1a2"
+version = "0.0.1a3"
 
 [project.optional-dependencies]
 dev = [
