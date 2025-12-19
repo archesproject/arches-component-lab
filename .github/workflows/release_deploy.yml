@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - main
+      - ${{ github.event.repository.default_branch }}
+      - 'release_testing'
 
 jobs:
   build-and-publish:
