@@ -9,7 +9,6 @@ permissions:
   contents: write
   pull-requests: write
 
-
 increment_version_and_pr:
     runs-on: ubuntu-latest
 
