@@ -58,7 +58,7 @@ jobs:
                 else:
                     return Version(f"{current_version.base_version}{pre}0")
 
-            toml_file = Path("/Users/cyrus/Documents/projects/getty/afrc/arches-component-lab/pyproject.toml")
+            toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
             latest_published_version = get_latest_published_version("arches-component-lab")
             pyproject.project["version"] = increment_version(latest_published_version, "a")
