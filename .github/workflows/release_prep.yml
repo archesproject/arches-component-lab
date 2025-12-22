@@ -95,7 +95,6 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           run: |
-            # Derive base branch (change 'main' if your default is different)
             BASE_BRANCH=${{ github.event.repository.default_branch }}
             HEAD_BRANCH="${GITHUB_REF_NAME}"
 
@@ -116,4 +115,4 @@ jobs:
               --base "$BASE_BRANCH" \
               --head "$HEAD_BRANCH" \
               --title "on merge: pypi release prep for version ${{ steps.increment_version.outputs.new_version }}" \
-              --body "Automated release preparation.Release will be deployed on merge"
+              --body "Automated release preparation. PyPI release will be deployed on merge"
