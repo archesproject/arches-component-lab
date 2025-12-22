@@ -50,7 +50,6 @@ jobs:
                 return Version(versions[0]) if len(versions) else None
 
             def increment_version(current_version: Version, pre: str = "a") -> str:
-                current_version=Version('1.0.1')
                 if not current_version:
                     return Version(f"0.0.0{pre}{0}")
                 elif current_version.pre and current_version.pre[0] == pre:
@@ -58,7 +57,7 @@ jobs:
                 else:
                     return Version(f"{current_version.base_version}{pre}0")
 
-            toml_file = Path("/Users/cyrus/Documents/projects/getty/afrc/arches-component-lab/pyproject.toml")
+            toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
             latest_published_version = get_latest_published_version("arches-component-lab")
             pyproject.project["version"] = increment_version(latest_published_version, "a")
