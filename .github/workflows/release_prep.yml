@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'release_alpha'
+      - 'test/*'
 
 permissions:
   contents: write
