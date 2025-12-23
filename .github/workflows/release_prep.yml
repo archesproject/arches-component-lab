@@ -56,8 +56,7 @@ jobs:
                 versions.sort(key=Version, reverse=True)
                 return Version(versions[0]) if len(versions) else None
 
-            def increment_version(current: Version) -> str:
-                branch = os.getenv("BRANCH_NAME", "alpha_release")
+            def increment_version(current: Version, branch: str) -> str:
                 if not current:
                     current = Version(f"0.0.0")
 
@@ -80,8 +79,27 @@ jobs:
 
             toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
+            current_branch = os.getenv("BRANCH_NAME")
+
+            match current_branch:
+                case "release_alpha":
+                    dev_status = "Development Status :: 3 - Alpha"
+                case "release_beta":
+                    dev_status = "Development Status :: 4 - Beta"
+                case _:
+                    dev_status = "Development Status :: 5 - Production/Stable"
+
+            dev_status_index = next(
+                (
+                    idx
+                    for idx, string in enumerate(pyproject.project["classifiers"])
+                    if "Development Status" in string
+                ),
+                0,
+            )
+            pyproject.project["classifiers"][dev_status_index] = dev_status
             latest_published_version = get_latest_published_version(pyproject.project["name"])
-            pyproject.project["version"] = increment_version(latest_published_version)
+            pyproject.project["version"] = increment_version(latest_published_version, current_branch)
             pyproject.dump(toml_file)
             PYCODE
 
