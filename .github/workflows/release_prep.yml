@@ -54,7 +54,7 @@ jobs:
                 elif current_version.pre and current_version.pre[0] == pre:
                     return Version(f"{current_version.base_version}{current_version.pre[0]}{current_version.pre[1] + 1}")
                 else:
-                    return Version(f"{current_version.base_version}{pre}0")
+                    return Version(f"{current_version.major}.{current_version.minor + 1}.{current_version.micro}{pre}0")
 
             toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
