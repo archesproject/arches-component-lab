@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - 'release_alpha'
+      - 'release_beta'
+      - 'release_patch'
+      - 'release_minor'
+      - 'release_major'
       - 'test/*'
 
 permissions:
@@ -52,19 +56,33 @@ jobs:
                 versions.sort(key=Version, reverse=True)
                 return Version(versions[0]) if len(versions) else None
 
-            def increment_version(current_version: Version, pre: str = "a") -> str:
-                if not current_version:
-                    return Version(f"0.0.0{pre}{0}")
-                elif current_version.pre and current_version.pre[0] == pre:
-                    return Version(f"{current_version.base_version}{current_version.pre[0]}{current_version.pre[1] + 1}")
+            def increment_version(current: Version) -> str:
+                branch = os.getenv("BRANCH_NAME", "alpha_release")
+                if not current:
+                    current = Version(f"0.0.0")
+
+                if "alpha" in branch or "beta" in branch:
+                    pre = "a" if "alpha" in branch else "b"
+                    if current.pre and current.pre[0] == pre:
+                        return Version(f"{current.base_version}{current.pre[0]}{current.pre[1] + 1}")
+                    else:
+                        return Version(f"{current.base_version}{pre}0")
                 else:
-                    return Version(f"{current_version.major}.{current_version.minor + 1}.{current_version.micro}{pre}0")
+                    match branch:
+                        case "release_major":
+                            return Version(f"{current.major + 1}.{0}.{0}")
+                        case "release_minor":
+                            return Version(f"{current.major}.{current.minor + 1}.{0}")
+                        case "release_patch":
+                            return Version(f"{current.major}.{current.minor}.{current.micro + 1}")
+                        case _:
+                            raise ValueError("Unable to identify release version")
 
             print(f"Current branch: {os.getenv("BRANCH_NAME")}")
             toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
             latest_published_version = get_latest_published_version("arches-component-lab")
-            pyproject.project["version"] = increment_version(latest_published_version, "a")
+            pyproject.project["version"] = increment_version(latest_published_version)
             pyproject.dump(toml_file)
             PYCODE
 
