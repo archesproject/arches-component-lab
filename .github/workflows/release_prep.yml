@@ -25,7 +25,7 @@ jobs:
           with:
             python-version: '3.x'
 
-        - name: Install TOML library
+        - name: Install python dependencies
           run: |
             python -m pip install --upgrade pip
             pip install pyproject-parser
@@ -68,7 +68,6 @@ jobs:
             latest_published_version = get_latest_published_version("arches-component-lab")
             pyproject.project["version"] = increment_version(latest_published_version, "a")
             pyproject.dump(toml_file)
-            print(f"::set-output name=new_version::{pyproject.project["version"]}")
             PYCODE
 
         - name: Configure git
