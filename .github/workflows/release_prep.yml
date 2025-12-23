@@ -31,16 +31,13 @@ jobs:
             pip install pyproject-parser
             pip install requests
 
-        - name: Get branch name
-          id: get_branch
-          run: |
-            echo "BRANCH_NAME=${{ github.ref_name }}"
-            echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
-
         - name: Increment version in pyproject.toml
           id: increment_version
+          env:
+            BRANCH_NAME: ${{ github.ref_name }}
           run: |
             python - << 'PYCODE'
+            import os
             import requests
             from pathlib import Path
             from pyproject_parser import PyProject
@@ -63,6 +60,7 @@ jobs:
                 else:
                     return Version(f"{current_version.major}.{current_version.minor + 1}.{current_version.micro}{pre}0")
 
+            print(f"Current branch: {os.getenv("BRANCH_NAME")}")
             toml_file = Path("pyproject.toml")
             pyproject = PyProject.load(toml_file)
             latest_published_version = get_latest_published_version("arches-component-lab")
