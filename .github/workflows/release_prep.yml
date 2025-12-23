@@ -8,6 +8,7 @@ on:
       - 'release_patch'
       - 'release_minor'
       - 'release_major'
+      - 'test/*'
 
 permissions:
   contents: write
