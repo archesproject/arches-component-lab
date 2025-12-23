@@ -16,9 +16,6 @@ def get_latest_published_version(package: str) -> Version:
 
 
 def increment_version(current: Version, branch: str) -> str:
-    if "test" in branch:
-        branch = "release_alpha"
-
     if not current:
         current = Version(f"0.0.0")
 
