@@ -16,6 +16,9 @@ def get_latest_published_version(package: str) -> Version:
 
 
 def increment_version(current: Version, branch: str) -> str:
+    if "test" in branch:
+        branch = "release_alpha"
+
     if not current:
         current = Version(f"0.0.0")
 
@@ -66,6 +69,8 @@ def update_pyproject():
         latest_published_version, current_branch
     )
     pyproject.dump(toml_file)
+    with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+        print(f"new_version={pyproject.project["version"]}", file=output)
 
 
 if __name__ == "__main__":
