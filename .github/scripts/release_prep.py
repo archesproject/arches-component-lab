@@ -1,8 +1,8 @@
 import os
 import requests
 from pathlib import Path
-from pyproject_parser import PyProject
 from packaging.version import Version
+from pyproject_parser import PyProject
 
 
 def get_latest_published_version(package: str) -> Version:
@@ -39,29 +39,34 @@ def increment_version(current: Version, branch: str) -> str:
                 raise ValueError("Unable to identify release version")
 
 
-toml_file = Path("pyproject.toml")
-pyproject = PyProject.load(toml_file)
-current_branch = os.getenv("BRANCH_NAME")
+def update_pyproject():
+    toml_file = Path("pyproject.toml")
+    pyproject = PyProject.load(toml_file)
+    current_branch = os.getenv("BRANCH_NAME")
 
-match current_branch:
-    case "release_alpha":
-        dev_status = "Development Status :: 3 - Alpha"
-    case "release_beta":
-        dev_status = "Development Status :: 4 - Beta"
-    case _:
-        dev_status = "Development Status :: 5 - Production/Stable"
+    match current_branch:
+        case "release_alpha":
+            dev_status = "Development Status :: 3 - Alpha"
+        case "release_beta":
+            dev_status = "Development Status :: 4 - Beta"
+        case _:
+            dev_status = "Development Status :: 5 - Production/Stable"
 
-dev_status_index = next(
-    (
-        idx
-        for idx, string in enumerate(pyproject.project["classifiers"])
-        if "Development Status" in string
-    ),
-    0,
-)
-pyproject.project["classifiers"][dev_status_index] = dev_status
-latest_published_version = get_latest_published_version(pyproject.project["name"])
-pyproject.project["version"] = increment_version(
-    latest_published_version, current_branch
-)
-pyproject.dump(toml_file)
+    dev_status_index = next(
+        (
+            idx
+            for idx, string in enumerate(pyproject.project["classifiers"])
+            if "Development Status" in string
+        ),
+        0,
+    )
+    pyproject.project["classifiers"][dev_status_index] = dev_status
+    latest_published_version = get_latest_published_version(pyproject.project["name"])
+    pyproject.project["version"] = increment_version(
+        latest_published_version, current_branch
+    )
+    pyproject.dump(toml_file)
+
+
+if __name__ == "__main__":
+    update_pyproject()
