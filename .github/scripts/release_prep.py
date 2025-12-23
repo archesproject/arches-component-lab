@@ -66,6 +66,8 @@ def update_pyproject():
         latest_published_version, current_branch
     )
     pyproject.dump(toml_file)
+    with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+        print(f"new_version={pyproject.project["version"]}", file=output)
 
 
 if __name__ == "__main__":
