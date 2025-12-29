@@ -90,5 +90,5 @@ jobs:
             gh pr create \
               --base "$BASE_BRANCH" \
               --head "$HEAD_BRANCH" \
-              --title "on merge: pypi release prep for version ${{ steps.increment_version.outputs.new_version }}" \
+              --title "on merge: pypi release of version ${{ steps.increment_version.outputs.new_version }}" \
               --body "Automated release preparation. PyPI release will be deployed on merge"
