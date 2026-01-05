@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const { $gettext } = useGettext();
 
-const { openFileChooser, cardXNodeXWidgetData, totalFiles } = defineProps<{
+const { openFileChooser, cardXNodeXWidgetData, isDisabled } = defineProps<{
     openFileChooser: () => void;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    totalFiles: number;
+    isDisabled: boolean;
 }>();
-
-const maxFiles = ref(cardXNodeXWidgetData.node.config?.maxFiles as number);
-const isDisabled = computed(() =>
-    maxFiles.value ? maxFiles.value <= totalFiles : false,
-);
 </script>
 
 <template>

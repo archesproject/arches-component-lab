@@ -37,8 +37,12 @@ const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 
 const savedFiles = ref<FileReference[]>([]);
 const pendingFiles = ref<FileData[]>([]);
-const totalFiles = computed(() => {
-    return savedFiles.value.length + pendingFiles.value.length;
+const maxFiles = ref(cardXNodeXWidgetData.node.config.maxFiles as number);
+
+const isDisabled = computed(() => {
+    return maxFiles.value
+        ? maxFiles.value <= savedFiles.value.length + pendingFiles.value.length
+        : false;
 });
 
 const allowedFileTypes = ref();
@@ -132,7 +136,7 @@ function openFileChooser(): void {
             <FileDropZone
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :open-file-chooser="openFileChooser"
-                :total-files="totalFiles"
+                :is-disabled="isDisabled"
             />
 
             <FileList
