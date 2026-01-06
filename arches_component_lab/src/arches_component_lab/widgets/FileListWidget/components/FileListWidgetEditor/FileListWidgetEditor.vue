@@ -40,9 +40,8 @@ const pendingFiles = ref<FileData[]>([]);
 const maxFiles = ref(cardXNodeXWidgetData.node.config.maxFiles as number);
 
 const isDisabled = computed(() => {
-    return maxFiles.value
-        ? maxFiles.value <= savedFiles.value.length + pendingFiles.value.length
-        : false;
+    const totalFiles = savedFiles.value.length + pendingFiles.value.length;
+    return maxFiles.value ? maxFiles.value <= totalFiles : false;
 });
 
 const allowedFileTypes = ref();
