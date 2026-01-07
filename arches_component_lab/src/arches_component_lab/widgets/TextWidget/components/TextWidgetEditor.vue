@@ -115,7 +115,9 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </template>
 
 <style>
-.p-select-options, .p-select-label, .p-select-overlay {
+.p-select-options,
+.p-select-label,
+.p-select-overlay {
     font-size: 1rem;
 }
 </style>
