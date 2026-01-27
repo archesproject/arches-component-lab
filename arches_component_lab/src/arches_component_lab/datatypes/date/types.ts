@@ -5,10 +5,12 @@ export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
         config: {
             dateFormat: string;
-            viewMode: string;
-            minDate: boolean;
-            maxDate: boolean;
         };
+    };
+    config: CardXNodeXWidgetData["config"] & {
+        viewMode: string;
+        minDate: boolean;
+        maxDate: boolean;
     };
 }
 
