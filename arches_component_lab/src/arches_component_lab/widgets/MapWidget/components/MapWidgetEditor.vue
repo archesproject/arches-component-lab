@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import InputText from "primevue/inputtext";
+
 import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types";
 
 defineProps<{
@@ -7,8 +9,10 @@ defineProps<{
 </script>
 
 <template>
-    <input
+    <InputText
         disabled
-        :value="aliasedNodeData?.display_value"
+        type="text"
+        :fluid="true"
+        :model-value="aliasedNodeData?.display_value || ''"
     />
 </template>
