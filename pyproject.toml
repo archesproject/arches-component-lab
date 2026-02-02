@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arches-component-lab"
-version = "0.0.1a6"
+version = "0.0.1a7"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later"
@@ -25,9 +25,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [ 
-    "arches>=7.6.9", 
-    "arches_querysets[drf] @ git+https://github.com/archesproject/arches-querysets@dev/1.1.x",
+dependencies = [
+    "arches>=7.6.9",
+    "arches-querysets[drf] @ git+https://github.com/archesproject/arches-querysets@dev/1.1.x",
 ]
 dynamic = []
 
