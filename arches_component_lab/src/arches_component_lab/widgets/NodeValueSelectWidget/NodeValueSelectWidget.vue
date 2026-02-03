@@ -5,7 +5,7 @@ import NodeValueSelectWidgetViewer from "@/arches_component_lab/widgets/NodeValu
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
+import type { NodeValueValue } from "@/arches_component_lab/datatypes/node-value/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
+    aliasedNodeData: NodeValueValue | null;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
