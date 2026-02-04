@@ -50,7 +50,9 @@ export async function fetchCardXNodeXWidgetDataFromNodeGroup(
     try {
         const parsed = await response.json();
         if (response.ok) {
-            return parsed;
+            return (parsed as CardXNodeXWidgetData[]).toSorted(
+                (a, b) => a.sortorder - b.sortorder,
+            );
         }
         throw new Error(parsed.message);
     } catch (error) {
