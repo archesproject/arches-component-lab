@@ -25,10 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [
-    "arches>=7.6.9",
-    "arches-querysets[drf] @ git+https://github.com/archesproject/arches-querysets@dev/1.1.x",
-]
+dependencies = [ "arches>=7.6.9", "arches-querysets[drf]>=1.1.0a0",]
 dynamic = []
 
 [[project.authors]]
