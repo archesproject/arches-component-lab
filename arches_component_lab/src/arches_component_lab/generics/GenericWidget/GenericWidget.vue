@@ -49,6 +49,7 @@ const emit = defineEmits([
     "update:isDirty",
     "update:isFocused",
     "update:value",
+    "update:isLoading",
 ]);
 
 const isLoading = ref(false);
@@ -107,6 +108,7 @@ watchEffect(async () => {
         configurationError.value = error as Error;
     } finally {
         isLoading.value = false;
+        emit("update:isLoading", isLoading.value);
     }
 });
 </script>
