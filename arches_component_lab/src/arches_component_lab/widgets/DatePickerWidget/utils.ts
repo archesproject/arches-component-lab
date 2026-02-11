@@ -73,5 +73,5 @@ export function convertViewMode(viewMode: string) {
     {
         return "date";
     }
-    return viewMode?.replace(/s$/, "");
+    return viewMode.replace(/s$/, "");
 }
