@@ -69,8 +69,7 @@ export function convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
 }
 
 export function convertViewMode(viewMode: string) {
-    if (viewMode === "days" || !viewMode)
-    {
+    if (viewMode === "days" || !viewMode) {
         return "date";
     }
     return viewMode.replace(/s$/, "");
