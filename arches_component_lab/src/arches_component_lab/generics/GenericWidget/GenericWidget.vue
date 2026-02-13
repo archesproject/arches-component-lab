@@ -4,6 +4,7 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
+    watch,
     watchEffect,
 } from "vue";
 
@@ -49,6 +50,7 @@ const emit = defineEmits([
     "update:isDirty",
     "update:isFocused",
     "update:value",
+    "update:isLoading",
 ]);
 
 const isLoading = ref(false);
@@ -80,6 +82,10 @@ const widgetValue = computed(() => {
     } else {
         return null;
     }
+});
+
+watch(isLoading, () => {
+    emit("update:isLoading", isLoading.value);
 });
 
 watchEffect(async () => {
