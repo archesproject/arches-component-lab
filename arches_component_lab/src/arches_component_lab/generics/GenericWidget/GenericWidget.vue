@@ -4,6 +4,7 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
+    watch,
     watchEffect,
 } from "vue";
 
@@ -83,6 +84,10 @@ const widgetValue = computed(() => {
     }
 });
 
+watch(isLoading, () => {
+    emit("update:isLoading", isLoading.value);
+});
+
 watchEffect(async () => {
     if (resolvedCardXNodeXWidgetData.value) {
         return;
@@ -108,7 +113,6 @@ watchEffect(async () => {
         configurationError.value = error as Error;
     } finally {
         isLoading.value = false;
-        emit("update:isLoading", isLoading.value);
     }
 });
 </script>
