@@ -17,6 +17,7 @@ const getFileUrl = (originalUrl: string) => {
         !originalUrl ||
         originalUrl.toLowerCase().startsWith("http://") ||
         originalUrl.toLowerCase().startsWith("https://") ||
+        originalUrl.toLowerCase().startsWith("blob:") ||
         originalUrl.startsWith(arches.urls.url_subpath)
     ) {
         return originalUrl;
