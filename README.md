@@ -21,19 +21,21 @@ For developer install instructions, see the [Developer Setup](#developer-setup-f
 
 1. If you don't already have an Arches project, you'll need to create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
 
-2. When your project is ready, add "arches_querysets", "arches_component_lab" to INSTALLED_APPS **below** the name of your project. 
+2. When your project is ready, add "arches_querysets" and "arches_component_lab" to INSTALLED_APPS **below** the name of your project, but **above** "arches"
 For projects using Arches >= 8.x also add "pgtrigger" as follows:
 ```python
     INSTALLED_APPS = (
-        ...
         "my_project_name",
+        ...
         "arches_querysets",
         "arches_component_lab",
+        "arches",
+        ...
         "pgtrigger",             # Only when using Arches >= 8.x
     )
     ```
 
-3. Next ensure arches and arches_component_lab are included as dependencies in package.json
+1. Next ensure arches and arches_component_lab are included as dependencies in package.json
     ```
     "dependencies": {
         "arches": "archesproject/arches#dev/8.0.x",
@@ -41,19 +43,19 @@ For projects using Arches >= 8.x also add "pgtrigger" as follows:
     }
     ```
 
-4. Update urls.py to include the arches_component_lab urls
+2. Update urls.py to include the arches_component_lab urls
     ```
     urlpatterns = [
         path("", include("arches_component_lab.urls")),
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     ```
 
-5. Start your project
+3. Start your project
     ```
     python manage.py runserver
     ```
 
-6. Next cd into your project's app directory (the one with package.json) install and build front-end dependencies:
+4. Next cd into your project's app directory (the one with package.json) install and build front-end dependencies:
     ```
     npm install
     npm run build_development
