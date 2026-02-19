@@ -61,6 +61,12 @@ For projects using Arches >= 8.x also add "pgtrigger" as follows:
     npm run build_development
     ```
 
+5. If you are on Arches version 8.1+ and are using the [Language Datatype](https://github.com/archesproject/arches/pull/12558), you should execute this command:
+
+```
+python manage.py widget sync_mappings -wn language-select -cn LanguageSelectWidget
+```
+
 ## Developer Setup (for contributing to the Arches Component Lab project)
 
 1. Download the arches-component-lab repo:
