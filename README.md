@@ -33,7 +33,7 @@ For projects using Arches >= 8.x also add "pgtrigger" as follows:
         ...
         "pgtrigger",             # Only when using Arches >= 8.x
     )
-    ```
+```
 
 1. Next ensure arches and arches_component_lab are included as dependencies in package.json
     ```
@@ -159,3 +159,14 @@ NOTE: Changes are committed to the arches-component-lab repository.
     ```
 
 6. Navigate to https://github.com/archesproject/arches-component-lab/pulls to see and commit the pull request
+
+
+## Extending Arches Component Lab
+
+Arches Component Lab uses the `WidgetMapping` model to map Widgets to their Vue components in the file system. To create this mapping, you should use the `sync_mappings` operation of the `widget` command module.
+
+This command takes two parameters `widget-name` (`-wn`) and `component-name` (`-cn`) and can be used as such:
+
+```
+python manage.py widget sync_mappings -wn language-select -cn LanguageSelectWidget
+```
