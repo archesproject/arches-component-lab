@@ -81,7 +81,7 @@ class WidgetSynchronizerTestCase(TestCase):
 
     def test_validate(self):
         with captured_stdout() as stdout:
-            management.call_command("validate", "--codes", "2001")
+            management.call_command("validate", "--codes", "2001", "--verbosity", "2")
             output = stdout.getvalue()
             self.assertIn(
                 "Widgets without a mapping to a Component Lab Vue component", output
