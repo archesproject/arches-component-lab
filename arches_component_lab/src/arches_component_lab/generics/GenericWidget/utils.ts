@@ -1,3 +1,5 @@
+import type { Ref } from "vue";
+
 export function removeVueExtension(inputFilename: string): string {
     if (typeof inputFilename !== "string") {
         throw new TypeError(
@@ -11,4 +13,12 @@ export function removeVueExtension(inputFilename: string): string {
     }
 
     return inputFilename.replace(vueExtensionPattern, "");
+}
+
+export function loadingHandler(loadingCount: Ref<number>) {
+    return (event: boolean) => {
+        if (event) {
+            loadingCount.value += 1;
+        }
+    };
 }
