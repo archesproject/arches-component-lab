@@ -34,20 +34,44 @@ class WidgetSynchronizerTestCase(TestCase):
         self.dummy_widget_1.delete()
         super().tearDown()
 
-    def test_synchronize_dummy_widget(self):
-        self.assertIsNone(
-            WidgetMapping.objects.filter(widget=self.dummy_widget_0).first()
+    def test_check_for_missing_mappings(self):
+        self.assertFalse(
+            WidgetMapping.objects.filter(
+                widget_id__in=[
+                    self.dummy_widget_0.widgetid,
+                    self.dummy_widget_1.widgetid,
+                ]
+            ).exists()
         )
-        WidgetSynchronizer().synchronize_widgets(widget_name="dummy-widget")
-        mapping = WidgetMapping.objects.filter(widget=self.dummy_widget_0).first()
-        self.assertEqual(mapping.widget, self.dummy_widget_0)
+        widgets_without_mappings = WidgetSynchronizer().check_for_missing_mappings()
+        self.assertIn(self.dummy_widget_0.widgetid, widgets_without_mappings)
+        self.assertIn(self.dummy_widget_1.widgetid, widgets_without_mappings)
 
-    def test_synchronize_with_multiple_missing_widgets_and_no_parameters(self):
-        self.assertIsNone(
-            WidgetMapping.objects.filter(widget=self.dummy_widget_0).first()
+    def test_add_mapping(self):
+        self.assertFalse(
+            WidgetMapping.objects.filter(
+                widget_id__in=[
+                    self.dummy_widget_0.widgetid,
+                    self.dummy_widget_1.widgetid,
+                ]
+            ).exists()
         )
-        self.assertIsNone(
-            WidgetMapping.objects.filter(widget=self.dummy_widget_1).first()
+        synchronizer = WidgetSynchronizer()
+        mapping_0 = synchronizer.add_mapping(self.dummy_widget_0.name)
+        mapping_1 = synchronizer.add_mapping(self.dummy_widget_1.name)
+
+        self.assertIsNotNone(mapping_0)
+        self.assertIsNotNone(mapping_1)
+
+        self.assertEqual(mapping_0.widget, self.dummy_widget_0)
+        self.assertEqual(mapping_1.widget, self.dummy_widget_1)
+
+        expected_component_path_0 = (
+            "arches_component_lab/widgets/DummyWidget/DummyWidget.vue"
         )
-        with self.assertRaises(ValueError):
-            WidgetSynchronizer().synchronize_widgets()
+        expected_component_path_1 = (
+            "arches_component_lab/widgets/AnotherWidget/AnotherWidget.vue"
+        )
+
+        self.assertEqual(mapping_0.component, expected_component_path_0)
+        self.assertEqual(mapping_1.component, expected_component_path_1)
