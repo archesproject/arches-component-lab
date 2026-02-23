@@ -1,5 +1,7 @@
 from uuid import uuid4
 from django.test import TestCase
+from django.core import management
+from django.test.utils import captured_stdout
 
 from arches.app.models.models import Widget
 from arches_component_lab.models import WidgetMapping
@@ -76,3 +78,11 @@ class WidgetSynchronizerTestCase(TestCase):
         self.assertEqual(mapping_1.widget, self.dummy_widget_1)
         self.assertEqual(mapping_0.component, expected_component_path_0)
         self.assertEqual(mapping_1.component, expected_component_path_1)
+
+    def test_validate(self):
+        with captured_stdout() as stdout:
+            management.call_command("validate", "--codes", "2001")
+            output = stdout.getvalue()
+            self.assertIn(
+                "Widgets without a mapping to a Component Lab Vue component", output
+            )
