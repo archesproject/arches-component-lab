@@ -169,10 +169,14 @@ NOTE: Changes are committed to the arches-component-lab repository.
 
 ## Extending Arches Component Lab
 
-Arches Component Lab uses the `WidgetMapping` model to map Widgets to their Vue components in the file system. To create this mapping, you should use the `sync_mappings` operation of the `widget` command module.
-
-This command takes two parameters `widget-name` (`-wn`) and `component-name` (`-cn`) and can be used as such:
-
+Arches Component Lab uses the `WidgetMapping` model to map Widgets to their Vue components in the file system. To identify missing mappings, run:
 ```
-python manage.py widget sync_mappings -wn language-select -cn LanguageSelectWidget
+python manage.py widget check_mappings
+```
+
+If a mapping is missing, you should use the `add_mapping` operation of the `widget` command module.
+
+This command takes two parameters, `widget_name` (`-wn`) and `component_path` (`-cp`):
+```
+python manage.py widget add_mapping -wn language-select -p arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue
 ```
