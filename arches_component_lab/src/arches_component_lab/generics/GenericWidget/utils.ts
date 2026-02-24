@@ -15,7 +15,7 @@ export function removeVueExtension(inputFilename: string): string {
     return inputFilename.replace(vueExtensionPattern, "");
 }
 
-export function loadingHandler(loadingCount: Ref<number>) {
+export function incrementLoadedWidgets(loadingCount: Ref<number>) {
     return (event: boolean) => {
         if (event) {
             loadingCount.value += 1;
