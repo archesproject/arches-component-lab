@@ -178,5 +178,5 @@ If a mapping is missing, you should use the `add_mapping` operation of the `widg
 
 This command takes two parameters, `widget_name` (`-wn`) and `component_path` (`-cp`):
 ```
-python manage.py widget add_mapping -wn language-select -p arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue
+python manage.py widget add_mapping -wn language-select -cp arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue
 ```
