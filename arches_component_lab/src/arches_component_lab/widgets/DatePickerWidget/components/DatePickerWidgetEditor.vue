@@ -120,7 +120,7 @@ const modelDate = computed(() => {
         :date-format="dateFormat"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
-        :manual-input="false"
+        :manual-input="true"
         :show-clear="true"
         :model-value="modelDate"
         :show-time="shouldShowTime"
