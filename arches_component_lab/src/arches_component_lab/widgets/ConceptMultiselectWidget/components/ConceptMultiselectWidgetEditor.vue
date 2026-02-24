@@ -96,6 +96,7 @@ function onUpdateModelValue(selectedConcepts: string[]) {
         selection-mode="multiple"
         :fluid="true"
         filter
+        :show-clear="true"
         :loading="isLoading"
         :model-value="initialValue"
         :options="options as TreeNode[]"

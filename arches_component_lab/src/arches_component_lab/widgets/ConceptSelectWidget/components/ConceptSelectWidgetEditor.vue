@@ -93,6 +93,7 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         selection-mode="single"
         filter
         :fluid="true"
+        :show-clear="true"
         :loading="isLoading"
         :model-value="initialValue"
         :options="options as TreeNode[]"
