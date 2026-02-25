@@ -37,10 +37,7 @@ export async function fetchTileData(
 }
 
 // Promise-based cache: graph config is static for the lifetime of the SPA.
-const nodegroupConfigCache = new Map<
-    string,
-    Promise<CardXNodeXWidgetData[]>
->();
+const nodegroupConfigCache = new Map<string, Promise<CardXNodeXWidgetData[]>>();
 
 export function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
