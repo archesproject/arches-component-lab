@@ -30,7 +30,10 @@ const {
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptListValue | string[]): void;
+    (
+        event: "update:value",
+        updatedValue: ConceptListValue | string[] | null,
+    ): void;
 }>();
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
@@ -41,14 +44,14 @@ const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean>>(() => {
+const initialValue = computed<Record<string, boolean> | null>(() => {
     return (
         aliasedNodeData?.node_value?.reduce(
             (acc: Record<string, boolean>, value: string) => {
                 return { ...acc, [value]: true };
             },
-            {},
-        ) || {}
+            {} as Record<string, boolean>,
+        ) || null
     );
 });
 

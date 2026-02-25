@@ -41,9 +41,9 @@ const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean>>(
-    (): Record<string, boolean> => {
-        if (!aliasedNodeData?.node_value) return {};
+const initialValue = computed<Record<string, boolean> | null>(
+    (): Record<string, boolean> | null => {
+        if (!aliasedNodeData?.node_value) return null;
         return { [aliasedNodeData.node_value]: true };
     },
 );
