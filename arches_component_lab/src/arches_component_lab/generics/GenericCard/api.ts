@@ -36,26 +36,47 @@ export async function fetchTileData(
     }
 }
 
-export async function fetchCardXNodeXWidgetDataFromNodeGroup(
+// Promise-based cache: graph config is static for the lifetime of the SPA.
+const nodegroupConfigCache = new Map<
+    string,
+    Promise<CardXNodeXWidgetData[]>
+>();
+
+export function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
     nodegroupAlias: string,
 ): Promise<CardXNodeXWidgetData[]> {
-    const response = await fetch(
-        arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
-            graphSlug,
-            nodegroupAlias,
-        ),
-    );
-
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+    const cacheKey = `${graphSlug}:${nodegroupAlias}`;
+    const cached = nodegroupConfigCache.get(cacheKey);
+    if (cached) {
+        return cached;
     }
+
+    const promise = (async () => {
+        const response = await fetch(
+            arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
+                graphSlug,
+                nodegroupAlias,
+            ),
+        );
+
+        try {
+            const parsed = await response.json();
+            if (response.ok) {
+                return parsed;
+            }
+            throw new Error(parsed.message);
+        } catch (error) {
+            throw new Error((error as Error).message || response.statusText);
+        }
+    })();
+
+    promise.catch(() => {
+        nodegroupConfigCache.delete(cacheKey);
+    });
+
+    nodegroupConfigCache.set(cacheKey, promise);
+    return promise;
 }
 
 export async function upsertTile(
