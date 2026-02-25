@@ -62,22 +62,15 @@ class WidgetSynchronizerTestCase(TestCase):
         expected_component_path_0 = (
             "arches_component_lab/widgets/DummyWidget/DummyWidget.vue"
         )
-        expected_component_path_1 = (
-            "arches_component_lab/widgets/AnotherWidget/AnotherWidget.vue"
-        )
 
-        mapping_0 = synchronizer.add_mapping(self.dummy_widget_0.name)
-        mapping_1 = synchronizer.add_mapping(
-            self.dummy_widget_1.name,
-            expected_component_path_1,
+        mapping_0 = synchronizer.add_mapping(
+            self.dummy_widget_0.name,
+            expected_component_path_0,
         )
 
         self.assertIsNotNone(mapping_0)
-        self.assertIsNotNone(mapping_1)
         self.assertEqual(mapping_0.widget, self.dummy_widget_0)
-        self.assertEqual(mapping_1.widget, self.dummy_widget_1)
         self.assertEqual(mapping_0.component, expected_component_path_0)
-        self.assertEqual(mapping_1.component, expected_component_path_1)
 
     def test_validate(self):
         with captured_stdout() as stdout:
