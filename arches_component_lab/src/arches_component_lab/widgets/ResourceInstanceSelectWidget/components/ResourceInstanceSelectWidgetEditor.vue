@@ -5,6 +5,8 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceCreation.vue";
+
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
@@ -24,6 +26,7 @@ const {
     nodeAlias,
     graphSlug,
     aliasedNodeData,
+    canCreateNewResources,
     shouldEmitSimplifiedValue,
     defaultTerm,
 } = defineProps<{
@@ -31,6 +34,7 @@ const {
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceValue | null;
+    canCreateNewResources?: boolean;
     shouldEmitSimplifiedValue?: boolean;
     defaultTerm?: string;
 }>();
@@ -46,7 +50,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<{ display_value: string; resource_id: string }[]>(
+const options = ref<{ display_value: string; id: string; }[]>(
     aliasedNodeData?.details || [],
 );
 const isLoading = ref(false);
@@ -54,6 +58,11 @@ const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
+
+const graphIdsInOptions = ref<Set<string>>(new Set());
+const selectedGraphId = ref<string | null>(null);
+const showResourceCreation = ref(false);
+const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
@@ -89,12 +98,19 @@ async function getOptions(page: number, filterTerm?: string) {
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceSelectOption => ({
                 display_value: resourceRecord.display_value ?? "",
-                resource_id: resourceRecord.resourceinstanceid,
+                id: resourceRecord.resourceinstanceid,
             }),
         );
 
         if (resourceData.current_page == 1) {
             options.value = references;
+            if (canCreateNewResources && cardXNodeXWidgetData.node.config.graphs.length > 0) {
+                cardXNodeXWidgetData.node.config.graphs.forEach((graph: { name: string; graphid: string; }) => {
+                    const placeholder = `${$gettext("Create a new")} ${graph.name}`;
+                    options.value.unshift({ display_value: placeholder, id: graph.graphid });
+                    graphIdsInOptions.value.add(graph.graphid);
+                });
+            }
         } else {
             options.value = [...options.value, ...references];
         }
@@ -147,10 +163,18 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id == value);
+    return options.value.find((option) => option.id == value);
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
+    if (graphIdsInOptions.value.has(updatedValue[0])) {
+        resourceCreationDialogKey.value++;
+        selectedGraphId.value = updatedValue[0];
+        showResourceCreation.value = true;
+        updatedValue.pop();
+        return;
+    }
+
     const selectedValue = updatedValue ?? "";
 
     const option = getOption(selectedValue);
@@ -183,15 +207,15 @@ function onUpdateModelValue(updatedValue: string | null) {
     <Select
         display="chip"
         option-label="display_value"
-        option-value="resource_id"
+        option-value="id"
         :filter="true"
-        :filter-fields="['display_value', 'resource_id']"
+        :filter-fields="['display_value', 'id']"
         :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="aliasedNodeData?.details?.[0]?.resource_id"
+        :model-value="aliasedNodeData?.details?.[0]?.id"
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
@@ -202,8 +226,14 @@ function onUpdateModelValue(updatedValue: string | null) {
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
         }"
+        :overlay-visible="showResourceCreation ? false : undefined"
         @filter="onFilter"
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
+    />
+    <ResourceInstanceCreation
+        v-if="showResourceCreation"
+        :key="resourceCreationDialogKey"
+        :graph-id="selectedGraphId"
     />
 </template>

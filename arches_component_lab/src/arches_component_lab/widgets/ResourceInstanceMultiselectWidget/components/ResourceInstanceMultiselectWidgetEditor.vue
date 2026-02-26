@@ -7,6 +7,8 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceCreation.vue";
+
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
@@ -28,12 +30,14 @@ const {
     nodeAlias,
     graphSlug,
     aliasedNodeData,
+    canCreateNewResources,
     shouldEmitSimplifiedValue,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceListValue | null;
+    canCreateNewResources?: boolean;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -48,7 +52,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<{ display_value: string; resource_id: string }[]>(
+const options = ref<{ display_value: string; id: string; }[]>(
     aliasedNodeData?.details || [],
 );
 const isLoading = ref(false);
@@ -57,11 +61,16 @@ const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
 
+const graphIdsInOptions = ref<Set<string>>(new Set());
+const selectedGraphId = ref<string | null>(null);
+const showResourceCreation = ref(false);
+const resourceCreationDialogKey = ref(0);
+
 const resourceResultsCurrentCount = computed(() => options.value.length);
 const initialValueFromTileData = computed(() => {
     if (aliasedNodeData?.details) {
         return aliasedNodeData.details.map((option) => {
-            return option.resource_id;
+            return option.id;
         });
     }
     return [];
@@ -93,12 +102,19 @@ async function getOptions(page: number, filterTerm?: string) {
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceListOption => ({
                 display_value: resourceRecord.display_value ?? "",
-                resource_id: resourceRecord.resourceinstanceid,
+                id: resourceRecord.resourceinstanceid,
             }),
         );
 
         if (resourceData.current_page == 1) {
             options.value = references;
+            if (canCreateNewResources && cardXNodeXWidgetData.node.config.graphs.length > 0) {
+                cardXNodeXWidgetData.node.config.graphs.forEach((graph: { name: string; graphid: string; }) => {
+                    const placeholder = `${$gettext("Create a new")} ${graph.name}`;
+                    options.value.unshift({ display_value: placeholder, id: graph.graphid });
+                    graphIdsInOptions.value.add(graph.graphid);
+                });
+            }
         } else {
             options.value = [...options.value, ...references];
         }
@@ -151,10 +167,28 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function getOption(value: string): ResourceInstanceListOption | undefined {
-    return options.value.find((option) => option.resource_id == value);
+    return options.value.find((option) => option.id == value);
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
+    // if more than one option is selected, remove the create command from the array
+    if (updatedValue.length > 0) {
+        for (const graphId of graphIdsInOptions.value) {
+            const index = updatedValue.indexOf(graphId);
+            if (index > -1) {
+                updatedValue.splice(index, 1);
+            }
+        }
+    }
+
+    if (graphIdsInOptions.value.has(updatedValue[0])) {
+        resourceCreationDialogKey.value++;
+        selectedGraphId.value = updatedValue[0];
+        showResourceCreation.value = true;
+        updatedValue.pop();
+        return;
+    }
+
     const options = updatedValue.map((resourceId: string) => {
         return getOption(resourceId);
     });
@@ -190,9 +224,9 @@ function onUpdateModelValue(updatedValue: string[]) {
     <MultiSelect
         display="chip"
         option-label="display_value"
-        option-value="resource_id"
+        option-value="id"
         :filter="true"
-        :filter-fields="['display_value', 'resource_id']"
+        :filter-fields="['display_value', 'id']"
         :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
@@ -208,6 +242,7 @@ function onUpdateModelValue(updatedValue: string[]) {
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
         }"
+        :overlay-visible="showResourceCreation ? false : undefined"
         @filter="onFilter"
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
@@ -250,6 +285,11 @@ function onUpdateModelValue(updatedValue: string[]) {
             </div>
         </template>
     </MultiSelect>
+    <ResourceInstanceCreation
+        v-if="showResourceCreation"
+        :key="resourceCreationDialogKey"
+        :graph-id="selectedGraphId"
+    />
 </template>
 
 <style scoped>
