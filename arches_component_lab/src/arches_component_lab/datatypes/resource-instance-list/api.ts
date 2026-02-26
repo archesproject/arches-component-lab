@@ -1,5 +1,5 @@
-import arches from "arches";
 import type { ResourceInstanceListOption } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
+import { generateArchesURL } from "@/arches/utils/generate-arches-url.ts";
 
 export const fetchRelatableResources = async (
     graphSlug: string,
@@ -23,10 +23,17 @@ export const fetchRelatableResources = async (
         params.append("initialValue", initialValue.resource_id);
     });
     const response = await fetch(
-        `${arches.urls.api_relatable_resources(
-            graphSlug,
-            nodeAlias,
-        )}?${params}`,
+        `${generateArchesURL("arches_component_lab:api-relatable-resources", { graph: graphSlug, node_alias: nodeAlias })}?${params}`,
+    );
+
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message || response.statusText);
+    return parsed;
+};
+
+export const fetchGraphs = async (graphId?: string[] | string) => {
+    const response = await fetch(
+        generateArchesURL("arches:graphs_api", { graph_id: graphId }),
     );
 
     const parsed = await response.json();
