@@ -130,6 +130,6 @@ const modelDate = computed(() => {
         :show-seconds="shouldShowTime"
         :show-icon="true"
         :view="viewMode"
-        @update:model-value="onUpdateModelValue"
+        @update:model-value="onUpdateModelValue($event as unknown as string)"
     />
 </template>
