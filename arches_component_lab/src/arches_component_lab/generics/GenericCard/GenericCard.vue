@@ -59,9 +59,9 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        if (!tileData && !tileId && !resourceInstanceId) {
-            throw new Error();
-        }
+        // if (!tileData && !tileId && !resourceInstanceId) {
+        //     throw new Error();
+        // }
 
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
