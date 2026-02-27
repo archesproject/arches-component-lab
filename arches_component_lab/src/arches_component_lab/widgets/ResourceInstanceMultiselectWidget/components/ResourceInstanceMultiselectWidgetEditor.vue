@@ -172,7 +172,7 @@ function getOption(value: string): ResourceInstanceListOption | undefined {
 
 function onUpdateModelValue(updatedValue: string[]) {
     // if more than one option is selected, remove the create command from the array
-    if (updatedValue.length > 0) {
+    if (updatedValue.length > 1) {
         for (const graphId of graphIdsInOptions.value) {
             const index = updatedValue.indexOf(graphId);
             if (index > -1) {
@@ -247,6 +247,11 @@ function onUpdateModelValue(updatedValue: string[]) {
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
     >
+        <template #option="slotProps">
+            <div :class="{ 'hide-checkbox': graphIdsInOptions.has(slotProps.option.id) }">
+                {{ slotProps.option.display_value }}
+            </div>
+        </template>
         <template #chip="slotProps">
             <div style="width: 100%">
                 <div class="chip-text">
@@ -324,5 +329,15 @@ function onUpdateModelValue(updatedValue: string[]) {
 :deep(.p-multiselect-label-container) {
     white-space: break-spaces;
     width: inherit;
+}
+</style>
+
+<style>
+.p-multiselect-option:has(.hide-checkbox) .p-checkbox {
+    display: none !important;
+}
+
+.hide-checkbox {
+    font-weight: bold;
 }
 </style>
