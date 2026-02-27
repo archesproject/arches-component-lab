@@ -1,6 +1,7 @@
 from django.db.models import Q
 from arches import __version__ as _arches_version_str
 from packaging.version import Version
+
 arches_version = Version(_arches_version_str)
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
