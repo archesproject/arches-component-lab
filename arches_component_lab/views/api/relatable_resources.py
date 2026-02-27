@@ -5,7 +5,9 @@ from django.utils.translation import get_language
 from arches.app.models.models import Node, ResourceInstance, GraphModel
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches import __version__ as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+arches_version = Version(_arches_version_str)
 from django.db.models import Q, F
 
 
@@ -16,7 +18,7 @@ class RelatableResourcesView(View):
             graph__slug=graph,
             graph__publication__isnull=False,
         )
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             node_filter = node_filter & Q(graph__is_active=True)
 
         node = Node.objects.get(node_filter)
