@@ -8,12 +8,16 @@ import { fetchGraphs } from "@/arches_component_lab/datatypes/resource-instance-
 import GenericCard from "@/arches_component_lab/generics/GenericCard/GenericCard.vue";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { Card, Node } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData, Card, Node } from "@/arches_component_lab/types.ts";
 
 const {
     graphId,
 } = defineProps<{
     graphId: string;
+}>();
+
+const emit = defineEmits<{
+    (event: "resourceCreated", resourceinstance: string): void;
 }>();
 
 const visible = ref(true);
@@ -32,8 +36,9 @@ watchEffect(async () => {
     visible.value = true;
 });
 
-function onSave() {
+function onSave(event: AliasedTileData) {
     visible.value = false;
+    emit("resourceCreated", event);
 }
 </script>
 
@@ -66,7 +71,7 @@ function onSave() {
             :nodegroup-alias="nodegroupAlias"
             :graph-slug="graphSlug"
             :resource-instance-id="undefined"
-            @save="onSave"
+            @save="onSave($event)"
         />
     </Dialog>
 </template>

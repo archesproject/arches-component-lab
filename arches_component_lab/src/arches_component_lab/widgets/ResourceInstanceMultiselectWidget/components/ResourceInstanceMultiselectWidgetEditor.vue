@@ -23,7 +23,7 @@ import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData, CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const {
     cardXNodeXWidgetData,
@@ -218,6 +218,12 @@ function onUpdateModelValue(updatedValue: string[]) {
         emit("update:value", formattedValue);
     }
 }
+
+async function onResourceCreated(createdResource: AliasedTileData) {
+    const updatedValues = [createdResource.resourceinstance];   
+    onUpdateModelValue(updatedValues);
+    showResourceCreation.value = false;
+}
 </script>
 
 <template>
@@ -294,6 +300,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         v-if="showResourceCreation"
         :key="resourceCreationDialogKey"
         :graph-id="selectedGraphId"
+        @resource-created="onResourceCreated"
     />
 </template>
 
