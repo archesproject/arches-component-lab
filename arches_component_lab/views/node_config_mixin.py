@@ -1,5 +1,5 @@
 from django.db.models import Q
-from arches import VERSION as arches_version
+from arches import __version__ as arches_version
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
