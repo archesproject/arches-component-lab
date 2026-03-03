@@ -3,21 +3,23 @@ import { ref, watchEffect } from "vue";
 
 import Dialog from "primevue/dialog";
 
-import { fetchGraphs } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
+import { fetchGraph } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 
 import GenericCard from "@/arches_component_lab/generics/GenericCard/GenericCard.vue";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { AliasedTileData, Card, Node } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedTileData,
+    Card,
+    Node,
+} from "@/arches_component_lab/types.ts";
 
-const {
-    graphId,
-} = defineProps<{
+const { graphId } = defineProps<{
     graphId: string;
 }>();
 
 const emit = defineEmits<{
-    (event: "resourceCreated", resourceinstance: string): void;
+    (event: "resourceCreated", resource: AliasedTileData): void;
 }>();
 
 const visible = ref(true);
@@ -28,11 +30,13 @@ const nodegroupAlias = ref<string>("");
 
 watchEffect(async () => {
     visible.value = false;
-    const graph = await fetchGraphs(graphId);
+    const graph = await fetchGraph(graphId);
     graphSlug.value = graph.graph.slug;
     graphName.value = graph.graph.name;
     const card = graph.cards.find((card: Card) => card.sortorder == 0); // maybe make this more robust later
-    nodegroupAlias.value = card.nodes.find((node: Node) => node.nodeid === card.nodegroup_id)?.alias;
+    nodegroupAlias.value = card.nodes.find(
+        (node: Node) => node.nodeid === card.nodegroup_id,
+    )?.alias;
     visible.value = true;
 });
 
@@ -76,5 +80,4 @@ function onSave(event: AliasedTileData) {
     </Dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

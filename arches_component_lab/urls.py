@@ -59,7 +59,7 @@ urlpatterns = [
         name="api-tile-list-create",
     ),
     path(
-        "api/api-tile-new-resource/<slug:graph>/<slug:nodegroup_alias>",
+        "api/tile-new-resource/<slug:graph>/<slug:nodegroup_alias>",
         ArchesTileListCreateView.as_view(),
         name="api-tile-new-resource",
     ),

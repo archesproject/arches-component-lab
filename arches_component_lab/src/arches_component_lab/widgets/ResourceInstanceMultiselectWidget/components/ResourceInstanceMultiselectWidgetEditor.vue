@@ -22,8 +22,9 @@ import type {
 import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
+    ResourceInstanceListCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { AliasedTileData, CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
 const {
     cardXNodeXWidgetData,
@@ -33,7 +34,7 @@ const {
     canCreateNewResources,
     shouldEmitSimplifiedValue,
 } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceListValue | null;
@@ -52,8 +53,8 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<{ display_value: string; id: string; }[]>(
-    aliasedNodeData?.details || [],
+const options = ref<ResourceInstanceListOption[]>(
+    aliasedNodeData?.details ?? [],
 );
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
@@ -62,19 +63,14 @@ const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
 
 const graphIdsInOptions = ref<Set<string>>(new Set());
-const selectedGraphId = ref<string | null>(null);
+const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const initialValueFromTileData = computed(() => {
-    if (aliasedNodeData?.details) {
-        return aliasedNodeData.details.map((option) => {
-            return option.id;
-        });
-    }
-    return [];
-});
+const selectedValues = ref<string[]>(
+    aliasedNodeData?.details?.map((option) => option.resource_id) || [],
+);
 
 watchEffect(() => {
     getOptions(1);
@@ -94,7 +90,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            aliasedNodeData?.details,
+            selectedValues.value,
         );
 
         const references = resourceData.data.map(
@@ -102,16 +98,23 @@ async function getOptions(page: number, filterTerm?: string) {
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceListOption => ({
                 display_value: resourceRecord.display_value ?? "",
-                id: resourceRecord.resourceinstanceid,
+                resource_id: resourceRecord.resourceinstanceid,
             }),
         );
 
         if (resourceData.current_page == 1) {
             options.value = references;
-            if (canCreateNewResources && cardXNodeXWidgetData.node.config.graphs.length > 0) {
-                cardXNodeXWidgetData.node.config.graphs.forEach((graph: { name: string; graphid: string; }) => {
+            if (
+                canCreateNewResources &&
+                cardXNodeXWidgetData.node.config.graphs &&
+                cardXNodeXWidgetData.node.config.graphs.length > 0
+            ) {
+                cardXNodeXWidgetData.node.config.graphs.forEach((graph) => {
                     const placeholder = `${$gettext("Create a new")} ${graph.name}`;
-                    options.value.unshift({ display_value: placeholder, id: graph.graphid });
+                    options.value.unshift({
+                        display_value: placeholder,
+                        resource_id: graph.graphid,
+                    });
                     graphIdsInOptions.value.add(graph.graphid);
                 });
             }
@@ -167,25 +170,21 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function getOption(value: string): ResourceInstanceListOption | undefined {
-    return options.value.find((option) => option.id == value);
+    return options.value.find((option) => option.resource_id == value);
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
-    // if more than one option is selected, remove the create command from the array
-    if (updatedValue.length > 1) {
-        for (const graphId of graphIdsInOptions.value) {
-            const index = updatedValue.indexOf(graphId);
-            if (index > -1) {
-                updatedValue.splice(index, 1);
-            }
-        }
-    }
-
-    if (graphIdsInOptions.value.has(updatedValue[0])) {
+    selectedGraphId.value =
+        updatedValue.find((value: string) =>
+            graphIdsInOptions.value.has(value),
+        ) || "";
+    if (selectedGraphId.value) {
         resourceCreationDialogKey.value++;
-        selectedGraphId.value = updatedValue[0];
         showResourceCreation.value = true;
-        updatedValue.pop();
+        const index = updatedValue.indexOf(selectedGraphId.value);
+        if (index > -1) {
+            updatedValue.splice(index, 1);
+        }
         return;
     }
 
@@ -204,6 +203,8 @@ function onUpdateModelValue(updatedValue: string[]) {
         },
     );
 
+    selectedValues.value = updatedValue;
+
     if (shouldEmitSimplifiedValue) {
         emit("update:value", updatedValue as string[]);
     } else {
@@ -219,9 +220,13 @@ function onUpdateModelValue(updatedValue: string[]) {
     }
 }
 
-async function onResourceCreated(createdResource: AliasedTileData) {
-    const updatedValues = [createdResource.resourceinstance];   
-    onUpdateModelValue(updatedValues);
+async function onResourceCreated(createdTile: AliasedTileData) {
+    selectedValues.value = [
+        ...selectedValues.value,
+        createdTile.resourceinstance,
+    ];
+    getOptions(1);
+    onUpdateModelValue([createdTile.resourceinstance]);
     showResourceCreation.value = false;
 }
 </script>
@@ -230,15 +235,15 @@ async function onResourceCreated(createdResource: AliasedTileData) {
     <MultiSelect
         display="chip"
         option-label="display_value"
-        option-value="id"
+        option-value="resource_id"
         :filter="true"
-        :filter-fields="['display_value', 'id']"
+        :filter-fields="['display_value', 'resource_id']"
         :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="initialValueFromTileData"
+        :model-value="selectedValues"
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
@@ -254,7 +259,13 @@ async function onResourceCreated(createdResource: AliasedTileData) {
         @update:model-value="onUpdateModelValue($event)"
     >
         <template #option="slotProps">
-            <div :class="{ 'hide-checkbox': graphIdsInOptions.has(slotProps.option.id) }">
+            <div
+                :class="{
+                    'hide-checkbox': graphIdsInOptions.has(
+                        slotProps.option.resource_id,
+                    ),
+                }"
+            >
                 {{ slotProps.option.display_value }}
             </div>
         </template>
@@ -299,7 +310,7 @@ async function onResourceCreated(createdResource: AliasedTileData) {
     <ResourceInstanceCreation
         v-if="showResourceCreation"
         :key="resourceCreationDialogKey"
-        :graph-id="selectedGraphId"
+        :graph-id="selectedGraphId!"
         @resource-created="onResourceCreated"
     />
 </template>

@@ -1,4 +1,3 @@
-import type { ResourceInstanceListOption } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import { generateArchesURL } from "@/arches/utils/generate-arches-url.ts";
 
 export const fetchRelatableResources = async (
@@ -6,7 +5,7 @@ export const fetchRelatableResources = async (
     nodeAlias: string,
     page: number,
     filterTerm?: string[] | string,
-    initialValues?: ResourceInstanceListOption[] | null | undefined,
+    initialValues?: string[] | null | undefined,
 ) => {
     const params = new URLSearchParams();
 
@@ -20,7 +19,7 @@ export const fetchRelatableResources = async (
         });
     }
     initialValues?.forEach((initialValue) => {
-        params.append("initialValue", initialValue.resource_id);
+        params.append("initialValue", initialValue);
     });
     const response = await fetch(
         `${generateArchesURL("arches_component_lab:api-relatable-resources", { graph: graphSlug, node_alias: nodeAlias })}?${params}`,
@@ -31,7 +30,7 @@ export const fetchRelatableResources = async (
     return parsed;
 };
 
-export const fetchGraphs = async (graphId?: string[] | string) => {
+export const fetchGraph = async (graphId: string) => {
     const response = await fetch(
         generateArchesURL("arches:graphs_api", { graph_id: graphId }),
     );
