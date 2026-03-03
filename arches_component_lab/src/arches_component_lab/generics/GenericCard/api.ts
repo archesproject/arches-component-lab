@@ -13,67 +13,56 @@ export async function fetchTileData(
     nodegroupAlias: string,
     tileId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    let response;
+    const tileUrl = tileId
+        ? arches.urls.api_tile(graphSlug, nodegroupAlias, tileId)
+        : arches.urls.api_tile_blank(graphSlug, nodegroupAlias);
 
-    if (tileId) {
-        response = await fetch(
-            arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
-        );
-    } else {
-        response = await fetch(
-            arches.urls.api_tile_blank(graphSlug, nodegroupAlias),
-        );
+    const response = await fetch(tileUrl);
+    const parsed = await response.json();
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
     }
-
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
-    }
+    return parsed;
 }
 
 // Promise-based cache: graph config is static for the lifetime of the SPA.
 const nodegroupConfigCache = new Map<string, Promise<CardXNodeXWidgetData[]>>();
+
+async function fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
+    graphSlug: string,
+    nodegroupAlias: string,
+): Promise<CardXNodeXWidgetData[]> {
+    const response = await fetch(
+        arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
+            graphSlug,
+            nodegroupAlias,
+        ),
+    );
+    const parsed = await response.json();
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
+    return parsed;
+}
 
 export function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
     nodegroupAlias: string,
 ): Promise<CardXNodeXWidgetData[]> {
     const cacheKey = `${graphSlug}:${nodegroupAlias}`;
-    const cached = nodegroupConfigCache.get(cacheKey);
-    if (cached) {
-        return cached;
-    }
 
-    const promise = (async () => {
-        const response = await fetch(
-            arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
-                graphSlug,
-                nodegroupAlias,
-            ),
+    if (!nodegroupConfigCache.has(cacheKey)) {
+        const fetchRequest = fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
+            graphSlug,
+            nodegroupAlias,
         );
 
-        try {
-            const parsed = await response.json();
-            if (response.ok) {
-                return parsed;
-            }
-            throw new Error(parsed.message);
-        } catch (error) {
-            throw new Error((error as Error).message || response.statusText);
-        }
-    })();
+        // On failure, evict so a retry can re-fetch.
+        fetchRequest.catch(() => nodegroupConfigCache.delete(cacheKey));
+        nodegroupConfigCache.set(cacheKey, fetchRequest);
+    }
 
-    promise.catch(() => {
-        nodegroupConfigCache.delete(cacheKey);
-    });
-
-    nodegroupConfigCache.set(cacheKey, promise);
-    return promise;
+    return nodegroupConfigCache.get(cacheKey)!;
 }
 
 export async function upsertTile(
