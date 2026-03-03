@@ -17,13 +17,13 @@ export async function fetchTileData(
 
     if (tileId) {
         tileUrl = arches.urls.api_tile(graphSlug, nodegroupAlias, tileId);
-    } else { 
+    } else {
         tileUrl = arches.urls.api_tile_blank(graphSlug, nodegroupAlias);
     }
 
     const response = await fetch(tileUrl);
     const parsed = await response.json();
-    
+
     if (!response.ok) {
         throw new Error(parsed.message ?? response.statusText);
     }
