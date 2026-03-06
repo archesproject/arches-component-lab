@@ -33,7 +33,6 @@ const {
     shouldShowLabel = true,
     aliasedNodeData,
     shouldEmitSimplifiedValue = false,
-    canCreateNewResources = false,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
@@ -44,7 +43,6 @@ const {
     shouldShowLabel?: boolean;
     aliasedNodeData?: unknown | null | undefined;
     shouldEmitSimplifiedValue?: boolean;
-    canCreateNewResources?: boolean;
 }>();
 
 const emit = defineEmits([
@@ -156,7 +154,6 @@ watchEffect(async () => {
                     :mode="mode"
                     :node-alias="nodeAlias"
                     :should-emit-simplified-value="shouldEmitSimplifiedValue"
-                    :can-create-new-resources="canCreateNewResources"
                     :aliased-node-data="widgetValue"
                     @update:value="onUpdateValue($event)"
                 />

@@ -14,7 +14,6 @@ const {
     graphSlug,
     cardXNodeXWidgetData,
     aliasedNodeData,
-    canCreateNewResources = false,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     mode: WidgetMode;
@@ -22,7 +21,6 @@ const {
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ResourceInstanceListValue | null;
-    canCreateNewResources?: boolean;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -37,7 +35,6 @@ const emit = defineEmits(["update:value"]);
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
-        :can-create-new-resources="canCreateNewResources"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer

@@ -31,14 +31,12 @@ const {
     nodeAlias,
     graphSlug,
     aliasedNodeData,
-    canCreateNewResources,
     shouldEmitSimplifiedValue,
 } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceListValue | null;
-    canCreateNewResources?: boolean;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -51,7 +49,9 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
+// in future iteration these may be declared in the CardXNodeXWidgetData config
+const itemSize = 36;
+const canCreateNewResources = true;
 
 const options = ref<ResourceInstanceListOption[]>(
     aliasedNodeData?.details ?? [],
@@ -110,7 +110,9 @@ async function getOptions(page: number, filterTerm?: string) {
                 cardXNodeXWidgetData.node.config.graphs.length > 0
             ) {
                 cardXNodeXWidgetData.node.config.graphs.forEach((graph) => {
-                    const placeholder = `${$gettext("Create a new")} ${graph.name}`;
+                    const placeholder = $gettext("Create a new %{graphName}", {
+                        graphName: graph.name,
+                    });
                     options.value.unshift({
                         display_value: placeholder,
                         resource_id: graph.graphid,
@@ -226,7 +228,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         createdTile.resourceinstance,
     ];
     getOptions(1);
-    onUpdateModelValue([createdTile.resourceinstance]);
+    onUpdateModelValue(selectedValues.value);
     showResourceCreation.value = false;
 }
 </script>

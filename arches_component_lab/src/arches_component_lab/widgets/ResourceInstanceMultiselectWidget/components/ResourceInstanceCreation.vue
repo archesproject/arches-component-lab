@@ -51,13 +51,14 @@ function onSave(event: AliasedTileData) {
         v-model:visible="visible"
         position="center"
         :draggable="false"
-        :header="$gettext('Create a new ' + graphName)"
+        :header="
+            $gettext('Create a new %{graphName}', { graphName: graphName })
+        "
         :close-on-escape="true"
         :modal="true"
         :pt="{
             root: {
                 style: {
-                    minWidth: '50rem',
                     borderRadius: '0',
                 },
             },

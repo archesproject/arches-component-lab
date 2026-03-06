@@ -1,4 +1,4 @@
-import { generateArchesURL } from "@/arches/utils/generate-arches-url.ts";
+import arches from "arches";
 
 export const fetchRelatableResources = async (
     graphSlug: string,
@@ -22,7 +22,7 @@ export const fetchRelatableResources = async (
         params.append("initialValue", initialValue);
     });
     const response = await fetch(
-        `${generateArchesURL("arches_component_lab:api-relatable-resources", { graph: graphSlug, node_alias: nodeAlias })}?${params}`,
+        `${arches.urls.api_relatable_resources(graphSlug, nodeAlias)}?${params}`,
     );
 
     const parsed = await response.json();
@@ -31,9 +31,7 @@ export const fetchRelatableResources = async (
 };
 
 export const fetchGraph = async (graphId: string) => {
-    const response = await fetch(
-        generateArchesURL("arches:graphs_api", { graph_id: graphId }),
-    );
+    const response = await fetch(`${arches.urls.graphs_api}${graphId}`);
 
     const parsed = await response.json();
     if (!response.ok) throw new Error(parsed.message || response.statusText);
