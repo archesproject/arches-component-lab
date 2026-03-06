@@ -7,7 +7,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
-import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceCreation/ResourceInstanceCreation.vue";
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/components/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
@@ -51,7 +51,6 @@ const { $gettext } = useGettext();
 
 // in future iteration these may be declared in the CardXNodeXWidgetData config
 const itemSize = 36;
-const canCreateNewResources = true;
 
 const options = ref<ResourceInstanceListOption[]>(
     aliasedNodeData?.details ?? [],
@@ -62,7 +61,6 @@ const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
 
-const graphIdsInOptions = ref<Set<string>>(new Set());
 const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
@@ -104,22 +102,6 @@ async function getOptions(page: number, filterTerm?: string) {
 
         if (resourceData.current_page == 1) {
             options.value = references;
-            if (
-                canCreateNewResources &&
-                cardXNodeXWidgetData.node.config.graphs &&
-                cardXNodeXWidgetData.node.config.graphs.length > 0
-            ) {
-                cardXNodeXWidgetData.node.config.graphs.forEach((graph) => {
-                    const placeholder = $gettext("Create a new %{graphName}", {
-                        graphName: graph.name,
-                    });
-                    options.value.unshift({
-                        display_value: placeholder,
-                        resource_id: graph.graphid,
-                    });
-                    graphIdsInOptions.value.add(graph.graphid);
-                });
-            }
         } else {
             options.value = [...options.value, ...references];
         }
@@ -175,21 +157,13 @@ function getOption(value: string): ResourceInstanceListOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function onUpdateModelValue(updatedValue: string[]) {
-    selectedGraphId.value =
-        updatedValue.find((value: string) =>
-            graphIdsInOptions.value.has(value),
-        ) || "";
-    if (selectedGraphId.value) {
-        resourceCreationDialogKey.value++;
-        showResourceCreation.value = true;
-        const index = updatedValue.indexOf(selectedGraphId.value);
-        if (index > -1) {
-            updatedValue.splice(index, 1);
-        }
-        return;
-    }
+function onCreateNewResource(graphId: string) {
+    selectedGraphId.value = graphId;
+    resourceCreationDialogKey.value++;
+    showResourceCreation.value = true;
+}
 
+function onUpdateModelValue(updatedValue: string[]) {
     const options = updatedValue.map((resourceId: string) => {
         return getOption(resourceId);
     });
@@ -260,16 +234,27 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
     >
-        <template #option="slotProps">
-            <div
-                :class="{
-                    'hide-checkbox': graphIdsInOptions.has(
-                        slotProps.option.resource_id,
-                    ),
-                }"
-            >
-                {{ slotProps.option.display_value }}
+        <template
+            v-if="cardXNodeXWidgetData.node.config.graphs?.length"
+            #header
+        >
+            <div class="create-new-options-header">
+                <div
+                    v-for="graph in cardXNodeXWidgetData.node.config.graphs"
+                    :key="graph.graphid"
+                    class="create-new-option"
+                    @click="onCreateNewResource(graph.graphid)"
+                >
+                    {{
+                        $gettext("Create a new %{graphName}", {
+                            graphName: graph.name,
+                        })
+                    }}
+                </div>
             </div>
+        </template>
+        <template #option="slotProps">
+            <div>{{ slotProps.option.display_value }}</div>
         </template>
         <template #chip="slotProps">
             <div style="width: 100%">
@@ -309,6 +294,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
             </div>
         </template>
     </MultiSelect>
+
     <ResourceInstanceCreation
         v-if="showResourceCreation"
         :key="resourceCreationDialogKey"
@@ -353,11 +339,31 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 </style>
 
 <style>
-.p-multiselect-option:has(.hide-checkbox) .p-checkbox {
-    display: none !important;
+.p-multiselect-overlay {
+    display: flex;
+    flex-direction: column;
 }
 
-.hide-checkbox {
+.p-multiselect-header {
+    order: 0;
+}
+
+.create-new-options-header {
+    order: 1;
+}
+
+.p-multiselect-list-container,
+.p-virtualscroller {
+    order: 2;
+}
+
+.create-new-option {
     font-weight: bold;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.create-new-option:hover {
+    background: var(--p-multiselect-option-focus-background);
 }
 </style>
