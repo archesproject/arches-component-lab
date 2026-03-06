@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
-import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceCreation.vue";
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceCreation/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";

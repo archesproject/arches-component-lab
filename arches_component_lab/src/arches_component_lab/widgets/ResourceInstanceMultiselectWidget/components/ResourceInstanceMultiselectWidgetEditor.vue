@@ -7,7 +7,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
-import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceCreation.vue";
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/ResourceInstanceCreation/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
