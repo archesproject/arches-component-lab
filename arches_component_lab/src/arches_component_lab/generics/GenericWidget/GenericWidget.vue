@@ -2,9 +2,9 @@
 import {
     computed,
     defineAsyncComponent,
+    inject,
     ref,
     shallowRef,
-    watch,
     watchEffect,
 } from "vue";
 
@@ -23,6 +23,11 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+
+interface WidgetReadyTracker {
+    register: () => void;
+    reportReady: () => void;
+}
 
 const {
     cardXNodeXWidgetData,
@@ -50,12 +55,20 @@ const emit = defineEmits([
     "update:isDirty",
     "update:isFocused",
     "update:value",
-    "update:isLoading",
 ]);
 
 const isLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
+
+const widgetReadyTracker = inject<WidgetReadyTracker | undefined>(
+    "widgetReadyTracker",
+    undefined,
+);
+
+if (widgetReadyTracker) {
+    widgetReadyTracker.register();
+}
 
 const widgetComponent = computed(() => {
     if (!resolvedCardXNodeXWidgetData.value) {
@@ -82,10 +95,6 @@ const widgetValue = computed(() => {
     } else {
         return null;
     }
-});
-
-watch(isLoading, () => {
-    emit("update:isLoading", isLoading.value);
 });
 
 watchEffect(async () => {
@@ -162,6 +171,7 @@ watchEffect(async () => {
                     :should-emit-simplified-value="shouldEmitSimplifiedValue"
                     :aliased-node-data="widgetValue"
                     @update:value="onUpdateValue($event)"
+                    @vue:mounted="widgetReadyTracker?.reportReady()"
                 />
             </GenericFormField>
 
