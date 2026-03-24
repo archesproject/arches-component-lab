@@ -11,20 +11,18 @@ const { openFileChooser, cardXNodeXWidgetData, isDisabled, acceptedFileTypes } =
         openFileChooser: () => void;
         cardXNodeXWidgetData: CardXNodeXWidgetData;
         isDisabled: boolean;
-        acceptedFileTypes: string | undefined;
+        acceptedFileTypes: string[];
     }>();
 
-const mimeWildcardLabels: Record<string, string> = {
-    "image/*": "Images",
-};
-
 const displayFileTypes = computed(() => {
-    if (!acceptedFileTypes) {
+    if (!acceptedFileTypes.length) {
         return undefined;
     }
+    const mimeWildcardLabels: Record<string, string> = {
+        "image/*": $gettext("Images"),
+    };
     return acceptedFileTypes
-        .split(",")
-        .map((type) => mimeWildcardLabels[type.trim()] ?? type.trim())
+        .map((fileType) => mimeWildcardLabels[fileType] ?? fileType)
         .join(", ");
 });
 </script>
@@ -73,7 +71,11 @@ const displayFileTypes = computed(() => {
                 v-if="displayFileTypes"
                 class="accepted-types"
             >
-                {{ $gettext("Accepted file types:") }} {{ displayFileTypes }}
+                {{
+                    $gettext("Accepted file types: %{acceptedFileTypeLabels}", {
+                        acceptedFileTypeLabels: displayFileTypes,
+                    })
+                }}
             </div>
         </div>
     </div>

@@ -50,13 +50,13 @@ const acceptedFileTypes = computed(() => {
     const imagesOnly = cardXNodeXWidgetData.node.config?.imagesOnly;
 
     if (acceptedFiles) {
-        fileTypes.push(acceptedFiles);
+        fileTypes.push(...acceptedFiles.split(","));
     }
     if (imagesOnly) {
         fileTypes.push("image/*");
     }
 
-    return fileTypes.length > 0 ? fileTypes.join(",") : undefined;
+    return fileTypes;
 });
 
 const currentValues = ref();
@@ -133,7 +133,9 @@ function openFileChooser(): void {
 <template>
     <FileUpload
         ref="fileUploadRef"
-        :accept="acceptedFileTypes"
+        :accept="
+            acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
+        "
         :model-value="aliasedNodeData?.node_value"
         :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
