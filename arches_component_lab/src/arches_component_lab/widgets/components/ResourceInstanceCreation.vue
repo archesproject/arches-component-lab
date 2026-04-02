@@ -12,6 +12,7 @@ import type {
     AliasedTileData,
     Card,
     Node,
+    NodeGroup,
 } from "@/arches_component_lab/types.ts";
 
 const { graphId } = defineProps<{
@@ -34,8 +35,8 @@ watchEffect(async () => {
     graphSlug.value = graph.graph.slug;
     graphName.value = graph.graph.name;
     const rootNodeGroupIds = graph.graph.nodegroups
-        .filter((nodegroup) => nodegroup.parentnodegroup_id === null)
-        .map((nodegroup) => nodegroup.nodegroupid);
+        .filter((nodegroup: NodeGroup) => nodegroup.parentnodegroup_id === null)
+        .map((nodegroup: NodeGroup) => nodegroup.nodegroupid);
     const card = graph.cards.find((card: Card) => {
         return (
             card.sortorder == 0 && rootNodeGroupIds.includes(card.nodegroup_id)
