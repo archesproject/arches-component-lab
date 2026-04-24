@@ -28,4 +28,3 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
         label: string;
     };
 }
-

@@ -17,8 +17,10 @@ watchEffect(async () => {
     languages.value = response.languages;
 });
 
-const displayValue = computed(() =>
-    languages.value.find((lang) => lang.code === nodeValue)?.name ?? nodeValue,
+const displayValue = computed(
+    () =>
+        languages.value.find((lang) => lang.code === nodeValue)?.name ??
+        nodeValue,
 );
 </script>
 

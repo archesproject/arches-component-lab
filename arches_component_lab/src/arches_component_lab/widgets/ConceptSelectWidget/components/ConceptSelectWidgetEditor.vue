@@ -13,12 +13,7 @@ import type {
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    nodeValue,
-    cardXNodeXWidgetData,
-} = defineProps<{
+const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     nodeValue: string | null;
@@ -74,7 +69,7 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
-    const id = selectedOption ? (Object.keys(selectedOption)[0] ?? null) : null;
+    const id = selectedOption ? Object.keys(selectedOption)[0] ?? null : null;
     emit("update:value", id);
 }
 </script>

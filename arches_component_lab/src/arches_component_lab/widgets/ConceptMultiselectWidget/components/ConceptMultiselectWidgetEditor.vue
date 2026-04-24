@@ -13,12 +13,7 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    nodeValue,
-    cardXNodeXWidgetData,
-} = defineProps<{
+const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     nodeValue: string[] | null;

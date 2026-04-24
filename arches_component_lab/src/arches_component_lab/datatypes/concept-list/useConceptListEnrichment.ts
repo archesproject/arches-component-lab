@@ -18,7 +18,7 @@ export function useConceptListEnrichment(
         async (val) => {
             const mine = ++generation;
             resolved.value = [];
-            loading.value = !!(val?.length);
+            loading.value = !!val?.length;
             if (!val?.length) {
                 loading.value = false;
                 return;

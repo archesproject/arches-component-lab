@@ -11,10 +11,11 @@ const { nodeValue, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
 }>();
 
-const displayValue = computed(() =>
-    cardXNodeXWidgetData.node.config.options.find(
-        (o: DomainOption) => o.id === nodeValue,
-    )?.text ?? null,
+const displayValue = computed(
+    () =>
+        cardXNodeXWidgetData.node.config.options.find(
+            (o: DomainOption) => o.id === nodeValue,
+        )?.text ?? null,
 );
 </script>
 

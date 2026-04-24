@@ -11,16 +11,17 @@ const { nodeValue, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
 }>();
 
-const displayValue = computed(() =>
-    nodeValue
-        ?.map(
-            (id) =>
-                cardXNodeXWidgetData.node.config.options.find(
-                    (o: DomainOption) => o.id === id,
-                )?.text,
-        )
-        .filter(Boolean)
-        .join(", ") ?? null,
+const displayValue = computed(
+    () =>
+        nodeValue
+            ?.map(
+                (id) =>
+                    cardXNodeXWidgetData.node.config.options.find(
+                        (o: DomainOption) => o.id === id,
+                    )?.text,
+            )
+            .filter(Boolean)
+            .join(", ") ?? null,
 );
 </script>
 

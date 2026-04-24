@@ -33,7 +33,11 @@ const formFieldRef = useTemplateRef<FormFieldType>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
 const initialValue = Object.freeze(
-    nodeValue && typeof nodeValue === "object" ? { ...nodeValue } : nodeValue,
+    Array.isArray(nodeValue)
+        ? [...nodeValue]
+        : nodeValue && typeof nodeValue === "object"
+          ? { ...nodeValue }
+          : nodeValue,
 );
 
 watchEffect(() => {
@@ -52,13 +56,13 @@ function markFormFieldAsDirty() {
     formFieldRef.value.field.states.touched = true;
 }
 
-function resolver(updatedNodeValue: FormFieldResolverOptions): unknown {
-    validate(updatedNodeValue as unknown);
-    return updatedNodeValue as unknown;
+function resolver(updatedNodeValue: FormFieldResolverOptions) {
+    const errors = validate(updatedNodeValue);
+    return { errors };
 }
 
-function validate(value: unknown) {
-    console.log("validateValue", value);
+function validate(_value: FormFieldResolverOptions): string[] {
+    return [];
 }
 
 function onUpdateValue(updatedNodeValue: unknown) {

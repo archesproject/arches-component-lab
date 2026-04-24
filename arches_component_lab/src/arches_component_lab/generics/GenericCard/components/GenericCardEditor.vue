@@ -238,7 +238,9 @@ async function save() {
             nodegroupAlias,
             {
                 ...(tileData as AliasedTileData),
-                aliased_data: toRaw(aliasedData) as AliasedTileData["aliased_data"],
+                aliased_data: toRaw(
+                    aliasedData,
+                ) as AliasedTileData["aliased_data"],
             },
             tileData?.tileid ? tileData.tileid : undefined,
             resourceInstanceId,
@@ -295,9 +297,7 @@ defineExpose({ save });
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
-                    :node-value="
-                        aliasedData[cardXNodeXWidgetDatum.node.alias]
-                    "
+                    :node-value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
                     @update:is-dirty="
                         onUpdateWidgetDirtyState(
                             cardXNodeXWidgetDatum.node.alias,

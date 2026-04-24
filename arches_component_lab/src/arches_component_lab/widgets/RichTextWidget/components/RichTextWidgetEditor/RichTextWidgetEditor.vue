@@ -22,10 +22,7 @@ const { cardXNodeXWidgetData, nodeValue } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: Record<string, LanguageValue>,
-    ): void;
+    (event: "update:value", updatedValue: Record<string, LanguageValue>): void;
 }>();
 
 const languages = ref<Language[]>([]);

@@ -82,7 +82,12 @@ const widgetNodeValue = computed<unknown>(() => {
         return nodeValue ?? null;
     }
     const dv = resolvedCardXNodeXWidgetData.value?.config?.defaultValue;
-    if (dv !== null && dv !== undefined && typeof dv === "object" && "node_value" in dv) {
+    if (
+        dv !== null &&
+        dv !== undefined &&
+        typeof dv === "object" &&
+        "node_value" in dv
+    ) {
         return (dv as { node_value: unknown }).node_value ?? null;
     }
     return dv ?? null;

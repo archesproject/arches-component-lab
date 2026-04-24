@@ -13,12 +13,7 @@ import type {
 import { flattenCollectionItems } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    nodeValue,
-    cardXNodeXWidgetData,
-} = defineProps<{
+const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
     nodeValue: string | null;

@@ -22,22 +22,20 @@ import type {
 
 import type { AliasedTileData } from "@/arches_component_lab/types";
 
-const {
-    cardXNodeXWidgetData,
-    nodeAlias,
-    graphSlug,
-    nodeValue,
-    defaultTerm,
-} = defineProps<{
-    cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
-    nodeAlias: string;
-    graphSlug: string;
-    nodeValue: ResourceInstanceReference | null;
-    defaultTerm?: string;
-}>();
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, nodeValue, defaultTerm } =
+    defineProps<{
+        cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
+        nodeAlias: string;
+        graphSlug: string;
+        nodeValue: ResourceInstanceReference | null;
+        defaultTerm?: string;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceReference | null): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceReference | null,
+    ): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
