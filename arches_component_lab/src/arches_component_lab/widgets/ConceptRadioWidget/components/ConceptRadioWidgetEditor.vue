@@ -30,10 +30,10 @@ const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
-const flexDirection = (() =>
+const flexDirection =
     cardXNodeXWidgetData.config.groupDirection === "column"
         ? "flex-column"
-        : "flex-row")();
+        : "flex-row";
 
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);

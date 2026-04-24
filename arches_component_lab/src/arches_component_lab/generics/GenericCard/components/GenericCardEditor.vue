@@ -87,17 +87,12 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = deepClone(
-    extractNodeValues(
-        (tileData?.aliased_data as Record<string, unknown>) || {},
-    ),
+const extractedTileData = extractNodeValues(
+    (tileData?.aliased_data as Record<string, unknown>) || {},
 );
+const originalAliasedData = deepClone(extractedTileData);
 const aliasedData = reactive<Record<string, unknown>>(
-    deepClone(
-        extractNodeValues(
-            (tileData?.aliased_data as Record<string, unknown>) || {},
-        ),
-    ),
+    deepClone(extractedTileData),
 );
 
 const localWidgetDirtyStates = reactive(
