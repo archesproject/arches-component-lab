@@ -8,7 +8,6 @@ import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/componen
 
 import type {
     FileListCardXNodeXWidgetData,
-    FileListValue,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type {
@@ -16,21 +15,13 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const {
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    aliasedNodeData: FileListValue | null;
+const { nodeValue, cardXNodeXWidgetData } = defineProps<{
+    nodeValue: FileReference[] | null;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: FileListValue | FileReference[],
-    ): void;
+    (event: "update:value", updatedValue: FileReference[]): void;
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
@@ -59,22 +50,14 @@ const acceptedFileTypes = computed(() => {
     return fileTypes;
 });
 
-const currentValues = ref();
-
 watchEffect(() => {
-    if (aliasedNodeData) {
-        currentValues.value = aliasedNodeData.node_value;
-
-        if (aliasedNodeData.node_value) {
-            savedFiles.value = aliasedNodeData.node_value.map((file) => {
-                return {
-                    ...file,
-                    node_id: cardXNodeXWidgetData.node.nodeid,
-                };
-            });
-        } else {
-            savedFiles.value = [];
-        }
+    if (nodeValue) {
+        savedFiles.value = nodeValue.map((file) => ({
+            ...file,
+            node_id: cardXNodeXWidgetData.node.nodeid,
+        }));
+    } else {
+        savedFiles.value = [];
     }
 });
 
@@ -83,16 +66,7 @@ function emitUpdatedValue() {
         ...savedFiles.value,
         ...pendingFiles.value,
     ] as FileReference[];
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", allFiles);
-    } else {
-        emit("update:value", {
-            display_value: JSON.stringify(allFiles),
-            node_value: allFiles,
-            details: [],
-        });
-    }
+    emit("update:value", allFiles);
 }
 
 function onSelect(event: { files: PrimeVueFile[] }): void {
@@ -136,7 +110,7 @@ function openFileChooser(): void {
         :accept="
             acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
         "
-        :model-value="aliasedNodeData?.node_value"
+        :model-value="nodeValue"
         :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
         :show-upload-button="false"

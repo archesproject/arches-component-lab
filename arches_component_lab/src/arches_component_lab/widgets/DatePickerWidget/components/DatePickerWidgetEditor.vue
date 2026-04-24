@@ -12,23 +12,15 @@ import DatePicker from "primevue/datepicker";
 
 import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 
-import type {
-    DateDatatypeCardXNodeXWidgetData,
-    DateValue,
-} from "@/arches_component_lab/datatypes/date/types.ts";
+import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { cardXNodeXWidgetData, nodeValue } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DateValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DateValue | string | number): void;
+    (event: "update:value", updatedValue: string | null): void;
 }>();
 
 const shouldShowTime = ref(false);
@@ -49,71 +41,35 @@ watchEffect(() => {
 
 const onUpdateModelValue = debounce((updatedValue: string) => {
     if (!updatedValue) {
-        if (shouldEmitSimplifiedValue) {
-            emit("update:value", "");
-        } else {
-            emit("update:value", {
-                display_value: "",
-                node_value: null,
-                details: [],
-            });
-        }
+        emit("update:value", null);
         return;
     }
 
     const date = new Date(updatedValue);
 
-    if (shouldEmitSimplifiedValue) {
-        let simplifiedDate;
-        try {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Add 1 to month and pad
-            const day = date.getDate().toString().padStart(2, "0");
-            simplifiedDate = Number(`${year}${month}${day}`);
-        } catch (_error) {
-            simplifiedDate = updatedValue;
-        }
-        emit("update:value", simplifiedDate);
-    } else {
-        let formValue;
-        let formattedDate;
-
-        try {
-            formattedDate = formatDate(
-                date,
-                cardXNodeXWidgetData.node.config.dateFormat,
-            );
-
-            formValue = {
-                display_value: formattedDate,
-                node_value: formattedDate,
-                details: [],
-            };
-        } catch (_error) {
-            formValue = {
-                display_value: updatedValue,
-                node_value: updatedValue,
-                details: [],
-            };
-        }
-        emit("update:value", formValue);
+    try {
+        const formattedDate = formatDate(
+            date,
+            cardXNodeXWidgetData.node.config.dateFormat,
+        );
+        emit("update:value", formattedDate);
+    } catch (_error) {
+        emit("update:value", updatedValue);
     }
 }, 900);
 
 const modelDate = computed(() => {
-    if (!aliasedNodeData?.node_value) {
+    if (!nodeValue) {
         return null;
     }
     if (shouldShowTime.value) {
-        return new Date(aliasedNodeData?.node_value as string);
+        return new Date(nodeValue);
     }
-    const incommingDate = new Date(aliasedNodeData?.display_value as string);
-    const day = new Date(incommingDate).getUTCDate();
-    const month = new Date(incommingDate).getUTCMonth();
-    const year = new Date(incommingDate).getUTCFullYear();
-    const correctedDate = new Date(year, month, day);
-
-    return correctedDate;
+    const incomingDate = new Date(nodeValue);
+    const day = incomingDate.getUTCDate();
+    const month = incomingDate.getUTCMonth();
+    const year = incomingDate.getUTCFullYear();
+    return new Date(year, month, day);
 });
 </script>
 

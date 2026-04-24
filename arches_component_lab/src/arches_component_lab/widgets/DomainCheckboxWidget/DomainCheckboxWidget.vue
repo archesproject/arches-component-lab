@@ -4,10 +4,7 @@ import DomainCheckboxWidgetViewer from "@/arches_component_lab/widgets/DomainChe
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    DomainDatatypeCardXNodeXWidgetData,
-    DomainValueList,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -15,8 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValueList | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string[] | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -26,14 +22,12 @@ const emit = defineEmits(["update:value"]);
     <DomainCheckboxWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <DomainCheckboxWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>

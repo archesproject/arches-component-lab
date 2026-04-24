@@ -3,14 +3,9 @@ import arches from "arches";
 import { computed } from "vue";
 import { Image, Galleria } from "primevue";
 
-import type {
-    FileListValue,
-    FileReference,
-} from "@/arches_component_lab/datatypes/file-list/types";
+import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types";
 
-const props = defineProps<{
-    value: FileListValue | null;
-}>();
+const props = defineProps<{ nodeValue: FileReference[] | null }>();
 
 const getFileUrl = (originalUrl: string) => {
     const httpRegex = /^(blob:|https?:\/\/)/;
@@ -25,7 +20,7 @@ const getFileUrl = (originalUrl: string) => {
 };
 
 const imageData = computed(() => {
-    return props.value?.node_value?.map((fileReference: FileReference) => {
+    return props.nodeValue?.map((fileReference: FileReference) => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),

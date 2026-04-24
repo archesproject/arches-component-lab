@@ -6,34 +6,22 @@ import TreeSelect from "primevue/treeselect";
 import type { TreeNode } from "primevue/treenode";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
-import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import { convertSelectionToModelValue } from "@/arches_component_lab/datatypes/concept-list/utils.ts";
 
 import type {
     CollectionItem,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    aliasedNodeData: ConceptListValue | null;
+    nodeValue: string[] | null;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ConceptListValue | string[] | null,
-    ): void;
+    (event: "update:value", updatedValue: string[] | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -47,12 +35,13 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(() => {
     return (
-        aliasedNodeData?.node_value?.reduce(
-            (acc: Record<string, boolean>, value: string) => {
-                return { ...acc, [value]: true };
-            },
-            {} as Record<string, boolean>,
-        ) || null
+        nodeValue?.reduce(
+            (acc: Record<string, boolean>, id: string) => ({
+                ...acc,
+                [id]: true,
+            }),
+            {},
+        ) ?? null
     );
 });
 
@@ -75,7 +64,6 @@ async function getOptions() {
         );
 
         options.value = fetchedData.results as CollectionItem[];
-
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -85,16 +73,8 @@ async function getOptions() {
     }
 }
 
-function onUpdateModelValue(selectedConcepts: string[]) {
-    const formattedValue: ConceptListValue = convertSelectionToModelValue(
-        selectedConcepts,
-        options.value ?? ([] as CollectionItem[]),
-    );
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue.node_value);
-    } else {
-        emit("update:value", formattedValue);
-    }
+function onUpdateModelValue(selection: Record<string, boolean> | null) {
+    emit("update:value", selection ? Object.keys(selection) : null);
 }
 </script>
 

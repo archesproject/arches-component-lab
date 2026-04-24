@@ -5,23 +5,15 @@ import ResourceInstanceMultiselectWidgetViewer from "@/arches_component_lab/widg
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
+import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const {
-    mode,
-    nodeAlias,
-    graphSlug,
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: ResourceInstanceListValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: ResourceInstanceReference[] | null;
 }>();
 
 const emit = defineEmits(["update:isLoading", "update:value"]);
@@ -33,13 +25,14 @@ const emit = defineEmits(["update:isLoading", "update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
     />
 </template>

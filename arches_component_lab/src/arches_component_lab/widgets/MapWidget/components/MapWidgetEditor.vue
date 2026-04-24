@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import InputText from "primevue/inputtext";
 
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types";
+import type { FeatureCollection } from "geojson";
 
-defineProps<{
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
-}>();
+const { nodeValue } = defineProps<{ nodeValue: FeatureCollection | null }>();
+
+const displayValue = computed(() => {
+    if (!nodeValue) return "";
+    const count = nodeValue.features?.length ?? 0;
+    return `${count} feature(s)`;
+});
 </script>
 
 <template>
@@ -13,6 +18,6 @@ defineProps<{
         disabled
         type="text"
         :fluid="true"
-        :model-value="aliasedNodeData?.display_value || ''"
+        :model-value="displayValue"
     />
 </template>

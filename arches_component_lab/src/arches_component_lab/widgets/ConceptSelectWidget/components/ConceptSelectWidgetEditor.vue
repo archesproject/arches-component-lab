@@ -6,31 +6,22 @@ import TreeSelect from "primevue/treeselect";
 import type { TreeNode } from "primevue/treenode";
 
 import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
-import { convertConceptOptionToFormValue } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
 import type {
     CollectionItem,
-    ConceptValue,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    aliasedNodeData: ConceptValue | null;
+    nodeValue: string | null;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptValue | string | null): void;
+    (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -44,8 +35,8 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(
     (): Record<string, boolean> | null => {
-        if (!aliasedNodeData?.node_value) return null;
-        return { [aliasedNodeData.node_value]: true };
+        if (!nodeValue) return null;
+        return { [nodeValue]: true };
     },
 );
 
@@ -68,7 +59,6 @@ async function getOptions() {
         );
 
         options.value = fetchedData.results as CollectionItem[];
-
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -79,15 +69,8 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
-    const formattedValue = convertConceptOptionToFormValue(
-        selectedOption,
-        options.value ?? ([] as CollectionItem[]),
-    );
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue.node_value);
-    } else {
-        emit("update:value", formattedValue);
-    }
+    const id = selectedOption ? Object.keys(selectedOption)[0] ?? null : null;
+    emit("update:value", id);
 }
 </script>
 

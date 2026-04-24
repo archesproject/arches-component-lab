@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
-
-defineProps<{
-    aliasedNodeData: NonLocalizedTextValue | null;
-}>();
+defineProps<{ nodeValue: string | null }>();
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ nodeValue }}</div>
 </template>

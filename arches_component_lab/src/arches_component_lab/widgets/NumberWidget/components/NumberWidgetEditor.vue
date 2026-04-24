@@ -1,38 +1,25 @@
 <script setup lang="ts">
 import InputNumber from "primevue/inputnumber";
 
-import type {
-    NumberCardXNodeXWidgetData,
-    NumberValue,
-} from "@/arches_component_lab/datatypes/number/types.ts";
+import type { NumberCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
-    defineProps<{
-        cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-        aliasedNodeData: NumberValue | null;
-        shouldEmitSimplifiedValue?: boolean;
-    }>();
+const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+    nodeValue: number | null;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: NumberValue | number | null): void;
+    (event: "update:value", updatedValue: number | null): void;
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue);
-    } else {
-        emit("update:value", {
-            display_value: updatedValue !== null ? updatedValue.toString() : "",
-            node_value: updatedValue,
-            details: [],
-        });
-    }
+    emit("update:value", updatedValue);
 }
 </script>
 
 <template>
     <InputNumber
-        :model-value="aliasedNodeData?.node_value"
+        :model-value="nodeValue"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :placeholder="cardXNodeXWidgetData.config.placeholder"

@@ -5,7 +5,6 @@ import SwitchWidgetViewer from "@/arches_component_lab/widgets/SwitchWidget/comp
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,8 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
-    aliasedNodeData: BooleanValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: boolean | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -24,14 +22,13 @@ const emit = defineEmits(["update:value"]);
     <SwitchWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <SwitchWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>
 
