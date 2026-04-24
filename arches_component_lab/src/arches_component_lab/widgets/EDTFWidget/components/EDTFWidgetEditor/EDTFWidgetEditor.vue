@@ -1,41 +1,28 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 
 import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { $gettext } = useGettext();
+
+const { cardXNodeXWidgetData, nodeValue } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EDTFValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: EDTFValue | string | undefined): void;
+    (event: "update:value", updatedValue: string): void;
 }>();
 
 const shouldShowHelpDrawer = ref(false);
 
 function handleUpdateModelValue(updatedValue: string | undefined) {
-    const normalizedValue = updatedValue ?? "";
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", normalizedValue);
-    } else {
-        emit("update:value", {
-            display_value: normalizedValue,
-            node_value: normalizedValue,
-            details: [],
-        });
-    }
+    emit("update:value", updatedValue ?? "");
 }
 </script>
 
@@ -45,7 +32,7 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             class="flex-input"
             type="text"
             :fluid="true"
-            :model-value="aliasedNodeData?.node_value"
+            :model-value="nodeValue ?? ''"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
             @update:model-value="handleUpdateModelValue"

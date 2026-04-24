@@ -5,7 +5,6 @@ import ConceptSelectWidgetViewer from "@/arches_component_lab/widgets/ConceptSel
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,8 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: ConceptValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits(["update:isLoading", "update:value"]);
@@ -26,13 +24,14 @@ const emit = defineEmits(["update:isLoading", "update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ConceptSelectWidgetViewer
         v-if="mode === VIEW"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
     />
 </template>

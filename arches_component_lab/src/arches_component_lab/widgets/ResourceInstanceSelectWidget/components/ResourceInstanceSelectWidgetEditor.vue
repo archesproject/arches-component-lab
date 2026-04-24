@@ -14,7 +14,7 @@ import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceValue,
+    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
     ResourceInstanceCardXNodeXWidgetData,
@@ -26,23 +26,18 @@ const {
     cardXNodeXWidgetData,
     nodeAlias,
     graphSlug,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue,
+    nodeValue,
     defaultTerm,
 } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    aliasedNodeData: ResourceInstanceValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: ResourceInstanceReference | null;
     defaultTerm?: string;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ResourceInstanceValue | string[],
-    ): void;
+    (event: "update:value", updatedValue: ResourceInstanceReference | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -51,9 +46,7 @@ const { $gettext } = useGettext();
 // in future iteration these may be declared in the CardXNodeXWidgetData config
 const itemSize = 36;
 
-const options = ref<ResourceInstanceSelectOption[]>(
-    aliasedNodeData?.details ?? [],
-);
+const options = ref<ResourceInstanceSelectOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -65,9 +58,7 @@ const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const selectedValue = ref<string | null>(
-    aliasedNodeData?.details?.[0]?.resource_id ?? null,
-);
+const selectedValue = ref<string | null>(nodeValue?.resourceId ?? null);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -97,7 +88,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerms,
-            selectedValue.value || aliasedNodeData?.details?.[0]?.resource_id,
+            selectedValue.value,
         );
 
         const references = resourceData.data.map(
@@ -121,10 +112,7 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (
-            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
-            0
-        ) {
+        if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
@@ -162,10 +150,6 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id === value);
-}
-
 function onCreateNewResource(graphId: string) {
     selectedGraphId.value = graphId;
     resourceCreationDialogKey.value++;
@@ -174,25 +158,17 @@ function onCreateNewResource(graphId: string) {
 
 function onUpdateModelValue(updatedValue: string | null) {
     selectedValue.value = updatedValue;
-
-    const option = updatedValue ? getOption(updatedValue) : undefined;
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue ? [updatedValue] : []);
-    } else {
-        emit("update:value", {
-            display_value: option ? option.display_value : "",
-            node_value: updatedValue
-                ? {
-                      inverseOntologyProperty: "",
-                      ontologyProperty: "",
-                      resourceId: updatedValue,
-                      resourceXresourceId: "",
-                  }
-                : null,
-            details: option ? [option] : [],
-        } as ResourceInstanceValue);
-    }
+    emit(
+        "update:value",
+        updatedValue
+            ? {
+                  inverseOntologyProperty: "",
+                  ontologyProperty: "",
+                  resourceId: updatedValue,
+                  resourceXresourceId: "",
+              }
+            : null,
+    );
 }
 
 async function onResourceCreated(createdTile: AliasedTileData) {

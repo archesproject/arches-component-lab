@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types";
+import { computed } from "vue";
 
-defineProps<{
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
-}>();
+import type { FeatureCollection } from "geojson";
+
+const { nodeValue } = defineProps<{ nodeValue: FeatureCollection | null }>();
+
+const displayValue = computed(() => {
+    if (!nodeValue) return null;
+    const count = nodeValue.features?.length ?? 0;
+    return `${count} feature(s)`;
+});
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ displayValue }}</div>
 </template>

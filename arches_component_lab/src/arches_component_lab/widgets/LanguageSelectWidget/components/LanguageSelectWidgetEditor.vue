@@ -10,20 +10,14 @@ import type {
     CardXNodeXWidgetData,
     Language,
 } from "@/arches_component_lab/types.ts";
-import type { LanguageValue } from "@/arches_component_lab/datatypes/language/types.ts";
 
-const {
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { nodeValue, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: LanguageValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: LanguageValue | string | null): void;
+    (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -49,20 +43,7 @@ watchEffect(async () => {
 });
 
 function onUpdateModelValue(updatedValue: string | null) {
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue);
-    } else {
-        const updatedDisplayValue =
-            languages.value?.find(
-                (option: Language) => option.code === updatedValue,
-            )?.name || "";
-
-        emit("update:value", {
-            display_value: updatedDisplayValue,
-            node_value: updatedValue,
-            details: [],
-        });
-    }
+    emit("update:value", updatedValue);
 }
 </script>
 
@@ -74,7 +55,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :options="languages as Language[]"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"
-        :model-value="aliasedNodeData?.node_value"
+        :model-value="nodeValue"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

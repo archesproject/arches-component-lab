@@ -19,7 +19,6 @@ import GenericWidget from "@/arches_component_lab/generics/GenericWidget/Generic
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import type {
-    AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
@@ -62,14 +61,44 @@ function deepClone<T>(sourceObject: T): T {
     return JSON.parse(JSON.stringify(sourceObject));
 }
 
+function extractNodeValue(val: unknown): unknown {
+    if (
+        val !== null &&
+        val !== undefined &&
+        typeof val === "object" &&
+        "node_value" in val
+    ) {
+        return (val as { node_value: unknown }).node_value ?? null;
+    }
+    return val ?? null;
+}
+
+function extractNodeValues(
+    data: Record<string, unknown>,
+): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(data).map(([k, v]) => [k, extractNodeValue(v)]),
+    );
+}
+
 const genericWidgetRefs = useTemplateRef("genericWidget");
 
 const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = deepClone(tileData?.aliased_data || {});
-const aliasedData = reactive(deepClone(tileData?.aliased_data || {}));
+const originalAliasedData = deepClone(
+    extractNodeValues(
+        (tileData?.aliased_data as Record<string, unknown>) || {},
+    ),
+);
+const aliasedData = reactive<Record<string, unknown>>(
+    deepClone(
+        extractNodeValues(
+            (tileData?.aliased_data as Record<string, unknown>) || {},
+        ),
+    ),
+);
 
 const localWidgetDirtyStates = reactive(
     cardXNodeXWidgetData.reduce<Record<string, boolean>>(
@@ -181,7 +210,7 @@ function onUpdateWidgetFocusedState(nodeAlias: string, isFocused: boolean) {
     localWidgetFocusedStates[nodeAlias] = isFocused;
 }
 
-function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
+function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
     aliasedData[nodeAlias] = value;
 }
 
@@ -214,17 +243,17 @@ async function save() {
             nodegroupAlias,
             {
                 ...(tileData as AliasedTileData),
-                aliased_data: toRaw(aliasedData),
+                aliased_data: toRaw(aliasedData) as AliasedTileData["aliased_data"],
             },
             tileData?.tileid ? tileData.tileid : undefined,
             resourceInstanceId,
         );
 
-        Object.assign(aliasedData, deepClone(updatedTileData.aliased_data));
-        Object.assign(
-            originalAliasedData,
-            deepClone(updatedTileData.aliased_data),
+        const freshValues = extractNodeValues(
+            updatedTileData.aliased_data as Record<string, unknown>,
         );
+        Object.assign(aliasedData, deepClone(freshValues));
+        Object.assign(originalAliasedData, deepClone(freshValues));
 
         resetWidgetDirtyStates();
 
@@ -271,7 +300,7 @@ defineExpose({ save });
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
-                    :aliased-node-data="
+                    :node-value="
                         aliasedData[cardXNodeXWidgetDatum.node.alias]
                     "
                     @update:is-dirty="

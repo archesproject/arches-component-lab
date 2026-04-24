@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
+import { toRef } from "vue";
 
-const { aliasedNodeData } = defineProps<{
-    aliasedNodeData: ConceptValue | null;
+import { useConceptEnrichment } from "@/arches_component_lab/datatypes/concept/useConceptEnrichment.ts";
+
+const props = defineProps<{
+    nodeValue: string | null;
+    graphSlug: string;
+    nodeAlias: string;
 }>();
+
+const { label } = useConceptEnrichment(
+    toRef(props, "nodeValue"),
+    props.graphSlug,
+    props.nodeAlias,
+);
 </script>
+
 <template>
-    <div>
-        {{ aliasedNodeData?.display_value }}
-    </div>
+    <div>{{ label }}</div>
 </template>

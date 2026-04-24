@@ -5,7 +5,6 @@ import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,8 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EDTFValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -24,14 +22,11 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     <EDTFWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>

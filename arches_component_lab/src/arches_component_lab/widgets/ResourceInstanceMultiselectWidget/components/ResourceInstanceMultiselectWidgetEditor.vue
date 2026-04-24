@@ -16,10 +16,7 @@ import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceListValue,
     ResourceInstanceReference,
-} from "@/arches_component_lab/datatypes/resource-instance-list/types";
-import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
     ResourceInstanceListCardXNodeXWidgetData,
@@ -30,21 +27,16 @@ const {
     cardXNodeXWidgetData,
     nodeAlias,
     graphSlug,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue,
+    nodeValue,
 } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    aliasedNodeData: ResourceInstanceListValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: ResourceInstanceReference[] | null;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ResourceInstanceListValue | string[],
-    ): void;
+    (event: "update:value", updatedValue: ResourceInstanceReference[]): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -53,9 +45,7 @@ const { $gettext } = useGettext();
 // in future iteration these may be declared in the CardXNodeXWidgetData config
 const itemSize = 36;
 
-const options = ref<ResourceInstanceListOption[]>(
-    aliasedNodeData?.details ?? [],
-);
+const options = ref<ResourceInstanceListOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -68,7 +58,7 @@ const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValues = ref<string[]>(
-    aliasedNodeData?.details?.map((option) => option.resource_id) || [],
+    nodeValue?.map((r) => r.resourceId) ?? [],
 );
 
 watch(isLoading, (newValue) => {
@@ -117,10 +107,7 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (
-            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
-            0
-        ) {
+        if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
@@ -169,36 +156,16 @@ function onCreateNewResource(graphId: string) {
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
-    const options = updatedValue.map((resourceId: string) => {
-        return getOption(resourceId);
-    });
-
-    const formattedNodeValues: ResourceInstanceReference[] = updatedValue.map(
-        (value) => {
-            return {
-                inverseOntologyProperty: "",
-                ontologyProperty: "",
-                resourceId: value ?? "",
-                resourceXresourceId: "",
-            } as ResourceInstanceReference;
-        },
-    );
-
     selectedValues.value = updatedValue;
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue as string[]);
-    } else {
-        const formattedValue = {
-            display_value: options
-                .map((option) => option?.display_value)
-                .join(", "),
-            node_value: formattedNodeValues,
-            details: options ?? [],
-        } as ResourceInstanceListValue;
-
-        emit("update:value", formattedValue);
-    }
+    emit(
+        "update:value",
+        updatedValue.map((value) => ({
+            inverseOntologyProperty: "",
+            ontologyProperty: "",
+            resourceId: value,
+            resourceXresourceId: "",
+        })),
+    );
 }
 
 async function onResourceCreated(createdTile: AliasedTileData) {

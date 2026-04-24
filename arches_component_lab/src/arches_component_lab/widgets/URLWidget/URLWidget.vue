@@ -6,15 +6,14 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: URLValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: URLNodeValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -24,12 +23,11 @@ const emit = defineEmits(["update:value"]);
     <URLWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <URLWidgetViewer
         v-if="mode === VIEW"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>

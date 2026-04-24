@@ -4,19 +4,15 @@ import LanguageSelectWidgetViewer from "@/arches_component_lab/widgets/LanguageS
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    DomainDatatypeCardXNodeXWidgetData,
-    DomainValue,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeValue: string | null;
 }>();
 
 const emit = defineEmits(["update:isLoading", "update:value"]);
@@ -26,15 +22,12 @@ const emit = defineEmits(["update:isLoading", "update:value"]);
     <LanguageSelectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <LanguageSelectWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>

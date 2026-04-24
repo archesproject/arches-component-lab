@@ -4,8 +4,6 @@ import { useTemplateRef, watchEffect } from "vue";
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
 
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-
 type FormFieldType = {
     field: {
         states: {
@@ -15,26 +13,28 @@ type FormFieldType = {
         };
         errors: Array<{ message: string }>;
         props: {
-            onChange: (event: { value: AliasedNodeData }) => void;
+            onChange: (event: { value: unknown }) => void;
         };
     };
 };
 
-const { isDirty, nodeAlias, aliasedNodeData } = defineProps<{
+const { isDirty, nodeAlias, nodeValue } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    aliasedNodeData: AliasedNodeData | null;
+    nodeValue: unknown;
 }>();
 
 const emit = defineEmits<{
-    (e: "update:value", newValue: AliasedNodeData): void;
+    (e: "update:value", newValue: unknown): void;
     (e: "update:isDirty", dirty: boolean): void;
 }>();
 
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
-const initialValue = Object.freeze({ ...aliasedNodeData });
+const initialValue = Object.freeze(
+    nodeValue && typeof nodeValue === "object" ? { ...nodeValue } : nodeValue,
+);
 
 watchEffect(() => {
     if (isDirty) {
@@ -52,27 +52,25 @@ function markFormFieldAsDirty() {
     formFieldRef.value.field.states.touched = true;
 }
 
-function resolver(
-    updatedAliasedNodeData: FormFieldResolverOptions,
-): AliasedNodeData {
-    validate(updatedAliasedNodeData as unknown as AliasedNodeData);
-    return updatedAliasedNodeData as unknown as AliasedNodeData;
+function resolver(updatedNodeValue: FormFieldResolverOptions): unknown {
+    validate(updatedNodeValue as unknown);
+    return updatedNodeValue as unknown;
 }
 
-function validate(aliasedNodeData: AliasedNodeData) {
-    console.log("validateValue", aliasedNodeData);
+function validate(value: unknown) {
+    console.log("validateValue", value);
 }
 
-function onUpdateValue(updatedAliasedNodeData: AliasedNodeData) {
-    if (aliasedNodeData === updatedAliasedNodeData) {
+function onUpdateValue(updatedNodeValue: unknown) {
+    if (nodeValue === updatedNodeValue) {
         return;
     }
 
     formFieldRef.value?.field?.props?.onChange({
-        value: updatedAliasedNodeData,
+        value: updatedNodeValue,
     });
 
-    emit("update:value", updatedAliasedNodeData);
+    emit("update:value", updatedNodeValue);
     emit("update:isDirty", true);
 }
 </script>

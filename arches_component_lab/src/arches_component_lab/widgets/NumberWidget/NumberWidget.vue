@@ -4,17 +4,15 @@ import NumberWidgetViewer from "@/arches_component_lab/widgets/NumberWidget/comp
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { NumberValue } from "@/arches_component_lab/datatypes/number/types.ts";
+import type { NumberCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/number/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: NumberValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+    nodeValue: number | null;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -24,14 +22,11 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     <NumberWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <NumberWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>

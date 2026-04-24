@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
 
-import type { NodeValueValue } from "@/arches_component_lab/datatypes/node-value/types";
-
-defineProps<{
-    aliasedNodeData: NodeValueValue | null;
-}>();
+defineProps<{ nodeValue: string | null }>();
 </script>
 
 <template>
@@ -13,6 +9,6 @@ defineProps<{
         disabled
         type="text"
         :fluid="true"
-        :model-value="aliasedNodeData?.display_value || ''"
+        :model-value="nodeValue ?? ''"
     />
 </template>

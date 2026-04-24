@@ -18,10 +18,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type {
-    AliasedNodeData,
-    CardXNodeXWidgetData,
-} from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
@@ -32,8 +29,7 @@ const {
     mode,
     nodeAlias,
     shouldShowLabel = true,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
+    nodeValue,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
@@ -42,8 +38,7 @@ const {
     mode: WidgetMode;
     nodeAlias: string;
     shouldShowLabel?: boolean;
-    aliasedNodeData?: unknown | null | undefined;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue?: unknown | null | undefined;
 }>();
 
 const emit = defineEmits([
@@ -82,15 +77,15 @@ const widgetComponent = computed(() => {
     });
 });
 
-const widgetValue = computed(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData as AliasedNodeData;
-    } else if (resolvedCardXNodeXWidgetData.value?.config?.defaultValue) {
-        return resolvedCardXNodeXWidgetData.value.config
-            .defaultValue as AliasedNodeData;
-    } else {
-        return null;
+const widgetNodeValue = computed<unknown>(() => {
+    if (nodeValue !== undefined) {
+        return nodeValue ?? null;
     }
+    const dv = resolvedCardXNodeXWidgetData.value?.config?.defaultValue;
+    if (dv !== null && dv !== undefined && typeof dv === "object" && "node_value" in dv) {
+        return (dv as { node_value: unknown }).node_value ?? null;
+    }
+    return dv ?? null;
 });
 
 watchEffect(async () => {
@@ -151,7 +146,7 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :aliased-node-data="widgetValue!"
+                :node-value="widgetNodeValue"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
@@ -164,8 +159,7 @@ watchEffect(async () => {
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
-                    :should-emit-simplified-value="shouldEmitSimplifiedValue"
-                    :aliased-node-data="widgetValue"
+                    :node-value="widgetNodeValue"
                     @update:is-loading="isChildLoading = $event"
                     @update:value="onUpdateValue($event)"
                 />
@@ -179,7 +173,7 @@ watchEffect(async () => {
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
-                :aliased-node-data="widgetValue"
+                :node-value="widgetNodeValue"
                 @update:is-loading="isChildLoading = $event"
             />
         </template>

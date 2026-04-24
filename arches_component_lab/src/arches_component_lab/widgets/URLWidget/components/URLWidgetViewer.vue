@@ -1,23 +1,18 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
-import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
+import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types.ts";
 
 const { $gettext } = useGettext();
 
-defineProps<{
-    aliasedNodeData: URLValue | null;
-}>();
+defineProps<{ nodeValue: URLNodeValue | null }>();
 </script>
 
 <template>
     <a
-        v-if="aliasedNodeData?.node_value.url"
-        :href="aliasedNodeData?.node_value.url"
+        v-if="nodeValue?.url"
+        :href="nodeValue.url"
     >
-        {{
-            aliasedNodeData?.node_value?.url_label ||
-            aliasedNodeData?.node_value?.url
-        }}
+        {{ nodeValue.url_label || nodeValue.url }}
     </a>
 
     <span v-else>

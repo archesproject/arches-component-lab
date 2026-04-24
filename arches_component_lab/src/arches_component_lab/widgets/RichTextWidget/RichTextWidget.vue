@@ -5,7 +5,7 @@ import RichTextWidgetViewer from "@/arches_component_lab/widgets/RichTextWidget/
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
+import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,8 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeValue: Record<string, LanguageValue> | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -24,13 +23,11 @@ const emit = defineEmits(["update:value"]);
     <RichTextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :node-value="nodeValue"
         @update:value="emit('update:value', $event)"
     />
     <RichTextWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :node-value="nodeValue"
     />
 </template>
