@@ -23,8 +23,9 @@
         "arches": "archesproject/arches#dev/8.0.x",
         "dayjs": "^1.11.13",
         "dompurify": "^3.2.6",
-        "quill": "2.0.3",
-        "es-toolkit": "^1.44.0"
+        "es-toolkit": "^1.44.0",
+        "maplibre-gl": "^4.7.1",
+        "quill": "2.0.3"
     },
     "devDependencies": {
         "@types/geojson": "^7946.0.16",
