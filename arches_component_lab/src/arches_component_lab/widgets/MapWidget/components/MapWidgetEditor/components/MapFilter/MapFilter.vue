@@ -43,14 +43,14 @@ function clearAllDrawnFeatures() {
             severity="secondary"
             @click="deleteSelectedFeature"
         >
-            {{ $gettext("Clear Selected") }}
+            {{ $gettext("Remove Selected") }}
         </Button>
         <Button
             size="large"
             severity="secondary"
             @click="clearAllDrawnFeatures"
         >
-            {{ $gettext("Clear All") }}
+            {{ $gettext("Remove All") }}
         </Button>
     </div>
 </template>
@@ -60,6 +60,6 @@ function clearAllDrawnFeatures() {
     display: flex;
     flex-direction: row;
     gap: 1rem;
-    padding-block-start: 0.9375rem;
+    padding-block-start: 1rem;
 }
 </style>

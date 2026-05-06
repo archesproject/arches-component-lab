@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { inject, ref, watch } from "vue";
+import type { Ref } from "vue";
 
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useGettext } from "vue3-gettext";
 
-import type { Feature, Map } from "maplibre-gl";
-import type { Ref } from "vue";
-
 import InputNumber from "primevue/inputnumber";
 import Panel from "primevue/panel";
 import Select from "primevue/select";
+
+import type { Feature } from "geojson";
+import type { Map as MaplibreMap } from "maplibre-gl";
 
 import {
     DRAW_UPDATE_EVENT,
@@ -20,63 +21,58 @@ import {
     YARDS,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
-const props = defineProps<{
-    map: Map;
+const { map } = defineProps<{
+    map: MaplibreMap;
 }>();
+
+const { $gettext } = useGettext();
 
 const selectedDrawnFeature = inject<Ref<Feature | null>>(
     "selectedDrawnFeature",
     ref(null),
 );
 
-const { $gettext } = useGettext();
+const bufferDistance = ref(0);
+const selectedUnits = ref(METERS);
 
-const bufferDistance: Ref<number> = ref(0);
-
-const options = ref([
+const unitOptions = [
     { label: $gettext("meters"), code: METERS },
     { label: $gettext("feet"), code: FEET },
     { label: $gettext("miles"), code: MILES },
     { label: $gettext("kilometers"), code: KILOMETERS },
     { label: $gettext("yards"), code: YARDS },
-]);
-
-const selectedUnits: Ref<string> = ref(options.value[0].code);
+];
 
 watch([bufferDistance, selectedUnits], () => {
     if (bufferDistance.value < 0) {
         bufferDistance.value = 0;
     }
 
-    if (selectedDrawnFeature.value) {
-        const draw = props.map._controls.find(
-            (control: unknown) => control instanceof MapboxDraw,
-        ) as typeof MapboxDraw;
+    const feature = selectedDrawnFeature.value;
+    if (!feature) return;
 
-        (selectedDrawnFeature.value as Feature).properties!.buffer_distance =
-            bufferDistance.value;
-        (selectedDrawnFeature.value as Feature).properties!.buffer_units =
-            selectedUnits.value;
+    const draw = map._controls.find(
+        (control: unknown) => control instanceof MapboxDraw,
+    ) as InstanceType<typeof MapboxDraw>;
 
-        draw.add(selectedDrawnFeature.value);
-        props.map.fire(DRAW_UPDATE_EVENT, {
-            features: [selectedDrawnFeature.value],
-        });
-    }
+    feature.properties!.buffer_distance = bufferDistance.value;
+    feature.properties!.buffer_units = selectedUnits.value;
+
+    draw.add(feature);
+    map.fire(DRAW_UPDATE_EVENT, { features: [feature] });
 });
 
 watch(
     selectedDrawnFeature,
-    (feature: Feature | null) => {
-        if (feature) {
-            if (
-                Number.isInteger(feature.properties?.buffer_distance) &&
-                feature.properties?.buffer_units
-            ) {
-                bufferDistance.value = feature.properties.buffer_distance;
-                selectedUnits.value = feature.properties.buffer_units;
-                return;
-            }
+    (feature) => {
+        if (
+            feature &&
+            Number.isInteger(feature.properties?.buffer_distance) &&
+            feature.properties?.buffer_units
+        ) {
+            bufferDistance.value = feature.properties.buffer_distance;
+            selectedUnits.value = feature.properties.buffer_units;
+            return;
         }
 
         bufferDistance.value = 0;
@@ -104,7 +100,7 @@ watch(
             <Select
                 id="buff-units"
                 v-model="selectedUnits"
-                :options="options"
+                :options="unitOptions"
                 option-value="code"
                 option-label="label"
                 :placeholder="$gettext('Units')"

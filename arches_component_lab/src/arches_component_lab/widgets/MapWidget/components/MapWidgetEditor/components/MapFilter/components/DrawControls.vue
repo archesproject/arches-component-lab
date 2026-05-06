@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import type { ComputedRef, Ref } from "vue";
 
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useGettext } from "vue3-gettext";
 
-import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-
-import type { Map } from "maplibre-gl";
-
 import Select from "primevue/select";
 
+import type { Feature } from "geojson";
+import type { Map as MaplibreMap } from "maplibre-gl";
+
 import {
-    POINT,
-    LINE,
-    POLYGON,
-    DRAW_POINT,
-    DRAW_LINE_STRING,
-    DRAW_POLYGON,
     DRAW_CREATE_EVENT,
+    DRAW_LINE_STRING,
+    DRAW_POINT,
+    DRAW_POLYGON,
+    GEOMETRY_TYPE_LINESTRING,
+    GEOMETRY_TYPE_POINT,
+    GEOMETRY_TYPE_POLYGON,
+    LINE,
+    POINT,
+    POLYGON,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
-const props = defineProps<{
-    map: Map;
+const { map } = defineProps<{
+    map: MaplibreMap;
 }>();
 
 defineExpose({
@@ -35,8 +37,18 @@ const { $gettext } = useGettext();
 const geometryTypes = inject<
     Ref<string[] | null> | ComputedRef<string[] | null>
 >("geometryTypes", ref(null));
+const selectedDrawnFeature = inject<Ref<Feature | null>>(
+    "selectedDrawnFeature",
+    ref(null),
+);
 
 const selectedDrawType = ref<string | undefined>();
+
+const geometryTypeToDrawType: Record<string, string> = {
+    [GEOMETRY_TYPE_POINT]: POINT,
+    [GEOMETRY_TYPE_LINESTRING]: LINE,
+    [GEOMETRY_TYPE_POLYGON]: POLYGON,
+};
 
 const allOptions = [
     { label: $gettext("Draw a Marker"), code: POINT },
@@ -50,58 +62,68 @@ const options = computed(() => {
     return allOptions.filter((opt) => types.includes(opt.code));
 });
 
+const displayDrawType = computed(() => {
+    if (selectedDrawnFeature.value) {
+        return geometryTypeToDrawType[selectedDrawnFeature.value.geometry.type];
+    }
+    return selectedDrawType.value;
+});
+
 function getDraw(): InstanceType<typeof MapboxDraw> | undefined {
-    return props.map._controls?.find(
+    return map._controls?.find(
         (control: unknown) => control instanceof MapboxDraw,
     ) as InstanceType<typeof MapboxDraw> | undefined;
 }
 
-watch(
-    () => selectedDrawType.value,
-    (newDrawType) => {
-        const draw = getDraw();
-        if (newDrawType && draw) {
-            props.map.getCanvas().style.cursor = "crosshair";
-            if (newDrawType === POINT) {
-                draw.changeMode(DRAW_POINT);
-            } else if (newDrawType === LINE) {
-                draw.changeMode(DRAW_LINE_STRING);
-            } else if (newDrawType === POLYGON) {
-                draw.changeMode(DRAW_POLYGON);
-            }
-        } else {
-            props.map.getCanvas().style.cursor = "";
-        }
-    },
-);
+function onDrawTypeSelected(type: string | undefined) {
+    selectedDrawType.value = type;
+    const draw = getDraw();
+
+    if (!type || !draw) {
+        map.getCanvas().style.cursor = "";
+        return;
+    }
+
+    map.getCanvas().style.cursor = "crosshair";
+
+    if (type === POINT) {
+        draw.changeMode(DRAW_POINT);
+    } else if (type === LINE) {
+        draw.changeMode(DRAW_LINE_STRING);
+    } else if (type === POLYGON) {
+        draw.changeMode(DRAW_POLYGON);
+    }
+}
+
+function clearDrawSelection() {
+    selectedDrawType.value = undefined;
+    map.getCanvas().style.cursor = "";
+}
 
 onMounted(() => {
-    props.map.on(DRAW_CREATE_EVENT, resetDropdown);
+    map.on(DRAW_CREATE_EVENT, clearDrawSelection);
 });
 
 onUnmounted(() => {
-    props.map.off(DRAW_CREATE_EVENT, resetDropdown);
+    map.off(DRAW_CREATE_EVENT, clearDrawSelection);
 });
-
-function resetDropdown() {
-    selectedDrawType.value = undefined;
-}
 
 function deleteAllDrawnFeatures() {
     const draw = getDraw();
     if (!draw) return;
+
     draw.deleteAll();
-    props.map.fire("draw.delete");
+    map.fire("draw.delete");
 }
 
 function deleteSelectedDrawnFeature() {
     const draw = getDraw();
     if (!draw) return;
+
     const selectedFeatures = draw.getSelected();
     if (selectedFeatures.features.length) {
-        const featureId = selectedFeatures.features[0].id;
-        draw.delete(featureId);
-        props.map.fire("draw.delete");
+        draw.delete(selectedFeatures.features[0].id);
+        map.fire("draw.delete");
     }
 }
 </script>
@@ -111,13 +133,14 @@ function deleteSelectedDrawnFeature() {
         <label for="draw-type">{{ $gettext("Draw type") }}</label>
         <Select
             id="draw-type"
-            v-model="selectedDrawType"
-            :options="options"
+            :model-value="displayDrawType"
             option-label="label"
             option-value="code"
+            :options="options"
             :placeholder="$gettext('Draw a shape')"
-            class="w-full md:w-56"
-            fluid
+            :disabled="selectedDrawnFeature !== null"
+            :fluid="true"
+            @update:model-value="onDrawTypeSelected"
         />
     </div>
 </template>

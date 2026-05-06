@@ -83,6 +83,14 @@ export interface MapInteractionItem {
     icon: string;
 }
 
+export interface ResourceDescriptor {
+    displayname: string;
+    displaydescription: string;
+    map_popup: string;
+    graph_name: string;
+    permissions: { can_edit_resource_instance?: boolean };
+}
+
 export interface MapSource {
     id: number;
     name: string;

@@ -17,7 +17,7 @@ defineProps<{
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:isLoading", "update:value"]);
 </script>
 
 <template>
@@ -26,11 +26,13 @@ const emit = defineEmits(["update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
+        @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

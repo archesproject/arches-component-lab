@@ -3,6 +3,8 @@ import Cookies from "js-cookie";
 
 import type { FeatureCollection } from "geojson";
 
+import type { ResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/types.ts";
+
 export async function fetchMapSettings(): Promise<Record<string, unknown>> {
     const response = await fetch(arches.urls["api-settings"]);
     const parsed = await response.json();
@@ -25,6 +27,15 @@ export async function fetchDrawnFeaturesBuffer(
         headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") as string },
         body: JSON.stringify({ features }),
     });
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    return parsed;
+}
+
+export async function fetchResourceDescriptor(
+    resourceId: string,
+): Promise<ResourceDescriptor> {
+    const response = await fetch(arches.urls.resource_descriptors + resourceId);
     const parsed = await response.json();
     if (!response.ok) throw new Error(parsed.message ?? response.statusText);
     return parsed;

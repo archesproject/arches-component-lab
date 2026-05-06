@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, useTemplateRef, watch } from "vue";
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
 
 import maplibregl from "maplibre-gl";
-
-import "maplibre-gl/dist/maplibre-gl.css";
+import Skeleton from "primevue/skeleton";
 
 import {
     fetchMapSettings,
@@ -11,10 +10,17 @@ import {
     fetchGeoJSONBounds,
 } from "@/arches_component_lab/widgets/MapWidget/api.ts";
 
-import { STYLE_LOAD_EVENT } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
+import {
+    DEFAULT_FEATURE_COLOR,
+    DEFAULT_FEATURE_LINE_WIDTH,
+    DEFAULT_FEATURE_POINT_FILL,
+    DEFAULT_FEATURE_POINT_SIZE,
+    STYLE_LOAD_EVENT,
+    VIEWER_SOURCE_ID,
+} from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
 import type { FeatureCollection } from "geojson";
-import type { GeoJSONSource, Map } from "maplibre-gl";
+import type { GeoJSONSource, Map as MaplibreMap } from "maplibre-gl";
 
 import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type {
@@ -22,23 +28,43 @@ import type {
     RawBasemap,
 } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-const SOURCE_ID = "widget-features";
-const DEFAULT_FEATURE_COLOR = "#c12";
-const DEFAULT_FEATURE_POINT_FILL = "#ffffff";
-const DEFAULT_FEATURE_LINE_WIDTH = 2;
-const DEFAULT_FEATURE_POINT_SIZE = 6;
-
-const props = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     aliasedNodeData: GeoJSONFeatureCollectionValue | null;
 }>();
 
+const emit = defineEmits<{
+    (event: "update:isLoading", isLoading: boolean): void;
+}>();
+
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 
-let map: Map | null = null;
+const isLoading = ref(false);
+
+let map: MaplibreMap | null = null;
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
+
+watch(
+    () => aliasedNodeData,
+    () => {
+        if (map?.getSource(VIEWER_SOURCE_ID)) {
+            const source = map.getSource(VIEWER_SOURCE_ID) as GeoJSONSource;
+            source.setData(
+                aliasedNodeData?.node_value ?? {
+                    type: "FeatureCollection",
+                    features: [],
+                },
+            );
+            fitToFeatures();
+        }
+    },
+);
 
 onMounted(async () => {
-    const config = props.cardXNodeXWidgetData?.config;
+    const config = cardXNodeXWidgetData?.config;
 
     map = new maplibregl.Map({
         container: mapContainer.value!,
@@ -53,6 +79,20 @@ onMounted(async () => {
 
     map.addControl(new maplibregl.NavigationControl(), "top-left");
 
+    map.once(STYLE_LOAD_EVENT, () => {
+        addFeatureLayers();
+    });
+
+    await loadMapData();
+});
+
+onUnmounted(() => {
+    map?.remove();
+});
+
+async function loadMapData() {
+    const config = cardXNodeXWidgetData?.config;
+    isLoading.value = true;
     try {
         const [settings, mapData] = await Promise.all([
             fetchMapSettings(),
@@ -60,74 +100,50 @@ onMounted(async () => {
         ]);
 
         if (settings?.DEFAULT_BOUNDS && !config?.centerX && !config?.centerY) {
-            map.fitBounds(
+            map!.fitBounds(
                 settings.DEFAULT_BOUNDS as [number, number, number, number],
             );
         }
 
         const basemaps = (mapData?.basemaps ?? []) as RawBasemap[];
         const preferredBasemap = config?.basemap
-            ? basemaps.find((b) => b.name === config.basemap)
+            ? basemaps.find((basemap) => basemap.name === config.basemap)
             : null;
         const activeBasemap =
-            preferredBasemap ?? basemaps.find((b) => b.addtomap);
+            preferredBasemap ?? basemaps.find((basemap) => basemap.addtomap);
         if (activeBasemap?.url) {
-            map.setStyle(activeBasemap.url);
+            map!.setStyle(activeBasemap.url);
         }
-    } catch (_error) {
-        // proceed with default empty style
+    } catch (error) {
+        console.error("Error loading map data:", error);
+    } finally {
+        isLoading.value = false;
     }
-
-    map.once(STYLE_LOAD_EVENT, () => {
-        addFeatureLayers();
-    });
-});
-
-onUnmounted(() => {
-    if (map) {
-        map.remove();
-    }
-});
-
-watch(
-    () => props.aliasedNodeData,
-    () => {
-        if (map?.getSource(SOURCE_ID)) {
-            const source = map.getSource(SOURCE_ID) as GeoJSONSource;
-            source.setData(
-                props.aliasedNodeData?.node_value ?? {
-                    type: "FeatureCollection",
-                    features: [],
-                },
-            );
-            fitToFeatures();
-        }
-    },
-);
+}
 
 function addFeatureLayers() {
-    const config = props.cardXNodeXWidgetData?.config;
+    const config = cardXNodeXWidgetData?.config;
     const featureColor = config?.featureColor ?? DEFAULT_FEATURE_COLOR;
     const featureLineWidth =
         config?.featureLineWidth ?? DEFAULT_FEATURE_LINE_WIDTH;
     const featurePointSize =
         config?.featurePointSize ?? DEFAULT_FEATURE_POINT_SIZE;
 
-    const featureCollection: FeatureCollection = props.aliasedNodeData
-        ?.node_value ?? {
-        type: "FeatureCollection",
-        features: [],
-    };
+    const featureCollection: FeatureCollection =
+        aliasedNodeData?.node_value ?? {
+            type: "FeatureCollection",
+            features: [],
+        };
 
-    map!.addSource(SOURCE_ID, {
+    map!.addSource(VIEWER_SOURCE_ID, {
         type: "geojson",
         data: featureCollection,
     });
 
     map!.addLayer({
-        id: `${SOURCE_ID}-fill`,
+        id: `${VIEWER_SOURCE_ID}-fill`,
         type: "fill",
-        source: SOURCE_ID,
+        source: VIEWER_SOURCE_ID,
         filter: ["==", "$type", "Polygon"],
         paint: {
             "fill-color": featureColor,
@@ -136,9 +152,9 @@ function addFeatureLayers() {
     });
 
     map!.addLayer({
-        id: `${SOURCE_ID}-line`,
+        id: `${VIEWER_SOURCE_ID}-line`,
         type: "line",
-        source: SOURCE_ID,
+        source: VIEWER_SOURCE_ID,
         filter: ["in", "$type", "LineString", "Polygon"],
         paint: {
             "line-color": featureColor,
@@ -147,9 +163,9 @@ function addFeatureLayers() {
     });
 
     map!.addLayer({
-        id: `${SOURCE_ID}-circle`,
+        id: `${VIEWER_SOURCE_ID}-circle`,
         type: "circle",
-        source: SOURCE_ID,
+        source: VIEWER_SOURCE_ID,
         filter: ["==", "$type", "Point"],
         paint: {
             "circle-color": DEFAULT_FEATURE_POINT_FILL,
@@ -163,7 +179,7 @@ function addFeatureLayers() {
 }
 
 async function fitToFeatures() {
-    const features = props.aliasedNodeData?.node_value;
+    const features = aliasedNodeData?.node_value;
     if (!features?.features?.length) return;
 
     try {
@@ -175,22 +191,43 @@ async function fitToFeatures() {
             ],
             { padding: { top: 50, right: 50, bottom: 50, left: 50 } },
         );
-    } catch (_error) {
-        // skip fit if bounds fetch fails
+    } catch (error) {
+        console.error(error);
     }
 }
 </script>
 
 <template>
-    <div
-        ref="mapContainer"
-        class="map-viewer"
-    />
+    <div class="map-viewer">
+        <div
+            ref="mapContainer"
+            class="map-container"
+        />
+        <Skeleton
+            v-if="isLoading"
+            class="map-loading-skeleton"
+        />
+    </div>
 </template>
 
 <style scoped>
 .map-viewer {
+    position: relative;
     height: 18.75rem;
     width: 100%;
+}
+
+.map-container {
+    height: 100%;
+    width: 100%;
+}
+
+.map-loading-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 </style>

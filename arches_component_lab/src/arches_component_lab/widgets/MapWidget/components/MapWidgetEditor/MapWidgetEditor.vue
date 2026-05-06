@@ -13,7 +13,11 @@ import {
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import geojsonExtent from "@mapbox/geojson-extent";
 import maplibregl from "maplibre-gl";
+
+import { uniqBy } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
+
+import Skeleton from "primevue/skeleton";
 
 import BasemapControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/BasemapControls.vue";
 import FeaturePopup from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/FeaturePopup.vue";
@@ -51,7 +55,8 @@ import type { Feature, FeatureCollection } from "geojson";
 import type {
     AddLayerObject,
     GeoJSONSource,
-    Map,
+    LngLat,
+    Map as MaplibreMap,
     MapGeoJSONFeature,
     MapMouseEvent,
     Popup,
@@ -77,14 +82,10 @@ const {
     aliasedNodeData,
     cardXNodeXWidgetData,
     shouldEmitSimplifiedValue = false,
-    overlays: overlaysProp = [],
-    sources = [],
 } = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionValue | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     shouldEmitSimplifiedValue?: boolean;
-    overlays?: MapLayer[];
-    sources?: MapSource[];
 }>();
 
 const emit = defineEmits<{
@@ -92,33 +93,30 @@ const emit = defineEmits<{
         event: "update:value",
         value: GeoJSONFeatureCollectionValue | FeatureCollection,
     ): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const { $gettext } = useGettext();
 
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 
-const map = shallowRef<Map | null>(null);
+const map = shallowRef<MaplibreMap | null>(null);
+const isLoading = ref(false);
 const selectedDrawnFeature: Ref<Feature | null> = ref(null);
 const basemaps = ref<Basemap[]>([]);
-const localOverlays = ref<MapLayer[]>([...overlaysProp]);
-const overlayLayerIds = computed(() =>
-    localOverlays.value
-        .filter((overlay) => overlay.addtomap)
-        .flatMap((overlay) =>
-            overlay.layerdefinitions.map((layerDef) => layerDef.id),
-        ),
-);
+const overlays = ref<MapLayer[]>([]);
 const popupFeatures = ref<MapGeoJSONFeature[]>([]);
 const popupContainer = ref<HTMLElement | null>(null);
+
 let activePopup: Popup | null = null;
 
 let draw: InstanceType<typeof MapboxDraw>;
-let drawInitialized = false;
-let boundsInitialized = false;
-let basemapInitialized = false;
 let mapSources: MapSource[] = [];
 let defaultBounds: [number, number, number, number] | null = null;
+let currentBufferData: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [],
+};
 
 const mapInteractionItems: MapInteractionItem[] = [
     {
@@ -141,46 +139,47 @@ const mapInteractionItems: MapInteractionItem[] = [
     },
 ];
 
-provide("basemaps", basemaps);
-provide("overlays", localOverlays);
-provide("selectedDrawnFeature", selectedDrawnFeature);
-provide(
-    "geometryTypes",
-    computed(
-        () =>
-            cardXNodeXWidgetData?.config?.geometryTypes?.map((gt) =>
-                gt.id.toLowerCase(),
-            ) ?? null,
-    ),
+const overlayLayerIds = computed(() =>
+    overlays.value
+        .filter((overlay) => overlay.addtomap)
+        .flatMap((overlay) =>
+            overlay.layerdefinitions.map((layerDef) => layerDef.id),
+        ),
 );
 
-watch(
-    () => overlaysProp,
-    (updated) => {
-        localOverlays.value = [...updated];
-    },
+const geometryTypes = computed(
+    () =>
+        cardXNodeXWidgetData?.config?.geometryTypes?.map((geometryType) =>
+            geometryType.id.toLowerCase(),
+        ) ?? null,
 );
+
+provide("basemaps", basemaps);
+provide("overlays", overlays);
+provide("selectedDrawnFeature", selectedDrawnFeature);
+provide("geometryTypes", geometryTypes);
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
 
 watch(
     basemaps,
-    (updated) => {
-        if (!basemapInitialized) {
-            basemapInitialized = true;
-            return;
-        }
-        const active = updated.find((basemap) => basemap.active);
-        if (active && map.value) {
-            map.value.setStyle(active.url, { diff: false });
+    (updatedBasemaps) => {
+        const activeBasemap = updatedBasemaps.find((basemap) => basemap.active);
+
+        if (activeBasemap && map.value) {
+            map.value.setStyle(activeBasemap.url, { diff: false });
         }
     },
     { deep: true },
 );
 
 watch(
-    localOverlays,
-    (overlays) => {
-        if (map.value && map.value.isStyleLoaded()) {
-            updateMapOverlays(overlays);
+    overlays,
+    (updatedOverlays) => {
+        if (map.value?.isStyleLoaded()) {
+            updateMapOverlays(updatedOverlays);
         }
     },
     { deep: true },
@@ -188,6 +187,7 @@ watch(
 
 onMounted(async () => {
     const config = cardXNodeXWidgetData?.config;
+
     map.value = new maplibregl.Map({
         container: mapContainer.value!,
         zoom: config?.zoom ?? 2,
@@ -201,76 +201,103 @@ onMounted(async () => {
 
     map.value.addControl(new maplibregl.NavigationControl(), "top-left");
 
-    map.value.on("click", (e: MapMouseEvent) => {
-        if (!overlayLayerIds.value.length) return;
-        const features = map.value!.queryRenderedFeatures(e.point, {
-            layers: overlayLayerIds.value,
-        });
-        if (!features.length) return;
+    map.value.on("click", handleMapClick);
+    map.value.on("mousemove", handleMapMousemove);
 
-        const seen = new Set<string>();
-        const unique = features.filter((feature: MapGeoJSONFeature) => {
-            const id = String(
-                feature.properties?.resourceinstanceid ?? feature.id ?? "",
-            );
-            if (!id || seen.has(id)) return false;
-            seen.add(id);
-            return true;
-        });
+    map.value.once(STYLE_LOAD_EVENT, () => {
+        setupDraw();
 
-        if (activePopup) activePopup.remove();
-
-        const container = document.createElement("div");
-        container.style.height = "100%";
-        activePopup = new maplibregl.Popup({
-            maxWidth: "none",
-            className: "feature-info-popup",
-        })
-            .setDOMContent(container)
-            .setLngLat(e.lngLat)
-            .addTo(map.value!);
-
-        popupContainer.value = container;
-        popupFeatures.value = unique;
-
-        activePopup.on("close", () => {
-            popupContainer.value = null;
-            popupFeatures.value = [];
-            activePopup = null;
-        });
-    });
-
-    map.value.on("mousemove", (e: MapMouseEvent) => {
-        let features: MapGeoJSONFeature[] = [];
-        if (overlayLayerIds.value.length) {
-            features = map.value!.queryRenderedFeatures(e.point, {
-                layers: overlayLayerIds.value,
-            });
-        }
-        map.value!.getCanvas().style.cursor = features.length ? "pointer" : "";
-    });
-
-    // Register before the async API call so no style.load event can slip by.
-    // Using `on` (not `once`) so it re-fires on every style change (basemap switch).
-    map.value.on(STYLE_LOAD_EVENT, () => {
-        if (!drawInitialized) {
-            setupDraw();
-            drawInitialized = true;
-        }
-        if (!boundsInitialized && defaultBounds) {
-            boundsInitialized = true;
+        if (defaultBounds) {
+            const [west, south, east, north] = defaultBounds;
             map.value!.fitBounds(
                 [
-                    [defaultBounds[0], defaultBounds[1]],
-                    [defaultBounds[2], defaultBounds[3]],
+                    [west, south],
+                    [east, north],
                 ],
                 { padding: 20 },
             );
         }
+    });
+    map.value.on(STYLE_LOAD_EVENT, () => {
         map.value!.resize();
         addBufferLayer();
-        updateMapOverlays(localOverlays.value);
+        updateMapOverlays(overlays.value);
     });
+
+    await loadMapData();
+});
+
+onUnmounted(() => {
+    map.value?.remove();
+});
+
+function handleMapClick(event: MapMouseEvent) {
+    if (!overlayLayerIds.value.length) return;
+
+    const features = map.value!.queryRenderedFeatures(event.point, {
+        layers: overlayLayerIds.value,
+    });
+
+    if (!features.length) return;
+
+    openFeaturePopup(deduplicateFeatures(features), event.lngLat);
+}
+
+function deduplicateFeatures(
+    features: MapGeoJSONFeature[],
+): MapGeoJSONFeature[] {
+    const identifiableFeatures = features.filter(
+        (feature) => feature.properties?.resourceinstanceid || feature.id,
+    );
+
+    return uniqBy(identifiableFeatures, (feature) =>
+        String(feature.properties?.resourceinstanceid ?? feature.id),
+    );
+}
+
+function openFeaturePopup(features: MapGeoJSONFeature[], lngLat: LngLat) {
+    activePopup?.remove();
+
+    const container = document.createElement("div");
+    container.style.height = "100%";
+
+    activePopup = new maplibregl.Popup({
+        maxWidth: "none",
+        className: "feature-info-popup",
+    })
+        .setDOMContent(container)
+        .setLngLat(lngLat)
+        .addTo(map.value!);
+
+    popupContainer.value = container;
+    popupFeatures.value = features;
+
+    activePopup.on("close", () => {
+        popupContainer.value = null;
+        popupFeatures.value = [];
+        activePopup = null;
+    });
+}
+
+function handleMapMousemove(event: MapMouseEvent) {
+    const canvas = map.value!.getCanvas();
+
+    if (!overlayLayerIds.value.length) {
+        canvas.style.cursor = "";
+        return;
+    }
+
+    const features = map.value!.queryRenderedFeatures(event.point, {
+        layers: overlayLayerIds.value,
+    });
+
+    canvas.style.cursor = features.length ? "pointer" : "";
+}
+
+async function loadMapData() {
+    isLoading.value = true;
+
+    const config = cardXNodeXWidgetData?.config;
 
     try {
         const [settings, mapData] = await Promise.all([
@@ -278,15 +305,13 @@ onMounted(async () => {
             fetchMapData(),
         ]);
 
-        const resourceSources: MapSource[] = (
-            (mapData?.resource_map_sources ?? []) as {
-                name: string;
-                source: MapSource["source"];
-            }[]
-        ).map((rawSource) => ({
+        type RawResourceSource = { name: string; source: MapSource["source"] };
+        const rawResourceSources = (mapData?.resource_map_sources ??
+            []) as RawResourceSource[];
+        const resourceSources: MapSource[] = rawResourceSources.map((raw) => ({
             id: 0,
-            name: rawSource.name,
-            source: rawSource.source,
+            name: raw.name,
+            source: raw.source,
         }));
         mapSources = [
             ...((mapData?.map_sources ?? []) as MapSource[]),
@@ -311,38 +336,34 @@ onMounted(async () => {
                 layer.activated !== false &&
                 !layer.searchonly,
         );
-        const resourceLayers: MapLayer[] = (mapData?.resource_map_layers ??
+        const resourceLayers = (mapData?.resource_map_layers ??
             []) as MapLayer[];
         const fetchedOverlays = [...configuredOverlays, ...resourceLayers].sort(
             (overlayA, overlayB) =>
                 (overlayA.sortorder ?? 0) - (overlayB.sortorder ?? 0),
         );
-        if (fetchedOverlays.length && !overlaysProp.length) {
-            localOverlays.value = fetchedOverlays;
-        }
+        overlays.value = fetchedOverlays;
 
         if (settings?.DEFAULT_BOUNDS) {
             defaultBounds = geojsonExtent(settings.DEFAULT_BOUNDS);
         }
 
-        const preferredBasemap = config?.basemap
-            ? basemaps.value.find((b) => b.value === config.basemap)
-            : null;
+        const preferredBasemap =
+            basemaps.value.find(
+                (basemap) => basemap.value === config?.basemap,
+            ) ?? null;
         const activeBasemap =
-            preferredBasemap ?? basemaps.value.find((b) => b.active);
+            preferredBasemap ??
+            basemaps.value.find((basemap) => basemap.active);
         if (activeBasemap?.url) {
-            map.value.setStyle(activeBasemap.url);
+            map.value!.setStyle(activeBasemap.url);
         }
-    } catch (_error) {
-        // proceed with default empty style
+    } catch (error) {
+        console.error("Error loading map data:", error);
+    } finally {
+        isLoading.value = false;
     }
-});
-
-onUnmounted(() => {
-    if (map.value) {
-        map.value.remove();
-    }
-});
+}
 
 function setupDraw() {
     draw = new MapboxDraw({
@@ -358,29 +379,27 @@ function setupDraw() {
     map.value!.addControl(draw);
 
     if (aliasedNodeData?.node_value?.features?.length) {
-        aliasedNodeData.node_value.features.forEach((feature) => {
+        for (const feature of aliasedNodeData.node_value.features) {
             draw.add(feature);
-        });
+        }
+
         updateDrawnFeatures();
     }
 
-    map.value!.on(DRAW_CREATE_EVENT, (e: DrawEvent) => {
-        selectNewlyDrawnFeature(e);
+    map.value!.on(DRAW_CREATE_EVENT, (drawEvent: DrawEvent) => {
+        selectNewlyDrawnFeature(drawEvent);
         updateDrawnFeatures();
     });
-
-    map.value!.on(DRAW_UPDATE_EVENT, (e: DrawEvent) => {
-        selectedDrawnFeature.value = e.features[0] ?? null;
+    map.value!.on(DRAW_UPDATE_EVENT, (drawEvent: DrawEvent) => {
+        selectedDrawnFeature.value = drawEvent.features[0] ?? null;
         updateDrawnFeatures();
     });
-
     map.value!.on(DRAW_DELETE_EVENT, () => {
         selectedDrawnFeature.value = null;
         updateDrawnFeatures();
     });
-
-    map.value!.on(DRAW_SELECTION_CHANGE_EVENT, (e: DrawEvent) => {
-        selectedDrawnFeature.value = e.features[0] ?? null;
+    map.value!.on(DRAW_SELECTION_CHANGE_EVENT, (drawEvent: DrawEvent) => {
+        selectedDrawnFeature.value = drawEvent.features[0] ?? null;
     });
 }
 
@@ -388,7 +407,7 @@ function addBufferLayer() {
     if (!map.value!.getSource(BUFFER_LAYER_ID)) {
         map.value!.addSource(BUFFER_LAYER_ID, {
             type: "geojson",
-            data: { type: "FeatureCollection", features: [] },
+            data: currentBufferData,
         });
     }
     if (!map.value!.getLayer(BUFFER_LAYER_ID)) {
@@ -405,8 +424,8 @@ function addBufferLayer() {
     }
 }
 
-function selectNewlyDrawnFeature(e: DrawEvent) {
-    const feature = e.features[0];
+function selectNewlyDrawnFeature(drawEvent: DrawEvent) {
+    const feature = drawEvent.features[0];
     const featureId = feature.id as string;
 
     map.value!.once(IDLE, () => {
@@ -425,12 +444,8 @@ async function updateDrawnFeatures() {
     const drawnFeatures = draw.getAll() as FeatureCollection;
 
     for (const feature of drawnFeatures.features) {
-        if (!feature.properties!.buffer_distance) {
-            feature.properties!.buffer_distance = 0;
-        }
-        if (!feature.properties!.buffer_units) {
-            feature.properties!.buffer_units = METERS;
-        }
+        feature.properties!.buffer_distance ??= 0;
+        feature.properties!.buffer_units ??= METERS;
     }
 
     try {
@@ -440,6 +455,7 @@ async function updateDrawnFeatures() {
                 (feature) => feature.properties!.buffer_distance,
             ),
         };
+
         let bufferedFeatures: FeatureCollection = {
             type: "FeatureCollection",
             features: [],
@@ -447,10 +463,11 @@ async function updateDrawnFeatures() {
         if (featuresToBuffer.features.length) {
             bufferedFeatures = await fetchDrawnFeaturesBuffer(featuresToBuffer);
         }
-        const source = map.value!.getSource(BUFFER_LAYER_ID) as GeoJSONSource;
-        if (source) {
-            source.setData(bufferedFeatures);
-        }
+
+        currentBufferData = bufferedFeatures;
+        (map.value!.getSource(BUFFER_LAYER_ID) as GeoJSONSource)?.setData(
+            currentBufferData,
+        );
 
         if (drawnFeatures.features.length) {
             const allFeatures: FeatureCollection = {
@@ -460,17 +477,21 @@ async function updateDrawnFeatures() {
                     ...bufferedFeatures.features,
                 ],
             };
-            const bounds = await fetchGeoJSONBounds(allFeatures);
+
+            const [west, south, east, north] =
+                await fetchGeoJSONBounds(allFeatures);
             map.value!.fitBounds(
                 [
-                    [bounds[0], bounds[1]],
-                    [bounds[2], bounds[3]],
+                    [west, south],
+                    [east, north],
                 ],
-                { padding: { top: 50, right: 100, bottom: 50, left: 50 } },
+                {
+                    padding: { top: 50, right: 100, bottom: 50, left: 50 },
+                },
             );
         }
-    } catch (_error) {
-        // buffer/bounds fetch failed; continue with drawn features only
+    } catch (error) {
+        console.error("Error updating drawn features:", error);
     }
 
     const count = drawnFeatures.features.length;
@@ -490,11 +511,10 @@ async function updateDrawnFeatures() {
 }
 
 function addOverlayToMap(overlay: MapLayer) {
-    const allSources = [...sources, ...mapSources];
-    overlay.layerdefinitions.forEach((layerDef: LayerDefinition) => {
+    for (const layerDef of overlay.layerdefinitions) {
         try {
             if (layerDef.source && !map.value!.getSource(layerDef.source)) {
-                const sourceSpec = allSources.find(
+                const sourceSpec = mapSources.find(
                     (mapSource) => mapSource.name === layerDef.source,
                 );
                 if (sourceSpec) {
@@ -507,30 +527,31 @@ function addOverlayToMap(overlay: MapLayer) {
             if (!map.value!.getLayer(layerDef.id)) {
                 map.value!.addLayer(layerDef as AddLayerObject);
             }
-        } catch (_e) {
-            // skip layers that can't be added to this style
+        } catch (error) {
+            console.error(error);
         }
-    });
+    }
 }
 
 function removeOverlayFromMap(overlay: MapLayer) {
     const sourcesToRemove: Record<string, boolean> = {};
 
-    overlay.layerdefinitions.forEach((layerDef: LayerDefinition) => {
+    for (const layerDef of overlay.layerdefinitions) {
         if (map.value!.getLayer(layerDef.id)) {
             map.value!.removeLayer(layerDef.id);
             if (layerDef.source) {
                 sourcesToRemove[layerDef.source] = true;
             }
         }
-    });
+    }
 
-    map.value!.getStyle()?.layers.forEach((layer: LayerDefinition) => {
-        const src = layer.source;
-        if (src && sourcesToRemove[src]) {
-            delete sourcesToRemove[src];
+    for (const layer of (map.value!.getStyle()?.layers ??
+        []) as LayerDefinition[]) {
+        const layerSource = layer.source;
+        if (layerSource && sourcesToRemove[layerSource]) {
+            delete sourcesToRemove[layerSource];
         }
-    });
+    }
 
     for (const source of Object.keys(sourcesToRemove)) {
         if (map.value!.getSource(source)) {
@@ -541,11 +562,11 @@ function removeOverlayFromMap(overlay: MapLayer) {
 
 function updateMapOverlays(overlays: MapLayer[]) {
     for (const overlay of overlays) {
-        overlay.layerdefinitions.forEach((layerDef: LayerDefinition) => {
+        for (const layerDef of overlay.layerdefinitions) {
             if (map.value!.getLayer(layerDef.id)) {
                 map.value!.removeLayer(layerDef.id);
             }
-        });
+        }
     }
     for (const overlay of overlays) {
         if (overlay.addtomap) {
@@ -563,10 +584,14 @@ function updateMapOverlays(overlays: MapLayer[]) {
             ref="mapContainer"
             class="map-container"
         />
+        <Skeleton
+            v-if="isLoading"
+            class="map-loading-skeleton"
+        />
         <InteractionsDrawer
             v-if="map"
             position="right"
-            :map="map as Map"
+            :map="map"
             :items="mapInteractionItems"
             :default-open-index="0"
         />
@@ -600,12 +625,22 @@ function updateMapOverlays(overlays: MapLayer[]) {
 
 <style scoped>
 .map-widget-editor {
+    position: relative;
     display: flex;
     flex-direction: row;
     width: 100%;
     flex: 1;
     min-height: 25rem;
     overflow: hidden;
+}
+
+.map-loading-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 
 .map-container {

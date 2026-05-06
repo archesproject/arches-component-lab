@@ -2,67 +2,52 @@
 import { computed, ref, watch } from "vue";
 
 import arches from "arches";
+import Button from "primevue/button";
 import Skeleton from "primevue/skeleton";
 import { useGettext } from "vue3-gettext";
 
+import { fetchResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/api.ts";
+
 import type { MapGeoJSONFeature } from "maplibre-gl";
 
-interface ResourceDescriptor {
-    displayname: string;
-    displaydescription: string;
-    map_popup: string;
-    graph_name: string;
-    permissions: { can_edit_resource_instance?: boolean };
-}
+import type { ResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-const props = defineProps<{ features: MapGeoJSONFeature[] }>();
+const { features } = defineProps<{ features: MapGeoJSONFeature[] }>();
 
 const { $gettext } = useGettext();
 
 const index = ref(0);
-const loading = ref(false);
+const isLoading = ref(false);
 const descriptor = ref<ResourceDescriptor | null>(null);
 
-const feature = computed(() => props.features[index.value]);
+const feature = computed(() => features[index.value]);
 const resourceId = computed(
     () => feature.value?.properties?.resourceinstanceid ?? null,
 );
-const total = computed(() => props.features.length);
-const isInitialLoading = computed(() => loading.value && !descriptor.value);
-
-let abortController: AbortController | null = null;
+const total = computed(() => features.length);
 
 watch(
     resourceId,
     async (id) => {
-        abortController?.abort();
+        descriptor.value = null;
         if (!id) return;
-        abortController = new AbortController();
-        loading.value = true;
+        isLoading.value = true;
         try {
-            const response = await fetch(
-                arches.urls.resource_descriptors + id,
-                {
-                    signal: abortController.signal,
-                },
-            );
-            if (response.ok) {
-                descriptor.value = await response.json();
-            }
+            descriptor.value = await fetchResourceDescriptor(id);
         } catch (error) {
-            if ((error as Error).name !== "AbortError") throw error;
+            console.error("Error fetching resource descriptor:", error);
         } finally {
-            loading.value = false;
+            isLoading.value = false;
         }
     },
     { immediate: true },
 );
 
-function prev() {
+function navigateToPreviousFeature() {
     index.value = (index.value - 1 + total.value) % total.value;
 }
 
-function next() {
+function navigateToNextFeature() {
     index.value = (index.value + 1) % total.value;
 }
 </script>
@@ -70,16 +55,17 @@ function next() {
 <template>
     <div class="popup">
         <div class="popup-title-bar">
-            <button
+            <Button
                 v-if="total > 1"
-                class="popup-nav-btn"
-                @click="prev"
-            >
-                <i class="fa fa-angle-left" />
-            </button>
+                icon="pi pi-chevron-left"
+                severity="secondary"
+                text
+                rounded
+                @click="navigateToPreviousFeature"
+            />
             <div class="popup-title">
                 <Skeleton
-                    v-if="isInitialLoading"
+                    v-if="isLoading"
                     height="1rem"
                     width="60%"
                 />
@@ -87,17 +73,18 @@ function next() {
                     {{ descriptor?.displayname ?? resourceId }}
                 </template>
             </div>
-            <button
+            <Button
                 v-if="total > 1"
-                class="popup-nav-btn"
-                @click="next"
-            >
-                <i class="fa fa-angle-right" />
-            </button>
+                icon="pi pi-chevron-right"
+                severity="secondary"
+                text
+                rounded
+                @click="navigateToNextFeature"
+            />
         </div>
 
         <div class="popup-body">
-            <template v-if="isInitialLoading">
+            <template v-if="isLoading">
                 <Skeleton
                     height="1rem"
                     class="popup-skeleton-row"
@@ -125,7 +112,7 @@ function next() {
                         v-if="descriptor.graph_name"
                         class="popup-metadata"
                     >
-                        <span>{{ $gettext("Resource Model") }} </span>
+                        <span>{{ $gettext("Resource Model") }}</span>
                         <span class="popup-metadata-value">{{
                             descriptor.graph_name
                         }}</span>
@@ -134,7 +121,7 @@ function next() {
                         v-if="resourceId"
                         class="popup-metadata"
                     >
-                        <span>{{ $gettext("ID") }}: </span>
+                        <span>{{ $gettext("ID") }}</span>
                         <span class="popup-metadata-value popup-id-value">{{
                             resourceId
                         }}</span>
@@ -144,24 +131,17 @@ function next() {
         </div>
 
         <div class="popup-footer">
-            <div class="popup-footer-links">
-                <a
-                    v-if="resourceId"
-                    :href="arches.urls.resource_report + resourceId"
-                    target="_blank"
-                >
-                    <i class="ion-document-text" />
-                    {{ $gettext("Report") }}
-                </a>
-                <a
-                    v-if="descriptor?.permissions?.can_edit_resource_instance"
-                    :href="arches.urls.resource_editor + resourceId"
-                    target="_blank"
-                >
-                    <i class="ion-ios-refresh-empty" />
-                    {{ $gettext("Edit") }}
-                </a>
-            </div>
+            <Button
+                v-if="resourceId"
+                as="a"
+                :href="arches.urls.resource_report + resourceId"
+                target="_blank"
+                icon="pi pi-book"
+                :label="$gettext('Report')"
+                severity="secondary"
+                text
+                size="small"
+            />
             <div
                 v-if="total > 1"
                 class="popup-counter"
@@ -205,29 +185,6 @@ function next() {
     text-overflow: ellipsis;
 }
 
-.popup-nav-btn {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 50%;
-    border: 0.0625rem solid var(--p-menubar-border-color);
-    background: none;
-    cursor: pointer;
-    font-size: 1.875rem;
-    font-weight: 600;
-    color: inherit;
-    padding: 0;
-    line-height: 1;
-}
-
-.popup-nav-btn:hover {
-    background: var(--p-button-secondary-hover-background);
-    color: var(--p-button-secondary-hover-color);
-}
-
 .popup-body {
     flex: 1;
     padding: 0.75rem 1rem;
@@ -253,6 +210,11 @@ function next() {
     opacity: 0.75;
 }
 
+.popup-metadata {
+    display: flex;
+    gap: 0.25rem;
+}
+
 .popup-metadata-value {
     color: var(--p-primary-color);
 }
@@ -268,21 +230,6 @@ function next() {
     padding: 0.5rem 1rem;
     border-top: 0.0625rem solid var(--p-menubar-border-color);
     background: var(--p-button-secondary-hover-background);
-}
-
-.popup-footer-links {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.popup-footer-links a {
-    color: var(--p-primary-color);
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.popup-footer-links a:hover {
-    text-decoration: underline;
 }
 
 .popup-counter {

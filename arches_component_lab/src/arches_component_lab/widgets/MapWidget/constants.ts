@@ -1,6 +1,10 @@
 export const BUFFER_FILL_COLOR = "#ea7f08";
 export const BUFFER_FILL_OPACITY = 0.3;
 export const BUFFER_LAYER_ID = "buffer-layer";
+export const DEFAULT_FEATURE_COLOR = "#c12";
+export const DEFAULT_FEATURE_LINE_WIDTH = 2;
+export const DEFAULT_FEATURE_POINT_FILL = "#ffffff";
+export const DEFAULT_FEATURE_POINT_SIZE = 6;
 export const DIRECT_SELECT = "direct_select";
 export const DRAW_CREATE_EVENT = "draw.create";
 export const DRAW_DELETE_EVENT = "draw.delete";
@@ -22,4 +26,5 @@ export const POINT = "point";
 export const POLYGON = "polygon";
 export const SIMPLE_SELECT = "simple_select";
 export const STYLE_LOAD_EVENT = "style.load";
+export const VIEWER_SOURCE_ID = "widget-features";
 export const YARDS = "yards";
