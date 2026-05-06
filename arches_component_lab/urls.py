@@ -6,7 +6,6 @@ from arches_component_lab.views.api.map import (
     FeatureBufferAPI,
     GeoJSONBoundsAPI,
     MapDataAPI,
-    MapSettingsAPI,
 )
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.card_x_node_x_widget import (
@@ -24,7 +23,6 @@ from arches_querysets.rest_framework.generic_views import (
 app_name = ArchesComponentLabConfig.name
 
 urlpatterns = [
-    path("api/settings", MapSettingsAPI.as_view(), name="api-settings"),
     path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),
     path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
     path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),

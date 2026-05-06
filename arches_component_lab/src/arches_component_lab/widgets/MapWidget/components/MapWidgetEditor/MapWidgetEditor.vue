@@ -26,7 +26,6 @@ import MapFilter from "@/arches_component_lab/widgets/MapWidget/components/MapWi
 import OverlayControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/OverlayControls.vue";
 
 import {
-    fetchMapSettings,
     fetchMapData,
     fetchDrawnFeaturesBuffer,
     fetchGeoJSONBounds,
@@ -300,10 +299,7 @@ async function loadMapData() {
     const config = cardXNodeXWidgetData?.config;
 
     try {
-        const [settings, mapData] = await Promise.all([
-            fetchMapSettings(),
-            fetchMapData(),
-        ]);
+        const mapData = await fetchMapData();
 
         type RawResourceSource = { name: string; source: MapSource["source"] };
         const rawResourceSources = (mapData?.resource_map_sources ??
@@ -344,8 +340,8 @@ async function loadMapData() {
         );
         overlays.value = fetchedOverlays;
 
-        if (settings?.DEFAULT_BOUNDS) {
-            defaultBounds = geojsonExtent(settings.DEFAULT_BOUNDS);
+        if (mapData?.default_bounds) {
+            defaultBounds = geojsonExtent(mapData.default_bounds);
         }
 
         const preferredBasemap =

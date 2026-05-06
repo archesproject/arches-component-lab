@@ -1,6 +1,5 @@
 import json
 
-from django.utils.translation import get_language, get_language_bidi
 from django.views.generic import View
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -12,33 +11,21 @@ from arches.app.utils.response import JSONResponse
 from arches_component_lab.utils.geo_utils import GeoUtils
 
 
-def _patch_tile_url(source_dict):
-    if "tiles" in source_dict:
-        tiles = source_dict["tiles"]
-        if tiles and not tiles[0].startswith("http"):
-            source_dict["tiles"] = [
-                "{}{}".format(settings.PUBLIC_SERVER_ADDRESS, tiles[0])
-            ]
-    return source_dict
-
-
-class MapSettingsAPI(View):
-    def get(self, request):
-        return JSONResponse(
-            {
-                "ACTIVE_LANGUAGE": get_language(),
-                "ACTIVE_LANGUAGE_DIRECTION": "rtl" if get_language_bidi() else "ltr",
-                "DEFAULT_BOUNDS": getattr(settings, "DEFAULT_BOUNDS", None),
-            }
-        )
-
-
 class MapDataAPI(View):
+    @staticmethod
+    def _ensure_absolute_tile_urls(source_dict):
+        if "tiles" in source_dict:
+            tiles = source_dict["tiles"]
+            if tiles and not tiles[0].startswith("http"):
+                source_dict["tiles"] = [
+                    "{}{}".format(settings.PUBLIC_SERVER_ADDRESS, tiles[0])
+                ]
+
     def get(self, request):
         map_layers = user_can_read_map_layers(request.user)
         map_sources = list(models.MapSource.objects.all())
         for map_source in map_sources:
-            _patch_tile_url(map_source.source)
+            self._ensure_absolute_tile_urls(map_source.source)
 
         datatype_factory = DataTypeFactory()
         geom_nodes = (
@@ -59,7 +46,7 @@ class MapDataAPI(View):
                 resource_source = datatype.get_map_source(node)
                 if resource_source is not None:
                     parsed_source = json.loads(resource_source["source"])
-                    _patch_tile_url(parsed_source)
+                    self._ensure_absolute_tile_urls(parsed_source)
                     resource_map_sources.append(
                         {
                             "name": resource_source["name"],
@@ -90,6 +77,7 @@ class MapDataAPI(View):
                 "basemaps": getattr(settings, "BASEMAPS", []),
                 "resource_map_layers": resource_map_layers,
                 "resource_map_sources": resource_map_sources,
+                "default_bounds": getattr(settings, "DEFAULT_BOUNDS", None),
             }
         )
 

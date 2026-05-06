@@ -5,13 +5,6 @@ import type { FeatureCollection } from "geojson";
 
 import type { ResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-export async function fetchMapSettings(): Promise<Record<string, unknown>> {
-    const response = await fetch(arches.urls["api-settings"]);
-    const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
-    return parsed;
-}
-
 export async function fetchMapData(): Promise<Record<string, unknown>> {
     const response = await fetch(arches.urls["api-map-data"]);
     const parsed = await response.json();

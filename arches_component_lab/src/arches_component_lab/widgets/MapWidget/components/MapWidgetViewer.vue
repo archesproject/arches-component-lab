@@ -5,7 +5,6 @@ import maplibregl from "maplibre-gl";
 import Skeleton from "primevue/skeleton";
 
 import {
-    fetchMapSettings,
     fetchMapData,
     fetchGeoJSONBounds,
 } from "@/arches_component_lab/widgets/MapWidget/api.ts";
@@ -94,14 +93,11 @@ async function loadMapData() {
     const config = cardXNodeXWidgetData?.config;
     isLoading.value = true;
     try {
-        const [settings, mapData] = await Promise.all([
-            fetchMapSettings(),
-            fetchMapData(),
-        ]);
+        const mapData = await fetchMapData();
 
-        if (settings?.DEFAULT_BOUNDS && !config?.centerX && !config?.centerY) {
+        if (mapData?.default_bounds && !config?.centerX && !config?.centerY) {
             map!.fitBounds(
-                settings.DEFAULT_BOUNDS as [number, number, number, number],
+                mapData.default_bounds as [number, number, number, number],
             );
         }
 
