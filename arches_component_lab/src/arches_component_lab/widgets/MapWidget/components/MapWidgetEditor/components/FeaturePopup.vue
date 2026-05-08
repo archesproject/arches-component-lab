@@ -112,19 +112,17 @@ function navigateToNextFeature() {
                         v-if="descriptor.graph_name"
                         class="popup-metadata"
                     >
-                        <span>{{ $gettext("Resource Model") }}</span>
-                        <span class="popup-metadata-value">{{
-                            descriptor.graph_name
-                        }}</span>
+                        {{
+                            $gettext("Resource Model: %{name}", {
+                                name: descriptor.graph_name,
+                            })
+                        }}
                     </div>
                     <div
                         v-if="resourceId"
-                        class="popup-metadata"
+                        class="popup-metadata popup-id-value"
                     >
-                        <span>{{ $gettext("ID") }}</span>
-                        <span class="popup-metadata-value popup-id-value">{{
-                            resourceId
-                        }}</span>
+                        {{ $gettext("ID: %{id}", { id: resourceId }) }}
                     </div>
                 </div>
             </template>
@@ -146,9 +144,12 @@ function navigateToNextFeature() {
                 v-if="total > 1"
                 class="popup-counter"
             >
-                <div class="popup-counter-badge">{{ index + 1 }}</div>
-                <span>{{ $gettext("of") }}</span>
-                <div>{{ total }}</div>
+                {{
+                    $gettext("%{current} of %{total}", {
+                        current: String(index + 1),
+                        total: String(total),
+                    })
+                }}
             </div>
         </div>
     </div>
@@ -237,19 +238,6 @@ function navigateToNextFeature() {
     align-items: center;
     gap: 0.25rem;
     font-weight: 500;
-    font-size: 1rem;
-}
-
-.popup-counter-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    background: var(--p-primary-200);
-    border: 0.0625rem solid var(--p-primary-500);
-    color: var(--p-primary-contrast-color);
     font-size: 1rem;
 }
 </style>
