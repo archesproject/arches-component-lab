@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { inject, ref } from "vue";
+import type { Ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import BufferControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/MapFilter/components/BufferControls.vue";
-import DrawControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/MapFilter/components/DrawControls.vue";
+import BufferControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/components/BufferControls.vue";
+import DrawControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/components/DrawControls.vue";
+import DrawnFeaturesList from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/components/DrawnFeaturesList.vue";
 
-import type { Map } from "maplibre-gl";
-import type { PropType } from "vue";
+import type { Feature } from "geojson";
+import type { Map as MaplibreMap } from "maplibre-gl";
 
-defineProps({
-    map: {
-        type: Object as PropType<Map>,
-        required: true,
-    },
-});
+defineProps<{
+    map: MaplibreMap;
+}>();
+
+const drawnFeatures = inject<Ref<Feature[]>>("drawnFeatures", ref([]));
 
 const { $gettext } = useGettext();
 
@@ -37,6 +38,10 @@ function clearAllDrawnFeatures() {
         :map="map"
     />
     <BufferControls :map="map" />
+    <DrawnFeaturesList
+        :map="map"
+        :features="drawnFeatures"
+    />
     <div class="clear-btns">
         <Button
             size="large"

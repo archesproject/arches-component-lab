@@ -19,11 +19,11 @@ import { useGettext } from "vue3-gettext";
 
 import Skeleton from "primevue/skeleton";
 
-import BasemapControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/BasemapControls.vue";
+import BasemapPanel from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/BasemapPanel.vue";
+import DrawPanel from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/DrawPanel.vue";
 import FeaturePopup from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/FeaturePopup.vue";
-import InteractionsDrawer from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer.vue";
-import MapFilter from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/MapFilter/MapFilter.vue";
-import OverlayControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/OverlayControls.vue";
+import InteractionsDrawer from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/InteractionsDrawer.vue";
+import OverlayPanel from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/OverlayPanel.vue";
 
 import {
     fetchMapData,
@@ -93,6 +93,7 @@ const emit = defineEmits<{
         value: GeoJSONFeatureCollectionValue | FeatureCollection,
     ): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (event: "update:overlays"): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -102,6 +103,7 @@ const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 const map = shallowRef<MaplibreMap | null>(null);
 const isLoading = ref(false);
 const selectedDrawnFeature: Ref<Feature | null> = ref(null);
+const drawnFeatures = shallowRef<Feature[]>([]);
 const basemaps = ref<Basemap[]>([]);
 const overlays = ref<MapLayer[]>([]);
 const popupFeatures = ref<MapGeoJSONFeature[]>([]);
@@ -121,19 +123,19 @@ const mapInteractionItems: MapInteractionItem[] = [
     {
         name: $gettext("Draw"),
         header: $gettext("Draw"),
-        component: MapFilter,
+        component: DrawPanel,
         icon: "pi pi-pencil",
     },
     {
         name: $gettext("Basemap"),
         header: $gettext("Basemap"),
-        component: BasemapControls,
+        component: BasemapPanel,
         icon: "pi pi-map",
     },
     {
         name: $gettext("Overlays"),
         header: $gettext("Overlays"),
-        component: OverlayControls,
+        component: OverlayPanel,
         icon: "pi pi-globe",
     },
 ];
@@ -156,6 +158,7 @@ const geometryTypes = computed(
 provide("basemaps", basemaps);
 provide("overlays", overlays);
 provide("selectedDrawnFeature", selectedDrawnFeature);
+provide("drawnFeatures", drawnFeatures);
 provide("geometryTypes", geometryTypes);
 
 watch(isLoading, (newValue) => {
@@ -219,8 +222,11 @@ onMounted(async () => {
     });
     map.value.on(STYLE_LOAD_EVENT, () => {
         map.value!.resize();
+
         addBufferLayer();
         updateMapOverlays(overlays.value);
+
+        emit("update:overlays");
     });
 
     await loadMapData();
@@ -394,8 +400,8 @@ function setupDraw() {
         selectedDrawnFeature.value = null;
         updateDrawnFeatures();
     });
-    map.value!.on(DRAW_SELECTION_CHANGE_EVENT, (drawEvent: DrawEvent) => {
-        selectedDrawnFeature.value = drawEvent.features[0] ?? null;
+    map.value!.on(DRAW_SELECTION_CHANGE_EVENT, () => {
+        selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
     });
 }
 
@@ -437,17 +443,18 @@ function selectNewlyDrawnFeature(drawEvent: DrawEvent) {
 }
 
 async function updateDrawnFeatures() {
-    const drawnFeatures = draw.getAll() as FeatureCollection;
+    const drawnFeatureCollection = draw.getAll() as FeatureCollection;
+    drawnFeatures.value = drawnFeatureCollection.features as Feature[];
 
-    for (const feature of drawnFeatures.features) {
+    for (const feature of drawnFeatureCollection.features) {
         feature.properties!.buffer_distance ??= 0;
         feature.properties!.buffer_units ??= METERS;
     }
 
     try {
         const featuresToBuffer: FeatureCollection = {
-            ...drawnFeatures,
-            features: drawnFeatures.features.filter(
+            ...drawnFeatureCollection,
+            features: drawnFeatureCollection.features.filter(
                 (feature) => feature.properties!.buffer_distance,
             ),
         };
@@ -465,11 +472,11 @@ async function updateDrawnFeatures() {
             currentBufferData,
         );
 
-        if (drawnFeatures.features.length) {
+        if (drawnFeatureCollection.features.length) {
             const allFeatures: FeatureCollection = {
                 type: "FeatureCollection",
                 features: [
-                    ...drawnFeatures.features,
+                    ...drawnFeatureCollection.features,
                     ...bufferedFeatures.features,
                 ],
             };
@@ -490,17 +497,17 @@ async function updateDrawnFeatures() {
         console.error("Error updating drawn features:", error);
     }
 
-    const count = drawnFeatures.features.length;
+    const count = drawnFeatureCollection.features.length;
     const displayValue = $gettext("%{ count } feature(s)", {
         " count ": String(count),
     });
 
     if (shouldEmitSimplifiedValue) {
-        emit("update:value", drawnFeatures);
+        emit("update:value", drawnFeatureCollection);
     } else {
         emit("update:value", {
             display_value: displayValue,
-            node_value: drawnFeatures,
+            node_value: drawnFeatureCollection,
             details: [],
         });
     }
@@ -572,6 +579,8 @@ function updateMapOverlays(overlays: MapLayer[]) {
         }
     }
 }
+
+defineExpose({ map });
 </script>
 
 <template>

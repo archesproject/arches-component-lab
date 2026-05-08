@@ -2,7 +2,6 @@
 import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import type { ComputedRef, Ref } from "vue";
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
@@ -22,6 +21,7 @@ import {
     POINT,
     POLYGON,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
+import { getMapboxDraw } from "@/arches_component_lab/widgets/MapWidget/utils.ts";
 
 const { map } = defineProps<{
     map: MaplibreMap;
@@ -69,15 +69,9 @@ const displayDrawType = computed(() => {
     return selectedDrawType.value;
 });
 
-function getDraw(): InstanceType<typeof MapboxDraw> | undefined {
-    return map._controls?.find(
-        (control: unknown) => control instanceof MapboxDraw,
-    ) as InstanceType<typeof MapboxDraw> | undefined;
-}
-
 function onDrawTypeSelected(type: string | undefined) {
     selectedDrawType.value = type;
-    const draw = getDraw();
+    const draw = getMapboxDraw(map);
 
     if (!type || !draw) {
         map.getCanvas().style.cursor = "";
@@ -109,7 +103,7 @@ onUnmounted(() => {
 });
 
 function deleteAllDrawnFeatures() {
-    const draw = getDraw();
+    const draw = getMapboxDraw(map);
     if (!draw) return;
 
     draw.deleteAll();
@@ -117,7 +111,7 @@ function deleteAllDrawnFeatures() {
 }
 
 function deleteSelectedDrawnFeature() {
-    const draw = getDraw();
+    const draw = getMapboxDraw(map);
     if (!draw) return;
 
     const selectedFeatures = draw.getSelected();

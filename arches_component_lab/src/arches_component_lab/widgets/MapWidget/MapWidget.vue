@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, useTemplateRef } from "vue";
+
 import MapWidgetEditor from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/MapWidgetEditor.vue";
 import MapWidgetViewer from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetViewer.vue";
 
@@ -17,17 +19,30 @@ defineProps<{
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
-const emit = defineEmits(["update:isLoading", "update:value"]);
+const emit = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:overlays",
+]);
+
+const editorRef =
+    useTemplateRef<InstanceType<typeof MapWidgetEditor>>("editor");
+
+defineExpose({
+    map: computed(() => editorRef.value?.map ?? null),
+});
 </script>
 
 <template>
     <MapWidgetEditor
         v-if="mode === EDIT"
+        ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
+        @update:overlays="emit('update:overlays')"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"
