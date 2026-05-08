@@ -95,7 +95,7 @@ watch(
                 v-model="bufferDistance"
                 :min="0"
                 :input-style="{ fontSize: '1.4rem' }"
-                fluid
+                :fluid="true"
             />
             <Select
                 id="buff-units"
@@ -104,7 +104,7 @@ watch(
                 option-value="code"
                 option-label="label"
                 :placeholder="$gettext('Units')"
-                fluid
+                :fluid="true"
             />
         </div>
     </Panel>
