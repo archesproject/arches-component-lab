@@ -45,6 +45,7 @@ import {
     GEOMETRY_TYPE_POLYGON,
     IDLE,
     METERS,
+    SEARCH_RENDER_CONTEXT,
     SIMPLE_SELECT,
     STYLE_LOAD_EVENT,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
@@ -80,10 +81,12 @@ interface DrawEvent {
 const {
     aliasedNodeData,
     cardXNodeXWidgetData,
+    renderContext,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionValue | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
+    renderContext?: string;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -336,7 +339,7 @@ async function loadMapData() {
             (layer) =>
                 layer.isoverlay &&
                 layer.activated !== false &&
-                !layer.searchonly,
+                (!layer.searchonly || renderContext === SEARCH_RENDER_CONTEXT),
         );
         const resourceLayers = (mapData?.resource_map_layers ??
             []) as MapLayer[];

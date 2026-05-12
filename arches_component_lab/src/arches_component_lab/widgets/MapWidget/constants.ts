@@ -24,6 +24,7 @@ export const METERS = "meters";
 export const MILES = "miles";
 export const POINT = "point";
 export const POLYGON = "polygon";
+export const SEARCH_RENDER_CONTEXT = "search";
 export const SIMPLE_SELECT = "simple_select";
 export const STYLE_LOAD_EVENT = "style.load";
 export const VIEWER_SOURCE_ID = "widget-features";

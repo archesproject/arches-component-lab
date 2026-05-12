@@ -12,6 +12,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
     mode: WidgetMode;
+    renderContext?: string;
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
@@ -39,6 +40,7 @@ defineExpose({
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
+        :render-context="renderContext"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
