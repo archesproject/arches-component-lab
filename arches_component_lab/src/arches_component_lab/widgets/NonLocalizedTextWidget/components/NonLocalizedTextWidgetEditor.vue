@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+
+import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/NonLocalizedTextWidget/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
@@ -7,10 +10,12 @@ import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non
 const {
     cardXNodeXWidgetData,
     aliasedNodeData,
+    renderContext,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: NonLocalizedTextValue | null;
+    renderContext?: string;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -36,7 +41,18 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
+    <Textarea
+        v-if="renderContext === MULTILINE_RENDER_CONTEXT"
+        :auto-resize="true"
+        :fluid="true"
+        :model-value="aliasedNodeData?.node_value || ''"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        rows="4"
+        @update:model-value="onUpdateModelValue($event)"
+    />
     <InputText
+        v-else
         type="text"
         :fluid="true"
         :model-value="aliasedNodeData?.node_value || ''"
