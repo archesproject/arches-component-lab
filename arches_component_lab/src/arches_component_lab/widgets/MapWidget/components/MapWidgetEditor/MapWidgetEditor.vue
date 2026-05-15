@@ -77,8 +77,8 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps<{
-    aliasedNodeData: FeatureCollection | null;
+const { value, cardXNodeXWidgetData, renderContext } = defineProps<{
+    value: FeatureCollection | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
 }>();
@@ -373,8 +373,8 @@ function setupDraw() {
 
     map.value!.addControl(draw);
 
-    if (aliasedNodeData?.features?.length) {
-        for (const feature of aliasedNodeData.features) {
+    if (value?.features?.length) {
+        for (const feature of value.features) {
             draw.add(feature);
         }
 

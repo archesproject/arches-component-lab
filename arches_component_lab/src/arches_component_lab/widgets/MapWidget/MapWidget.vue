@@ -17,7 +17,7 @@ defineProps<{
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    aliasedNodeData: FeatureCollection | null;
+    value: FeatureCollection | null;
 }>();
 
 const emit = defineEmits([
@@ -39,7 +39,7 @@ defineExpose({
         v-if="mode === EDIT"
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :value="value"
         :render-context="renderContext"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
@@ -48,7 +48,7 @@ defineExpose({
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :value="value"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

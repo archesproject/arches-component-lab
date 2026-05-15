@@ -1,5 +1,3 @@
-export type AliasedNodeData = unknown;
-
 export type AliasedNodegroupData = AliasedTileData | AliasedTileData[] | null;
 
 export interface AliasedData {
