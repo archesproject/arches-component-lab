@@ -15,8 +15,8 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { nodeValue, cardXNodeXWidgetData } = defineProps<{
-    nodeValue: FileReference[] | null;
+const { value, cardXNodeXWidgetData } = defineProps<{
+    value: FileReference[] | null;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
 
@@ -51,8 +51,8 @@ const acceptedFileTypes = computed(() => {
 });
 
 watchEffect(() => {
-    if (nodeValue) {
-        savedFiles.value = nodeValue.map((file) => ({
+    if (value) {
+        savedFiles.value = value.map((file) => ({
             ...file,
             node_id: cardXNodeXWidgetData.node.nodeid,
         }));
@@ -110,7 +110,7 @@ function openFileChooser(): void {
         :accept="
             acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
         "
-        :model-value="nodeValue"
+        :model-value="value"
         :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
         :show-upload-button="false"

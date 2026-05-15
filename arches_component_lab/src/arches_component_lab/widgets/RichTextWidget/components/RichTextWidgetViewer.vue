@@ -7,15 +7,13 @@ import type { LanguageValue } from "@/arches_component_lab/datatypes/string/type
 
 const { current } = useGettext();
 
-const { nodeValue } = defineProps<{
-    nodeValue: Record<string, LanguageValue> | null;
+const { value } = defineProps<{
+    value: Record<string, LanguageValue> | null;
 }>();
 
 const cleanHtml = computed(() => {
     const raw =
-        nodeValue?.[current]?.value ??
-        Object.values(nodeValue ?? {})[0]?.value ??
-        "";
+        value?.[current]?.value ?? Object.values(value ?? {})[0]?.value ?? "";
     return DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
 });
 </script>

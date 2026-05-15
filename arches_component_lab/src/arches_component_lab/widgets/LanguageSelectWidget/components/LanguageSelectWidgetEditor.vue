@@ -11,9 +11,9 @@ import type {
     Language,
 } from "@/arches_component_lab/types.ts";
 
-const { nodeValue, cardXNodeXWidgetData } = defineProps<{
+const { value, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -55,7 +55,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :options="languages as Language[]"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"
-        :model-value="nodeValue"
+        :model-value="value"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

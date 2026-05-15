@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineProps<{ nodeValue: number | null }>();
+defineProps<{ value: number | null }>();
 </script>
 
 <template>
-    <div>{{ nodeValue }}</div>
+    <div>{{ value }}</div>
 </template>

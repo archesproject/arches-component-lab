@@ -4,9 +4,9 @@ import RadioButtonGroup from "primevue/radiobuttongroup";
 
 import type { DomainDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { nodeValue, cardXNodeXWidgetData } = defineProps<{
+const { value, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const options = cardXNodeXWidgetData.node.config.options;
@@ -22,7 +22,7 @@ function onUpdateModelValue(updatedValue: string | null) {
 
 <template>
     <RadioButtonGroup
-        :model-value="nodeValue"
+        :model-value="value"
         class="button-group"
         @update:model-value="onUpdateModelValue($event)"
     >

@@ -12,7 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeValue: string[] | null;
+    value: string[] | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -22,12 +22,12 @@ const emit = defineEmits(["update:value"]);
     <DomainMultiselectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-value="nodeValue"
+        :value="value"
         @update:value="emit('update:value', $event)"
     />
     <DomainMultiselectWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-value="nodeValue"
+        :value="value"
     />
 </template>

@@ -2,11 +2,11 @@
 import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
 
 defineProps<{
-    nodeValue: string | null;
+    value: string | null;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 </script>
 
 <template>
-    <div>{{ nodeValue }}</div>
+    <div>{{ value }}</div>
 </template>

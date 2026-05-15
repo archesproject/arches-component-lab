@@ -3,9 +3,9 @@ import InputNumber from "primevue/inputnumber";
 
 import type { NumberCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-    nodeValue: number | null;
+    value: number | null;
 }>();
 
 const emit = defineEmits<{
@@ -19,7 +19,7 @@ function onUpdateModelValue(updatedValue: number | null) {
 
 <template>
     <InputNumber
-        :model-value="nodeValue"
+        :model-value="value"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :placeholder="cardXNodeXWidgetData.config.placeholder"

@@ -13,10 +13,10 @@ import type {
 import { flattenCollectionItems } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
+const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    nodeValue: string | null;
+    value: string | null;
     cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
 }>();
 
@@ -70,7 +70,7 @@ function onUpdateModelValue(value: string | null) {
 
 <template>
     <RadioButtonGroup
-        :model-value="nodeValue"
+        :model-value="value"
         :class="['button-group', flexDirection]"
         @update:model-value="onUpdateModelValue"
     >

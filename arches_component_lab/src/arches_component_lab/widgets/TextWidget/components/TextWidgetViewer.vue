@@ -4,17 +4,15 @@ import { useGettext } from "vue3-gettext";
 
 import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types";
 
-const { nodeValue } = defineProps<{
-    nodeValue: Record<string, LanguageValue> | null;
+const { value } = defineProps<{
+    value: Record<string, LanguageValue> | null;
 }>();
 
 const { current } = useGettext();
 
 const displayValue = computed(() => {
-    if (!nodeValue) return null;
-    return (
-        nodeValue[current]?.value ?? Object.values(nodeValue)[0]?.value ?? null
-    );
+    if (!value) return null;
+    return value[current]?.value ?? Object.values(value)[0]?.value ?? null;
 });
 </script>
 

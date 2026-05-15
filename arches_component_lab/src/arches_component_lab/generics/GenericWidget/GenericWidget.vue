@@ -4,9 +4,11 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
+    useAttrs,
     watch,
     watchEffect,
 } from "vue";
+import type { CSSProperties } from "vue";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -29,7 +31,7 @@ const {
     mode,
     nodeAlias,
     shouldShowLabel = true,
-    nodeValue,
+    value,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
@@ -38,7 +40,7 @@ const {
     mode: WidgetMode;
     nodeAlias: string;
     shouldShowLabel?: boolean;
-    nodeValue?: unknown | null | undefined;
+    value?: unknown | null | undefined;
 }>();
 
 const emit = defineEmits([
@@ -49,6 +51,17 @@ const emit = defineEmits([
 ]);
 
 defineOptions({ inheritAttrs: false });
+
+const attrs = useAttrs();
+
+const attrsClass = computed(() => attrs.class as string | undefined);
+const attrsStyle = computed(
+    () => attrs.style as string | CSSProperties | undefined,
+);
+const attrsForComponent = computed(function () {
+    const { class: _class, style: _style, ...rest } = attrs;
+    return rest;
+});
 
 const isLoading = ref(false);
 const isChildLoading = ref(false);
@@ -80,8 +93,8 @@ const widgetComponent = computed(() => {
 });
 
 const widgetNodeValue = computed<unknown>(() => {
-    if (nodeValue !== undefined) {
-        return nodeValue ?? null;
+    if (value !== undefined) {
+        return value ?? null;
     }
     const dv = resolvedCardXNodeXWidgetData.value?.config?.defaultValue;
     if (
@@ -127,6 +140,8 @@ watchEffect(async () => {
 <template>
     <div
         class="widget"
+        :class="attrsClass"
+        :style="attrsStyle"
         :data-graph-slug="graphSlug"
         :data-node-alias="nodeAlias"
         @focusin="() => emit('update:isFocused', true)"
@@ -153,7 +168,7 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :node-value="widgetNodeValue"
+                :value="widgetNodeValue"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
@@ -161,13 +176,13 @@ watchEffect(async () => {
             >
                 <component
                     :is="widgetComponent"
-                    v-bind="$attrs"
+                    v-bind="attrsForComponent"
                     :key="resolvedCardXNodeXWidgetData.id"
                     :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
-                    :node-value="widgetNodeValue"
+                    :value="widgetNodeValue"
                     @update:is-loading="isChildLoading = $event"
                     @update:value="onUpdateValue($event)"
                 />
@@ -176,13 +191,13 @@ watchEffect(async () => {
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
-                v-bind="$attrs"
+                v-bind="attrsForComponent"
                 :key="resolvedCardXNodeXWidgetData.id"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
-                :node-value="widgetNodeValue"
+                :value="widgetNodeValue"
                 @update:is-loading="isChildLoading = $event"
             />
         </template>

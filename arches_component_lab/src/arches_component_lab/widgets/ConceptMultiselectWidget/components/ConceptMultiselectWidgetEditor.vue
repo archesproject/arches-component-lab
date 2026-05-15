@@ -13,10 +13,10 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
+const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    nodeValue: string[] | null;
+    value: string[] | null;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
@@ -35,7 +35,7 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(() => {
     return (
-        nodeValue?.reduce(
+        value?.reduce(
             (acc: Record<string, boolean>, id: string) => ({
                 ...acc,
                 [id]: true,

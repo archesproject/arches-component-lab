@@ -18,10 +18,10 @@ type FormFieldType = {
     };
 };
 
-const { isDirty, nodeAlias, nodeValue } = defineProps<{
+const { isDirty, nodeAlias, value } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    nodeValue: unknown;
+    value: unknown;
 }>();
 
 const emit = defineEmits<{
@@ -33,11 +33,11 @@ const formFieldRef = useTemplateRef<FormFieldType>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
 const initialValue = Object.freeze(
-    Array.isArray(nodeValue)
-        ? [...nodeValue]
-        : nodeValue && typeof nodeValue === "object"
-          ? { ...nodeValue }
-          : nodeValue,
+    Array.isArray(value)
+        ? [...value]
+        : value && typeof value === "object"
+          ? { ...value }
+          : value,
 );
 
 watchEffect(() => {
@@ -66,7 +66,7 @@ function validate(_value: FormFieldResolverOptions): string[] {
 }
 
 function onUpdateValue(updatedNodeValue: unknown) {
-    if (nodeValue === updatedNodeValue) {
+    if (value === updatedNodeValue) {
         return;
     }
 

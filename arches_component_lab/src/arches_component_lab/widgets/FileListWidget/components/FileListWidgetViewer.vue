@@ -5,7 +5,7 @@ import { Image, Galleria } from "primevue";
 
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types";
 
-const props = defineProps<{ nodeValue: FileReference[] | null }>();
+const props = defineProps<{ value: FileReference[] | null }>();
 
 const getFileUrl = (originalUrl: string) => {
     const httpRegex = /^(blob:|https?:\/\/)/;
@@ -20,7 +20,7 @@ const getFileUrl = (originalUrl: string) => {
 };
 
 const imageData = computed(() => {
-    return props.nodeValue?.map((fileReference: FileReference) => {
+    return props.value?.map((fileReference: FileReference) => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),

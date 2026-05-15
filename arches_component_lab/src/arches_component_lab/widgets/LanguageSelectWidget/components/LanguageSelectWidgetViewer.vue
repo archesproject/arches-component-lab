@@ -5,7 +5,7 @@ import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 
 import type { Language } from "@/arches_component_lab/types.ts";
 
-const { nodeValue } = defineProps<{ nodeValue: string | null }>();
+const { value } = defineProps<{ value: string | null }>();
 
 const languages = ref<Language[]>([]);
 
@@ -18,9 +18,7 @@ watchEffect(async () => {
 });
 
 const displayValue = computed(
-    () =>
-        languages.value.find((lang) => lang.code === nodeValue)?.name ??
-        nodeValue,
+    () => languages.value.find((lang) => lang.code === value)?.name ?? value,
 );
 </script>
 

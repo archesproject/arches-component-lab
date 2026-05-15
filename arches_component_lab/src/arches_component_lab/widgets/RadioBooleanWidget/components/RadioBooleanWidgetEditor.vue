@@ -3,9 +3,9 @@ import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
-    nodeValue: boolean | null;
+    value: boolean | null;
 }>();
 
 const emit = defineEmits<{
@@ -33,7 +33,7 @@ function onUpdateModelValue(updatedValue: string | null) {
     <RadioButtonGroup
         fluid="true"
         class="button-group"
-        :model-value="nodeValue?.toString() ?? ''"
+        :model-value="value?.toString() ?? ''"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div class="radio-options">

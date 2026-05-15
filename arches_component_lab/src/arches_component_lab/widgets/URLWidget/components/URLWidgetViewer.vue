@@ -4,15 +4,15 @@ import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types.ts
 
 const { $gettext } = useGettext();
 
-defineProps<{ nodeValue: URLNodeValue | null }>();
+defineProps<{ value: URLNodeValue | null }>();
 </script>
 
 <template>
     <a
-        v-if="nodeValue?.url"
-        :href="nodeValue.url"
+        v-if="value?.url"
+        :href="value.url"
     >
-        {{ nodeValue.url_label || nodeValue.url }}
+        {{ value.url_label || value.url }}
     </a>
 
     <span v-else>

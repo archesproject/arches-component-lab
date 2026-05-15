@@ -22,12 +22,12 @@ import type {
 
 import type { AliasedTileData } from "@/arches_component_lab/types";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, nodeValue, defaultTerm } =
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value, defaultTerm } =
     defineProps<{
         cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
         nodeAlias: string;
         graphSlug: string;
-        nodeValue: ResourceInstanceReference | null;
+        value: ResourceInstanceReference | null;
         defaultTerm?: string;
     }>();
 
@@ -56,7 +56,7 @@ const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const selectedValue = ref<string | null>(nodeValue?.resourceId ?? null);
+const selectedValue = ref<string | null>(value?.resourceId ?? null);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);

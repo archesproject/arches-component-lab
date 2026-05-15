@@ -6,14 +6,14 @@ import type {
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { nodeValue, cardXNodeXWidgetData } = defineProps<{
-    nodeValue: string[] | null;
+const { value, cardXNodeXWidgetData } = defineProps<{
+    value: string[] | null;
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
 }>();
 
 const displayValue = computed(
     () =>
-        nodeValue
+        value
             ?.map(
                 (id) =>
                     cardXNodeXWidgetData.node.config.options.find(

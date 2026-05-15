@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: URLNodeValue | null;
+    value: URLNodeValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -23,11 +23,11 @@ const emit = defineEmits(["update:value"]);
     <URLWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-value="nodeValue"
+        :value="value"
         @update:value="emit('update:value', $event)"
     />
     <URLWidgetViewer
         v-if="mode === VIEW"
-        :node-value="nodeValue"
+        :value="value"
     />
 </template>

@@ -12,7 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const emit = defineEmits([
@@ -28,13 +28,13 @@ const emit = defineEmits([
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :node-value="nodeValue"
+        :value="value"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ConceptRadioWidgetViewer
         v-if="mode === VIEW"
-        :node-value="nodeValue"
+        :value="value"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
     />

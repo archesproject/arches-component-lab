@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
 
-defineProps<{ nodeValue: string | null }>();
+defineProps<{ value: string | null }>();
 </script>
 
 <template>
@@ -9,6 +9,6 @@ defineProps<{ nodeValue: string | null }>();
         disabled
         type="text"
         :fluid="true"
-        :model-value="nodeValue ?? ''"
+        :model-value="value ?? ''"
     />
 </template>

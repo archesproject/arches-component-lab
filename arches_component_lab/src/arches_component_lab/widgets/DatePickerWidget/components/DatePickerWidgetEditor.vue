@@ -14,9 +14,9 @@ import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 
 import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -59,13 +59,13 @@ const onUpdateModelValue = debounce((updatedValue: string) => {
 }, 900);
 
 const modelDate = computed(() => {
-    if (!nodeValue) {
+    if (!value) {
         return null;
     }
     if (shouldShowTime.value) {
-        return new Date(nodeValue);
+        return new Date(value);
     }
-    const incomingDate = new Date(nodeValue);
+    const incomingDate = new Date(value);
     const day = incomingDate.getUTCDate();
     const month = incomingDate.getUTCMonth();
     const year = incomingDate.getUTCFullYear();

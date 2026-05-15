@@ -16,9 +16,9 @@ import FocusController from "./components/FocusController.vue";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    nodeValue: Record<string, LanguageValue> | null;
+    value: Record<string, LanguageValue> | null;
 }>();
 
 const emit = defineEmits<{
@@ -45,7 +45,7 @@ watchEffect(async () => {
 });
 
 watch(languages, () => {
-    const workingObject = { ...nodeValue };
+    const workingObject = { ...value };
 
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {

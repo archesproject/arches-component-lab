@@ -12,7 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -22,11 +22,11 @@ const emit = defineEmits(["update:value"]);
     <NonLocalizedTextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-value="nodeValue"
+        :value="value"
         @update:value="emit('update:value', $event)"
     />
     <NonLocalizedTextWidgetViewer
         v-if="mode === VIEW"
-        :node-value="nodeValue"
+        :value="value"
     />
 </template>

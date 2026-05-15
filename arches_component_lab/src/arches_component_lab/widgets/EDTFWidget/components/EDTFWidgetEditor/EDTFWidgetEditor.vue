@@ -10,9 +10,9 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: string | null;
+    value: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -32,7 +32,7 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             class="flex-input"
             type="text"
             :fluid="true"
-            :model-value="nodeValue ?? ''"
+            :model-value="value ?? ''"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
             @update:model-value="handleUpdateModelValue"

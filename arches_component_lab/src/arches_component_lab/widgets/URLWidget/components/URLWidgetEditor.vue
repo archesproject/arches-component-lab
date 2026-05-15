@@ -9,13 +9,13 @@ import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: URLNodeValue | null;
+    value: URLNodeValue | null;
 }>();
 
-const urlLabel = ref(nodeValue?.url_label ?? "");
-const url = ref(nodeValue?.url ?? "");
+const urlLabel = ref(value?.url_label ?? "");
+const url = ref(value?.url ?? "");
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLNodeValue): void;

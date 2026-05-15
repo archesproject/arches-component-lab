@@ -23,11 +23,11 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, nodeValue } = defineProps<{
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    nodeValue: ResourceInstanceReference[] | null;
+    value: ResourceInstanceReference[] | null;
 }>();
 
 const emit = defineEmits<{
@@ -52,7 +52,16 @@ const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const selectedValues = ref<string[]>(nodeValue?.map((r) => r.resourceId) ?? []);
+const selectedValues = ref<string[]>(
+    value
+        ?.map(
+            (r) =>
+                r.resourceId ??
+                (r as unknown as { resourceinstanceid?: string })
+                    .resourceinstanceid,
+        )
+        .filter((id): id is string => id !== undefined) ?? [],
+);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);

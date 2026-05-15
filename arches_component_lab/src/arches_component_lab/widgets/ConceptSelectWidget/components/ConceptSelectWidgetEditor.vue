@@ -13,10 +13,10 @@ import type {
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, nodeValue, cardXNodeXWidgetData } = defineProps<{
+const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    nodeValue: string | null;
+    value: string | null;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
@@ -35,8 +35,8 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(
     (): Record<string, boolean> | null => {
-        if (!nodeValue) return null;
-        return { [nodeValue]: true };
+        if (!value) return null;
+        return { [value]: true };
     },
 );
 

@@ -7,13 +7,13 @@ import { useResourceInstanceListEnrichment } from "@/arches_component_lab/dataty
 import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
 const props = defineProps<{
-    nodeValue: ResourceInstanceReference[] | null;
+    value: ResourceInstanceReference[] | null;
     graphSlug: string;
     nodeAlias: string;
 }>();
 
 const { resolved } = useResourceInstanceListEnrichment(
-    toRef(props, "nodeValue"),
+    toRef(props, "value"),
     props.graphSlug,
     props.nodeAlias,
 );

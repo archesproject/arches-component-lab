@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-    nodeValue: FileReference[] | null;
+    value: FileReference[] | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -25,11 +25,11 @@ const emit = defineEmits(["update:value"]);
     <FileListWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :node-value="nodeValue"
+        :value="value"
         @update:value="emit('update:value', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"
-        :node-value="nodeValue"
+        :value="value"
     />
 </template>

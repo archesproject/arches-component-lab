@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeValue: ResourceInstanceReference[] | null;
+    value: ResourceInstanceReference[] | null;
 }>();
 
 const emit = defineEmits(["update:isLoading", "update:value"]);
@@ -25,13 +25,13 @@ const emit = defineEmits(["update:isLoading", "update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :node-value="nodeValue"
+        :value="value"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
-        :node-value="nodeValue"
+        :value="value"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
     />
