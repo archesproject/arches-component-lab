@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import Select from "primevue/select";
 
-import type {
-    DomainDatatypeCardXNodeXWidgetData,
-    DomainOption,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { nodeValue, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;

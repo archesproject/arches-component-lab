@@ -48,6 +48,8 @@ const emit = defineEmits([
     "update:value",
 ]);
 
+defineOptions({ inheritAttrs: false });
+
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
@@ -159,6 +161,7 @@ watchEffect(async () => {
             >
                 <component
                     :is="widgetComponent"
+                    v-bind="$attrs"
                     :key="resolvedCardXNodeXWidgetData.id"
                     :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                     :graph-slug="graphSlug"
@@ -173,6 +176,7 @@ watchEffect(async () => {
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
+                v-bind="$attrs"
                 :key="resolvedCardXNodeXWidgetData.id"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"

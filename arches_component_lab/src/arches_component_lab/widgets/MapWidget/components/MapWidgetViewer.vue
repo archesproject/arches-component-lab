@@ -1,17 +1,3 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
-import type { FeatureCollection } from "geojson";
-
-const { nodeValue } = defineProps<{ nodeValue: FeatureCollection | null }>();
-
-const displayValue = computed(() => {
-    if (!nodeValue) return null;
-    const count = nodeValue.features?.length ?? 0;
-    return `${count} feature(s)`;
-});
+// TODO: This component is currently just a placeholder to get the viewer up and running. It should be fleshed out to match the functionality of the editor, minus the editing capabilities.
 </script>
-
-<template>
-    <div>{{ displayValue }}</div>
-</template>

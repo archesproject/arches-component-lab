@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
-import { useGettext } from "vue3-gettext";
-
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-
-const { $gettext } = useGettext();
 
 const { cardXNodeXWidgetData, nodeValue } = defineProps<{
     cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
