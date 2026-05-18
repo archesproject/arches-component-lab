@@ -14,7 +14,7 @@ const { value, cardXNodeXWidgetData } = defineProps<{
 const displayValue = computed(
     () =>
         cardXNodeXWidgetData.node.config.options.find(
-            (o: DomainOption) => o.id === value,
+            (option: DomainOption) => option.id === value,
         )?.text ?? null,
 );
 </script>

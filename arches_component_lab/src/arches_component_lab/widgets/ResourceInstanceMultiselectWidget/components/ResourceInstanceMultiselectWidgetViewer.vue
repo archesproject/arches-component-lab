@@ -3,7 +3,7 @@ import { toRef } from "vue";
 
 import arches from "arches";
 
-import { useResourceInstanceListEnrichment } from "@/arches_component_lab/datatypes/resource-instance-list/useResourceInstanceListEnrichment.ts";
+import { useResourceDisplayNamesResolver } from "@/arches_component_lab/datatypes/resource-instance-list/useResourceDisplayNamesResolver.ts";
 import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
     nodeAlias: string;
 }>();
 
-const { resolved } = useResourceInstanceListEnrichment(
+const { resolved } = useResourceDisplayNamesResolver(
     toRef(props, "value"),
     props.graphSlug,
     props.nodeAlias,

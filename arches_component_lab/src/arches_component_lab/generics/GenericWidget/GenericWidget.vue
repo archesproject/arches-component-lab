@@ -8,7 +8,6 @@ import {
     watch,
     watchEffect,
 } from "vue";
-import type { CSSProperties } from "vue";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -17,9 +16,10 @@ import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/co
 import GenericFormField from "@/arches_component_lab/generics/GenericWidget/components/GenericFormField.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
+import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
+import type { CSSProperties } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -54,27 +54,23 @@ defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
 
-const attrsClass = computed(() => attrs.class as string | undefined);
-const attrsStyle = computed(
-    () => attrs.style as string | CSSProperties | undefined,
-);
-const attrsForComponent = computed(function () {
-    const { class: _class, style: _style, ...rest } = attrs;
-    return rest;
-});
-
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
+const attrsClass = computed(() => attrs.class as string | undefined);
+const attrsStyle = computed(
+    () => attrs.style as string | CSSProperties | undefined,
+);
+const attrsForComponent = computed(() => {
+    const { class: _class, style: _style, ...rest } = attrs;
+    return rest;
+});
+
 const isCombinedLoading = computed(
     () => isLoading.value || isChildLoading.value,
 );
-
-watch(isCombinedLoading, (newValue) => {
-    emit("update:isLoading", newValue);
-});
 
 const widgetComponent = computed(() => {
     if (!resolvedCardXNodeXWidgetData.value) {
@@ -108,6 +104,10 @@ const widgetNodeValue = computed<unknown>(() => {
     return dv ?? null;
 });
 
+watch(isCombinedLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
+
 watchEffect(async () => {
     if (resolvedCardXNodeXWidgetData.value) {
         return;
@@ -116,10 +116,11 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            graphSlug,
-            nodeAlias,
-        );
+        resolvedCardXNodeXWidgetData.value =
+            await useWidgetConfigStore().fetchWidgetConfig(
+                graphSlug,
+                nodeAlias,
+            );
         if (
             cardXNodeXWidgetDataOverrides &&
             resolvedCardXNodeXWidgetData.value

@@ -94,6 +94,8 @@ const { $gettext } = useGettext();
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 
 const map = shallowRef<MaplibreMap | null>(null);
+defineExpose({ map });
+
 const isLoading = ref(false);
 const selectedDrawnFeature: Ref<Feature | null> = ref(null);
 const drawnFeatures = shallowRef<Feature[]>([]);
@@ -559,8 +561,6 @@ function updateMapOverlays(overlays: MapLayer[]) {
         }
     }
 }
-
-defineExpose({ map });
 </script>
 
 <template>

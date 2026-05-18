@@ -2,9 +2,9 @@
 import { useGettext } from "vue3-gettext";
 import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types.ts";
 
-const { $gettext } = useGettext();
-
 defineProps<{ value: URLNodeValue | null }>();
+
+const { $gettext } = useGettext();
 </script>
 
 <template>

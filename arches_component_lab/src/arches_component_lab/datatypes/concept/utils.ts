@@ -23,9 +23,6 @@ export function getOption(
     );
 }
 
-/**
- * Flatten a tree of CollectionItem objects into a single array.
- */
 export function flattenCollectionItems(
     items: CollectionItem[],
 ): CollectionItem[] {

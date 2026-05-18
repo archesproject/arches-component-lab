@@ -8,8 +8,6 @@ import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { $gettext } = useGettext();
-
 const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     value: string | null;
@@ -18,6 +16,8 @@ const { cardXNodeXWidgetData, value } = defineProps<{
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const shouldShowHelpDrawer = ref(false);
 

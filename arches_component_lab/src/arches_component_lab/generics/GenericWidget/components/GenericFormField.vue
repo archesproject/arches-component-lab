@@ -32,13 +32,15 @@ const emit = defineEmits<{
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
-const initialValue = Object.freeze(
-    Array.isArray(value)
-        ? [...value]
-        : value && typeof value === "object"
-          ? { ...value }
-          : value,
-);
+let rawValue: unknown;
+if (Array.isArray(value)) {
+    rawValue = [...value];
+} else if (value && typeof value === "object") {
+    rawValue = { ...value };
+} else {
+    rawValue = value;
+}
+const initialValue = Object.freeze(rawValue);
 
 watchEffect(() => {
     if (isDirty) {

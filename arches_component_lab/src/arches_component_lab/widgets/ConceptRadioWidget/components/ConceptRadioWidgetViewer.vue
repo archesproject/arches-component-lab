@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toRef } from "vue";
 
-import { useConceptEnrichment } from "@/arches_component_lab/datatypes/concept/useConceptEnrichment.ts";
+import { useConceptLabelResolver } from "@/arches_component_lab/datatypes/concept/useConceptLabelResolver.ts";
 
 const props = defineProps<{
     value: string | null;
@@ -9,7 +9,7 @@ const props = defineProps<{
     nodeAlias: string;
 }>();
 
-const { label } = useConceptEnrichment(
+const { label } = useConceptLabelResolver(
     toRef(props, "value"),
     props.graphSlug,
     props.nodeAlias,

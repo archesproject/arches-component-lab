@@ -23,6 +23,8 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
+const ITEM_SIZE = 36;
+
 const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
@@ -37,9 +39,6 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-// in future iteration these may be declared in the CardXNodeXWidgetData config
-const itemSize = 36;
-
 const options = ref<ResourceInstanceListOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
@@ -51,7 +50,6 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValues = ref<string[]>(
     value
         ?.map(
@@ -63,6 +61,8 @@ const selectedValues = ref<string[]>(
         .filter((id): id is string => id !== undefined) ?? [],
 );
 
+const resourceResultsCurrentCount = computed(() => options.value.length);
+
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
 });
@@ -70,10 +70,6 @@ watch(isLoading, (newValue) => {
 watchEffect(() => {
     getOptions(1);
 });
-
-const onFilter = debounce((event: MultiSelectFilterEvent) => {
-    getOptions(1, event.value);
-}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
@@ -121,26 +117,17 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     if (
-        // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
         resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
     ) {
         return;
     }
 
-    if (
-        // if the user has NOT scrolled to the end of the list
-        event &&
-        event.last < resourceResultsCurrentCount.value - 1
-    ) {
+    if (event && event.last < resourceResultsCurrentCount.value - 1) {
         return;
     }
 
-    if (
-        // if the dropdown is opened and we already have data
-        !event &&
-        resourceResultsCurrentCount.value > 0
-    ) {
+    if (!event && resourceResultsCurrentCount.value > 0) {
         return;
     }
 
@@ -150,6 +137,12 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 function getOption(value: string): ResourceInstanceListOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
+
+const onFilter = debounce(function onFilterDebounced(
+    event: MultiSelectFilterEvent,
+) {
+    getOptions(1, event.value);
+}, 600);
 
 function onCreateNewResource(graphId: string) {
     selectedGraphId.value = graphId;
@@ -161,10 +154,10 @@ function onUpdateModelValue(updatedValue: string[]) {
     selectedValues.value = updatedValue;
     emit(
         "update:value",
-        updatedValue.map((value) => ({
+        updatedValue.map((selectedId) => ({
             inverseOntologyProperty: "",
             ontologyProperty: "",
-            resourceId: value,
+            resourceId: selectedId,
             resourceXresourceId: "",
         })),
     );
@@ -198,7 +191,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
         :virtual-scroller-options="{
-            itemSize: itemSize,
+            itemSize: ITEM_SIZE,
             lazy: true,
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
@@ -243,7 +236,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     target="_blank"
                     variant="text"
                     size="small"
-                    style="text-decoration: none"
+                    class="no-text-decoration"
                     :href="`${arches.urls.resource_report}${slotProps.value}`"
                     @click.stop
                 />
@@ -253,7 +246,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     target="_blank"
                     variant="text"
                     size="small"
-                    style="text-decoration: none"
+                    class="no-text-decoration"
                     :href="`${arches.urls.resource_editor}${slotProps.value}`"
                     @click.stop
                 />
@@ -278,6 +271,10 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 </template>
 
 <style scoped>
+.no-text-decoration {
+    text-decoration: none;
+}
+
 .button-container {
     display: flex;
     justify-content: flex-end;

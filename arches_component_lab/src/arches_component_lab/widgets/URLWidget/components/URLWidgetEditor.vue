@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useGettext } from "vue3-gettext";
 
+import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types";
-
-const { $gettext } = useGettext();
 
 const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     value: URLNodeValue | null;
 }>();
 
-const urlLabel = ref(value?.url_label ?? "");
-const url = ref(value?.url ?? "");
-
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLNodeValue): void;
 }>();
+
+const { $gettext } = useGettext();
+
+const urlLabel = ref(value?.url_label ?? "");
+const url = ref(value?.url ?? "");
 
 function onUpdateURLValue(updatedValue: string | undefined) {
     url.value = updatedValue ?? "";

@@ -13,8 +13,6 @@ import type {
 } from "@/arches_component_lab/types.ts";
 import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { $gettext } = useGettext();
-
 const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     value: Record<string, LanguageValue> | null;
@@ -23,6 +21,8 @@ const { cardXNodeXWidgetData, value } = defineProps<{
 const emit = defineEmits<{
     (event: "update:value", updatedValue: Record<string, LanguageValue>): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
@@ -79,7 +79,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <div style="display: flex; column-gap: 0.5rem">
+    <div class="widget-language-inputs">
         <Select
             v-model="selectedLanguage"
             class="language-selector"
@@ -100,6 +100,13 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         />
     </div>
 </template>
+
+<style scoped>
+.widget-language-inputs {
+    display: flex;
+    column-gap: 0.5rem;
+}
+</style>
 
 <style>
 .p-select-options,

@@ -24,11 +24,6 @@ import type {
 } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { $gettext } = useGettext();
-
-const SAVE = $gettext("Save");
-const CANCEL = $gettext("Cancel");
-
 const {
     cardXNodeXWidgetData,
     graphSlug,
@@ -58,30 +53,9 @@ const emit = defineEmits([
 ]);
 
 defineOptions({ inheritAttrs: false });
+defineExpose({ save });
 
-function deepClone<T>(sourceObject: T): T {
-    return JSON.parse(JSON.stringify(sourceObject));
-}
-
-function extractNodeValue(val: unknown): unknown {
-    if (
-        val !== null &&
-        val !== undefined &&
-        typeof val === "object" &&
-        "node_value" in val
-    ) {
-        return (val as { node_value: unknown }).node_value ?? null;
-    }
-    return val ?? null;
-}
-
-function extractNodeValues(
-    data: Record<string, unknown>,
-): Record<string, unknown> {
-    return Object.fromEntries(
-        Object.entries(data).map(([k, v]) => [k, extractNodeValue(v)]),
-    );
-}
+const { $gettext } = useGettext();
 
 const genericWidgetRefs = useTemplateRef("genericWidget");
 
@@ -122,44 +96,6 @@ const areButtonsDisabled = computed(() => {
         (isWidgetDirty) => !isWidgetDirty,
     );
 });
-
-async function focusWidgetInputForNodeAlias(nodeAlias: string) {
-    for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
-        const widgetComponentRefs = genericWidgetRefs.value;
-        if (!Array.isArray(widgetComponentRefs)) {
-            return;
-        }
-
-        const activeElement = document.activeElement as HTMLElement | null;
-
-        for (const widgetComponentRef of widgetComponentRefs) {
-            const widgetRootElement =
-                widgetComponentRef?.$el as HTMLElement | null;
-
-            if (!widgetRootElement) {
-                continue;
-            }
-
-            if (activeElement && widgetRootElement.contains(activeElement)) {
-                return;
-            }
-
-            const inputElementToFocus =
-                widgetRootElement.querySelector<HTMLElement>(
-                    `[id="${nodeAlias}"]`,
-                );
-
-            if (inputElementToFocus) {
-                inputElementToFocus.focus();
-                return;
-            }
-        }
-
-        await new Promise<void>((resolve) => {
-            requestAnimationFrame(() => resolve());
-        });
-    }
-}
 
 watch(
     () => selectedNodeAlias,
@@ -266,7 +202,67 @@ async function save() {
     }
 }
 
-defineExpose({ save });
+async function focusWidgetInputForNodeAlias(nodeAlias: string) {
+    for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
+        const widgetComponentRefs = genericWidgetRefs.value;
+        if (!Array.isArray(widgetComponentRefs)) {
+            return;
+        }
+
+        const activeElement = document.activeElement as HTMLElement | null;
+
+        for (const widgetComponentRef of widgetComponentRefs) {
+            const widgetRootElement =
+                widgetComponentRef?.$el as HTMLElement | null;
+
+            if (!widgetRootElement) {
+                continue;
+            }
+
+            if (activeElement && widgetRootElement.contains(activeElement)) {
+                return;
+            }
+
+            const inputElementToFocus =
+                widgetRootElement.querySelector<HTMLElement>(
+                    `[id="${nodeAlias}"]`,
+                );
+
+            if (inputElementToFocus) {
+                inputElementToFocus.focus();
+                return;
+            }
+        }
+
+        await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => resolve());
+        });
+    }
+}
+
+function deepClone<T>(sourceObject: T): T {
+    return JSON.parse(JSON.stringify(sourceObject));
+}
+
+function extractNodeValue(val: unknown): unknown {
+    if (
+        val !== null &&
+        val !== undefined &&
+        typeof val === "object" &&
+        "node_value" in val
+    ) {
+        return (val as { node_value: unknown }).node_value ?? null;
+    }
+    return val ?? null;
+}
+
+function extractNodeValues(
+    data: Record<string, unknown>,
+): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(data).map(([k, v]) => [k, extractNodeValue(v)]),
+    );
+}
 </script>
 
 <template>
@@ -332,7 +328,7 @@ defineExpose({ save });
                     severity="success"
                     size="small"
                     icon="pi pi-check"
-                    :label="SAVE"
+                    :label="$gettext('Save')"
                     @click="save"
                 />
                 <Button
@@ -341,7 +337,7 @@ defineExpose({ save });
                     severity="warn"
                     size="small"
                     icon="pi pi-undo"
-                    :label="CANCEL"
+                    :label="$gettext('Cancel')"
                     @click="resetForm"
                 />
             </div>

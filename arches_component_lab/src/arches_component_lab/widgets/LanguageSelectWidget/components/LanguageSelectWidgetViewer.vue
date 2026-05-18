@@ -9,6 +9,10 @@ const { value } = defineProps<{ value: string | null }>();
 
 const languages = ref<Language[]>([]);
 
+const displayValue = computed(
+    () => languages.value.find((lang) => lang.code === value)?.name ?? value,
+);
+
 watchEffect(async () => {
     const response = (await fetchLanguages()) as {
         languages: Language[];
@@ -16,10 +20,6 @@ watchEffect(async () => {
     };
     languages.value = response.languages;
 });
-
-const displayValue = computed(
-    () => languages.value.find((lang) => lang.code === value)?.name ?? value,
-);
 </script>
 
 <template>

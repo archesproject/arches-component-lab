@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
-import type { Ref } from "vue";
 
 import TreeSelect from "primevue/treeselect";
+
+import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
+
+import type { Ref } from "vue";
 import type { TreeNode } from "primevue/treenode";
-
-import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
-
 import type {
     CollectionItem,
     ConceptFetchResult,
@@ -53,10 +53,8 @@ async function getOptions() {
         if (optionsLoaded.value) return;
         isLoading.value = true;
 
-        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            graphSlug,
-            nodeAlias,
-        );
+        const fetchedData: ConceptFetchResult =
+            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
         options.value = fetchedData.results as CollectionItem[];
         optionsTotalCount.value = options.value.length;

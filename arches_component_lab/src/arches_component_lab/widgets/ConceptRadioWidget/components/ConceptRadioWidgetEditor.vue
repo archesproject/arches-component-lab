@@ -4,7 +4,7 @@ import { ref, watch, watchEffect } from "vue";
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
 import type {
     ConceptFetchResult,
     CollectionItem,
@@ -25,10 +25,12 @@ const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
-const flexDirection =
-    cardXNodeXWidgetData.config.groupDirection === "column"
-        ? "flex-column"
-        : "flex-row";
+let flexDirection: string;
+if (cardXNodeXWidgetData.config.groupDirection === "column") {
+    flexDirection = "flex-column";
+} else {
+    flexDirection = "flex-row";
+}
 
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
@@ -48,10 +50,8 @@ async function getOptions() {
     try {
         if (optionsLoaded.value) return;
         isLoading.value = true;
-        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            graphSlug,
-            nodeAlias,
-        );
+        const fetchedData: ConceptFetchResult =
+            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
         options.value = flattenCollectionItems(fetchedData.results);
         optionsTotalCount.value = options.value.length;
@@ -63,8 +63,8 @@ async function getOptions() {
     }
 }
 
-function onUpdateModelValue(value: string | null) {
-    emit("update:value", value ?? null);
+function onUpdateModelValue(updatedValue: string | null) {
+    emit("update:value", updatedValue ?? null);
 }
 </script>
 

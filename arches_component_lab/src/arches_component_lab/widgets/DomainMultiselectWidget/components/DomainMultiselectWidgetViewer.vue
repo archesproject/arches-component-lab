@@ -17,7 +17,7 @@ const displayValue = computed(
             ?.map(
                 (id) =>
                     cardXNodeXWidgetData.node.config.options.find(
-                        (o: DomainOption) => o.id === id,
+                        (option: DomainOption) => option.id === id,
                     )?.text,
             )
             .filter(Boolean)

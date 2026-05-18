@@ -5,11 +5,11 @@ import DOMPurify from "dompurify";
 
 import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types";
 
-const { current } = useGettext();
-
 const { value } = defineProps<{
     value: Record<string, LanguageValue> | null;
 }>();
+
+const { current } = useGettext();
 
 const cleanHtml = computed(() => {
     const raw =

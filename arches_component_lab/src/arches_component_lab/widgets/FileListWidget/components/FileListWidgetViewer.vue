@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import arches from "arches";
 import { computed } from "vue";
+
+import arches from "arches";
 import { Image, Galleria } from "primevue";
 
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types";
 
 const props = defineProps<{ value: FileReference[] | null }>();
-
-const getFileUrl = (originalUrl: string) => {
-    const httpRegex = /^(blob:|https?:\/\/)/;
-    if (
-        !originalUrl ||
-        httpRegex.test(originalUrl) ||
-        originalUrl.startsWith(arches.urls.url_subpath)
-    ) {
-        return originalUrl;
-    }
-    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
-};
 
 const imageData = computed(() => {
     return props.value?.map((fileReference: FileReference) => {
@@ -33,6 +22,18 @@ const imageData = computed(() => {
 const showThumbnails = computed(() => {
     return imageData.value && imageData.value.length > 1;
 });
+
+function getFileUrl(originalUrl: string) {
+    const httpRegex = /^(blob:|https?:\/\/)/;
+    if (
+        !originalUrl ||
+        httpRegex.test(originalUrl) ||
+        originalUrl.startsWith(arches.urls.url_subpath)
+    ) {
+        return originalUrl;
+    }
+    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
+}
 </script>
 
 <template>

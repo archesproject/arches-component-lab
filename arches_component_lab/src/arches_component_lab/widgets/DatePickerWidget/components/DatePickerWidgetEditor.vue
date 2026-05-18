@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { debounce } from "es-toolkit/function";
-
 import { computed, ref, watchEffect } from "vue";
+
+import { debounce } from "es-toolkit/function";
+import DatePicker from "primevue/datepicker";
 
 import {
     convertISO8601DatetimeFormatToPrimevueDatetimeFormat,
     convertViewMode,
 } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
-
-import DatePicker from "primevue/datepicker";
-
 import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 
 import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
@@ -25,8 +23,23 @@ const emit = defineEmits<{
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();
+
 const viewMode = computed(() => {
     return convertViewMode(cardXNodeXWidgetData?.config?.viewMode ?? "days");
+});
+
+const modelDate = computed(() => {
+    if (!value) {
+        return null;
+    }
+    if (shouldShowTime.value) {
+        return new Date(value);
+    }
+    const incomingDate = new Date(value);
+    const day = incomingDate.getUTCDate();
+    const month = incomingDate.getUTCMonth();
+    const year = incomingDate.getUTCFullYear();
+    return new Date(year, month, day);
 });
 
 watchEffect(() => {
@@ -39,7 +52,9 @@ watchEffect(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-const onUpdateModelValue = debounce((updatedValue: string) => {
+const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
+    updatedValue: string,
+) {
     if (!updatedValue) {
         emit("update:value", null);
         return;
@@ -57,20 +72,6 @@ const onUpdateModelValue = debounce((updatedValue: string) => {
         emit("update:value", updatedValue);
     }
 }, 900);
-
-const modelDate = computed(() => {
-    if (!value) {
-        return null;
-    }
-    if (shouldShowTime.value) {
-        return new Date(value);
-    }
-    const incomingDate = new Date(value);
-    const day = incomingDate.getUTCDate();
-    const month = incomingDate.getUTCMonth();
-    const year = incomingDate.getUTCFullYear();
-    return new Date(year, month, day);
-});
 </script>
 
 <template>

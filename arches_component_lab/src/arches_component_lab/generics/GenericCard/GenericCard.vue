@@ -7,10 +7,8 @@ import Skeleton from "primevue/skeleton";
 import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/components/GenericCardEditor.vue";
 import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
-import {
-    fetchTileData,
-    fetchCardXNodeXWidgetDataFromNodeGroup,
-} from "@/arches_component_lab/generics/GenericCard/api.ts";
+import { fetchTileData } from "@/arches_component_lab/generics/GenericCard/api.ts";
+import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -60,7 +58,10 @@ watchEffect(async () => {
 
     try {
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+            useWidgetConfigStore().fetchNodegroupWidgetConfigs(
+                graphSlug,
+                nodegroupAlias,
+            );
 
         if (tileData) {
             aliasedTileData.value = tileData;
