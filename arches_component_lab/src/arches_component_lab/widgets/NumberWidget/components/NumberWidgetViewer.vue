@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import type { NumberValue } from "@/arches_component_lab/datatypes/number/types";
-
-defineProps<{
-    aliasedNodeData: NumberValue | null;
-}>();
+defineProps<{ value: number | null }>();
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ value }}</div>
 </template>

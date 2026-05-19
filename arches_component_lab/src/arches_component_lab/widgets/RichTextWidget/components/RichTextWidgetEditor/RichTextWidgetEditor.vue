@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from "vue";
-import { useGettext } from "vue3-gettext";
 
+import { useGettext } from "vue3-gettext";
 import Editor from "primevue/editor";
 import Select from "primevue/select";
+
+import FocusController from "./components/FocusController.vue";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 
@@ -11,31 +13,22 @@ import type {
     StringCardXNodeXWidgetData,
     Language,
 } from "@/arches_component_lab/types.ts";
-import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
-import FocusController from "./components/FocusController.vue";
+import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: Record<string, LanguageValue> | null;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: StringValue | Record<Language["code"], string>,
-    ): void;
+    (event: "update:value", updatedValue: Record<string, LanguageValue>): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
-const managedNodeValue = ref<StringValue["node_value"]>();
+const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>("");
 
 watchEffect(async () => {
@@ -53,7 +46,7 @@ watchEffect(async () => {
 });
 
 watch(languages, () => {
-    const workingObject = { ...aliasedNodeData?.node_value };
+    const workingObject = { ...value };
 
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
@@ -80,28 +73,18 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
         updatedValue = "";
     }
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", {
-            [selectedLanguage.value!.code]: updatedValue,
-        });
-    } else {
-        emit("update:value", {
-            display_value: updatedValue,
-            node_value: {
-                ...managedNodeValue.value,
-                [selectedLanguage.value!.code]: {
-                    value: updatedValue,
-                    direction: selectedLanguage.value!.default_direction,
-                },
-            },
-            details: [],
-        });
-    }
+    emit("update:value", {
+        ...managedNodeValue.value,
+        [selectedLanguage.value!.code]: {
+            value: updatedValue,
+            direction: selectedLanguage.value!.default_direction,
+        },
+    });
 }
 </script>
 
 <template>
-    <div style="display: flex; flex-direction: column; row-gap: 0.5rem">
+    <div class="widget-language-inputs">
         <Select
             v-model="selectedLanguage"
             class="language-selector"
@@ -121,6 +104,14 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         </FocusController>
     </div>
 </template>
+
+<style scoped>
+.widget-language-inputs {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+</style>
 
 <style>
 .p-select-options,

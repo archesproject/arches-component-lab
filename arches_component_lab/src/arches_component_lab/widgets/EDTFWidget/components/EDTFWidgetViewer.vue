@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
-
-defineProps<{
-    aliasedNodeData: EDTFValue | null;
-}>();
+defineProps<{ value: string | null }>();
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ value }}</div>
 </template>

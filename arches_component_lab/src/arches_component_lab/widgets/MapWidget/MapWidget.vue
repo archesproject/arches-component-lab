@@ -6,7 +6,8 @@ import MapWidgetViewer from "@/arches_component_lab/widgets/MapWidget/components
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
+import type { FeatureCollection } from "geojson";
+
 import type { MapCardXNodeXWidgetData } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -16,8 +17,7 @@ defineProps<{
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: FeatureCollection | null;
 }>();
 
 const emit = defineEmits([
@@ -39,9 +39,8 @@ defineExpose({
         v-if="mode === EDIT"
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :value="value"
         :render-context="renderContext"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
         @update:overlays="emit('update:overlays')"
@@ -49,7 +48,7 @@ defineExpose({
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :value="value"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

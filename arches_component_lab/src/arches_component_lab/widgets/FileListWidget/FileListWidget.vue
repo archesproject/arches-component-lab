@@ -6,7 +6,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
     FileListCardXNodeXWidgetData,
-    FileListValue,
+    FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -15,8 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-    aliasedNodeData: FileListValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: FileReference[] | null;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -26,13 +25,11 @@ const emit = defineEmits(["update:value"]);
     <FileListWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :value="value"
         @update:value="emit('update:value', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="aliasedNodeData"
+        :value="value"
     />
 </template>

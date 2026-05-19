@@ -1,11 +1,30 @@
 <script setup lang="ts">
-import type { DomainValueList } from "@/arches_component_lab/datatypes/domain/types.ts";
+import { computed } from "vue";
 
-defineProps<{
-    aliasedNodeData: DomainValueList | null;
+import type {
+    DomainDatatypeCardXNodeXWidgetData,
+    DomainOption,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
+
+const { value, cardXNodeXWidgetData } = defineProps<{
+    value: string[] | null;
+    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
 }>();
+
+const displayValue = computed(
+    () =>
+        value
+            ?.map(
+                (id) =>
+                    cardXNodeXWidgetData.node.config.options.find(
+                        (option: DomainOption) => option.id === id,
+                    )?.text,
+            )
+            .filter(Boolean)
+            .join(", ") ?? null,
+);
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ displayValue }}</div>
 </template>

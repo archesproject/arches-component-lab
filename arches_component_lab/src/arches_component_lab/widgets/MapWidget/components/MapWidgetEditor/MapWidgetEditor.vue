@@ -63,7 +63,6 @@ import type {
     SourceSpecification,
 } from "maplibre-gl";
 
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type {
     Basemap,
     LayerDefinition,
@@ -78,23 +77,14 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const {
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    renderContext,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
+const { value, cardXNodeXWidgetData, renderContext } = defineProps<{
+    value: FeatureCollection | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        value: GeoJSONFeatureCollectionValue | FeatureCollection,
-    ): void;
+    (event: "update:value", value: FeatureCollection): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:overlays"): void;
 }>();
@@ -104,6 +94,8 @@ const { $gettext } = useGettext();
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 
 const map = shallowRef<MaplibreMap | null>(null);
+defineExpose({ map });
+
 const isLoading = ref(false);
 const selectedDrawnFeature: Ref<Feature | null> = ref(null);
 const drawnFeatures = shallowRef<Feature[]>([]);
@@ -383,8 +375,8 @@ function setupDraw() {
 
     map.value!.addControl(draw);
 
-    if (aliasedNodeData?.node_value?.features?.length) {
-        for (const feature of aliasedNodeData.node_value.features) {
+    if (value?.features?.length) {
+        for (const feature of value.features) {
             draw.add(feature);
         }
 
@@ -500,20 +492,7 @@ async function updateDrawnFeatures() {
         console.error("Error updating drawn features:", error);
     }
 
-    const count = drawnFeatureCollection.features.length;
-    const displayValue = $gettext("%{ count } feature(s)", {
-        " count ": String(count),
-    });
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", drawnFeatureCollection);
-    } else {
-        emit("update:value", {
-            display_value: displayValue,
-            node_value: drawnFeatureCollection,
-            details: [],
-        });
-    }
+    emit("update:value", drawnFeatureCollection);
 }
 
 function addOverlayToMap(overlay: MapLayer) {
@@ -582,8 +561,6 @@ function updateMapOverlays(overlays: MapLayer[]) {
         }
     }
 }
-
-defineExpose({ map });
 </script>
 
 <template>

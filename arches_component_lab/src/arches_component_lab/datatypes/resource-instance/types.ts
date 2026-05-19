@@ -1,11 +1,4 @@
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-
-export interface ResourceInstanceValue extends AliasedNodeData {
-    display_value: string;
-    node_value: ResourceInstanceReference | null;
-    details: { display_value: string; resource_id: string }[];
-}
 
 export interface ResourceInstanceReference {
     resourceId: string;

@@ -19,16 +19,10 @@ import GenericWidget from "@/arches_component_lab/generics/GenericWidget/Generic
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import type {
-    AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-
-const { $gettext } = useGettext();
-
-const SAVE = $gettext("Save");
-const CANCEL = $gettext("Cancel");
 
 const {
     cardXNodeXWidgetData,
@@ -59,10 +53,9 @@ const emit = defineEmits([
 ]);
 
 defineOptions({ inheritAttrs: false });
+defineExpose({ save });
 
-function deepClone<T>(sourceObject: T): T {
-    return JSON.parse(JSON.stringify(sourceObject));
-}
+const { $gettext } = useGettext();
 
 const genericWidgetRefs = useTemplateRef("genericWidget");
 
@@ -70,8 +63,13 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = deepClone(tileData?.aliased_data || {});
-const aliasedData = reactive(deepClone(tileData?.aliased_data || {}));
+const extractedTileData = extractNodeValues(
+    (tileData?.aliased_data as Record<string, unknown>) || {},
+);
+const originalAliasedData = deepClone(extractedTileData);
+const aliasedData = reactive<Record<string, unknown>>(
+    deepClone(extractedTileData),
+);
 
 const localWidgetDirtyStates = reactive(
     cardXNodeXWidgetData.reduce<Record<string, boolean>>(
@@ -98,44 +96,6 @@ const areButtonsDisabled = computed(() => {
         (isWidgetDirty) => !isWidgetDirty,
     );
 });
-
-async function focusWidgetInputForNodeAlias(nodeAlias: string) {
-    for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
-        const widgetComponentRefs = genericWidgetRefs.value;
-        if (!Array.isArray(widgetComponentRefs)) {
-            return;
-        }
-
-        const activeElement = document.activeElement as HTMLElement | null;
-
-        for (const widgetComponentRef of widgetComponentRefs) {
-            const widgetRootElement =
-                widgetComponentRef?.$el as HTMLElement | null;
-
-            if (!widgetRootElement) {
-                continue;
-            }
-
-            if (activeElement && widgetRootElement.contains(activeElement)) {
-                return;
-            }
-
-            const inputElementToFocus =
-                widgetRootElement.querySelector<HTMLElement>(
-                    `[id="${nodeAlias}"]`,
-                );
-
-            if (inputElementToFocus) {
-                inputElementToFocus.focus();
-                return;
-            }
-        }
-
-        await new Promise<void>((resolve) => {
-            requestAnimationFrame(() => resolve());
-        });
-    }
-}
 
 watch(
     () => selectedNodeAlias,
@@ -183,7 +143,7 @@ function onUpdateWidgetFocusedState(nodeAlias: string, isFocused: boolean) {
     localWidgetFocusedStates[nodeAlias] = isFocused;
 }
 
-function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
+function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
     aliasedData[nodeAlias] = value;
 }
 
@@ -216,17 +176,19 @@ async function save() {
             nodegroupAlias,
             {
                 ...(tileData as AliasedTileData),
-                aliased_data: toRaw(aliasedData),
+                aliased_data: toRaw(
+                    aliasedData,
+                ) as AliasedTileData["aliased_data"],
             },
             tileData?.tileid ? tileData.tileid : undefined,
             resourceInstanceId,
         );
 
-        Object.assign(aliasedData, deepClone(updatedTileData.aliased_data));
-        Object.assign(
-            originalAliasedData,
-            deepClone(updatedTileData.aliased_data),
+        const freshValues = extractNodeValues(
+            updatedTileData.aliased_data as Record<string, unknown>,
         );
+        Object.assign(aliasedData, deepClone(freshValues));
+        Object.assign(originalAliasedData, deepClone(freshValues));
 
         resetWidgetDirtyStates();
 
@@ -240,7 +202,67 @@ async function save() {
     }
 }
 
-defineExpose({ save });
+async function focusWidgetInputForNodeAlias(nodeAlias: string) {
+    for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
+        const widgetComponentRefs = genericWidgetRefs.value;
+        if (!Array.isArray(widgetComponentRefs)) {
+            return;
+        }
+
+        const activeElement = document.activeElement as HTMLElement | null;
+
+        for (const widgetComponentRef of widgetComponentRefs) {
+            const widgetRootElement =
+                widgetComponentRef?.$el as HTMLElement | null;
+
+            if (!widgetRootElement) {
+                continue;
+            }
+
+            if (activeElement && widgetRootElement.contains(activeElement)) {
+                return;
+            }
+
+            const inputElementToFocus =
+                widgetRootElement.querySelector<HTMLElement>(
+                    `[id="${nodeAlias}"]`,
+                );
+
+            if (inputElementToFocus) {
+                inputElementToFocus.focus();
+                return;
+            }
+        }
+
+        await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => resolve());
+        });
+    }
+}
+
+function deepClone<T>(sourceObject: T): T {
+    return JSON.parse(JSON.stringify(sourceObject));
+}
+
+function extractNodeValue(val: unknown): unknown {
+    if (
+        val !== null &&
+        val !== undefined &&
+        typeof val === "object" &&
+        "node_value" in val
+    ) {
+        return (val as { node_value: unknown }).node_value ?? null;
+    }
+    return val ?? null;
+}
+
+function extractNodeValues(
+    data: Record<string, unknown>,
+): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(data).map(([k, v]) => [k, extractNodeValue(v)]),
+    );
+}
 </script>
 
 <template>
@@ -274,9 +296,7 @@ defineExpose({ save });
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
-                    :aliased-node-data="
-                        aliasedData[cardXNodeXWidgetDatum.node.alias]
-                    "
+                    :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
                     @update:is-dirty="
                         onUpdateWidgetDirtyState(
                             cardXNodeXWidgetDatum.node.alias,
@@ -308,7 +328,7 @@ defineExpose({ save });
                     severity="success"
                     size="small"
                     icon="pi pi-check"
-                    :label="SAVE"
+                    :label="$gettext('Save')"
                     @click="save"
                 />
                 <Button
@@ -317,7 +337,7 @@ defineExpose({ save });
                     severity="warn"
                     size="small"
                     icon="pi pi-undo"
-                    :label="CANCEL"
+                    :label="$gettext('Cancel')"
                     @click="resetForm"
                 />
             </div>

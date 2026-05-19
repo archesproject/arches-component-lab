@@ -16,46 +16,30 @@ import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceListValue,
     ResourceInstanceReference,
-} from "@/arches_component_lab/datatypes/resource-instance-list/types";
-import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
     ResourceInstanceListCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
-const {
-    cardXNodeXWidgetData,
-    nodeAlias,
-    graphSlug,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue,
-} = defineProps<{
+const ITEM_SIZE = 36;
+
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
     cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    aliasedNodeData: ResourceInstanceListValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: ResourceInstanceReference[] | null;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ResourceInstanceListValue | string[],
-    ): void;
+    (event: "update:value", updatedValue: ResourceInstanceReference[]): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const { $gettext } = useGettext();
 
-// in future iteration these may be declared in the CardXNodeXWidgetData config
-const itemSize = 36;
-
-const options = ref<ResourceInstanceListOption[]>(
-    aliasedNodeData?.details ?? [],
-);
+const options = ref<ResourceInstanceListOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -66,10 +50,18 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValues = ref<string[]>(
-    aliasedNodeData?.details?.map((option) => option.resource_id) || [],
+    value
+        ?.map(
+            (r) =>
+                r.resourceId ??
+                (r as unknown as { resourceinstanceid?: string })
+                    .resourceinstanceid,
+        )
+        .filter((id): id is string => id !== undefined) ?? [],
 );
+
+const resourceResultsCurrentCount = computed(() => options.value.length);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -78,10 +70,6 @@ watch(isLoading, (newValue) => {
 watchEffect(() => {
     getOptions(1);
 });
-
-const onFilter = debounce((event: MultiSelectFilterEvent) => {
-    getOptions(1, event.value);
-}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
@@ -117,10 +105,7 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (
-            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
-            0
-        ) {
+        if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
@@ -132,26 +117,17 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     if (
-        // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
         resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
     ) {
         return;
     }
 
-    if (
-        // if the user has NOT scrolled to the end of the list
-        event &&
-        event.last < resourceResultsCurrentCount.value - 1
-    ) {
+    if (event && event.last < resourceResultsCurrentCount.value - 1) {
         return;
     }
 
-    if (
-        // if the dropdown is opened and we already have data
-        !event &&
-        resourceResultsCurrentCount.value > 0
-    ) {
+    if (!event && resourceResultsCurrentCount.value > 0) {
         return;
     }
 
@@ -162,6 +138,12 @@ function getOption(value: string): ResourceInstanceListOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
+const onFilter = debounce(function onFilterDebounced(
+    event: MultiSelectFilterEvent,
+) {
+    getOptions(1, event.value);
+}, 600);
+
 function onCreateNewResource(graphId: string) {
     selectedGraphId.value = graphId;
     resourceCreationDialogKey.value++;
@@ -169,36 +151,16 @@ function onCreateNewResource(graphId: string) {
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
-    const options = updatedValue.map((resourceId: string) => {
-        return getOption(resourceId);
-    });
-
-    const formattedNodeValues: ResourceInstanceReference[] = updatedValue.map(
-        (value) => {
-            return {
-                inverseOntologyProperty: "",
-                ontologyProperty: "",
-                resourceId: value ?? "",
-                resourceXresourceId: "",
-            } as ResourceInstanceReference;
-        },
-    );
-
     selectedValues.value = updatedValue;
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue as string[]);
-    } else {
-        const formattedValue = {
-            display_value: options
-                .map((option) => option?.display_value)
-                .join(", "),
-            node_value: formattedNodeValues,
-            details: options ?? [],
-        } as ResourceInstanceListValue;
-
-        emit("update:value", formattedValue);
-    }
+    emit(
+        "update:value",
+        updatedValue.map((selectedId) => ({
+            inverseOntologyProperty: "",
+            ontologyProperty: "",
+            resourceId: selectedId,
+            resourceXresourceId: "",
+        })),
+    );
 }
 
 async function onResourceCreated(createdTile: AliasedTileData) {
@@ -229,7 +191,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
         :virtual-scroller-options="{
-            itemSize: itemSize,
+            itemSize: ITEM_SIZE,
             lazy: true,
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
@@ -274,7 +236,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     target="_blank"
                     variant="text"
                     size="small"
-                    style="text-decoration: none"
+                    class="no-text-decoration"
                     :href="`${arches.urls.resource_report}${slotProps.value}`"
                     @click.stop
                 />
@@ -284,7 +246,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     target="_blank"
                     variant="text"
                     size="small"
-                    style="text-decoration: none"
+                    class="no-text-decoration"
                     :href="`${arches.urls.resource_editor}${slotProps.value}`"
                     @click.stop
                 />
@@ -309,6 +271,10 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 </template>
 
 <style scoped>
+.no-text-decoration {
+    text-decoration: none;
+}
+
 .button-container {
     display: flex;
     justify-content: flex-end;

@@ -1,50 +1,38 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
 import type {
-    ConceptValue,
     ConceptFetchResult,
     CollectionItem,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-import {
-    convertConceptOptionToFormValue,
-    flattenCollectionItems,
-} from "@/arches_component_lab/datatypes/concept/utils.ts";
+import { flattenCollectionItems } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    aliasedNodeData: ConceptValue | null;
+    value: string | null;
     cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptValue | string | null): void;
+    (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
-const flexDirection = computed(() =>
-    cardXNodeXWidgetData.config.groupDirection === "column"
-        ? "flex-column"
-        : "flex-row",
-);
+let flexDirection: string;
+if (cardXNodeXWidgetData.config.groupDirection === "column") {
+    flexDirection = "flex-column";
+} else {
+    flexDirection = "flex-row";
+}
 
 const options = ref<CollectionItem[]>([]);
-const selectedId = ref<string | null>(aliasedNodeData?.node_value ?? null);
-
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
@@ -62,13 +50,10 @@ async function getOptions() {
     try {
         if (optionsLoaded.value) return;
         isLoading.value = true;
-        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            graphSlug,
-            nodeAlias,
-        );
+        const fetchedData: ConceptFetchResult =
+            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
         options.value = flattenCollectionItems(fetchedData.results);
-
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -78,22 +63,14 @@ async function getOptions() {
     }
 }
 
-function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
-    const formattedValue: ConceptValue = convertConceptOptionToFormValue(
-        selectedOption,
-        options.value,
-    );
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue.node_value);
-    } else {
-        emit("update:value", formattedValue);
-    }
+function onUpdateModelValue(updatedValue: string | null) {
+    emit("update:value", updatedValue ?? null);
 }
 </script>
 
 <template>
     <RadioButtonGroup
-        :model-value="selectedId"
+        :model-value="value"
         :class="['button-group', flexDirection]"
         @update:model-value="onUpdateModelValue"
     >

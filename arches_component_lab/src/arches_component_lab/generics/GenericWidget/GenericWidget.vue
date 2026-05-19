@@ -4,6 +4,7 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
+    useAttrs,
     watch,
     watchEffect,
 } from "vue";
@@ -15,13 +16,11 @@ import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/co
 import GenericFormField from "@/arches_component_lab/generics/GenericWidget/components/GenericFormField.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
+import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type {
-    AliasedNodeData,
-    CardXNodeXWidgetData,
-} from "@/arches_component_lab/types.ts";
+import type { CSSProperties } from "vue";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
@@ -32,8 +31,7 @@ const {
     mode,
     nodeAlias,
     shouldShowLabel = true,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
+    value,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
@@ -42,8 +40,7 @@ const {
     mode: WidgetMode;
     nodeAlias: string;
     shouldShowLabel?: boolean;
-    aliasedNodeData?: unknown | null | undefined;
-    shouldEmitSimplifiedValue?: boolean;
+    value?: unknown | null | undefined;
 }>();
 
 const emit = defineEmits([
@@ -55,18 +52,25 @@ const emit = defineEmits([
 
 defineOptions({ inheritAttrs: false });
 
+const attrs = useAttrs();
+
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
+const attrsClass = computed(() => attrs.class as string | undefined);
+const attrsStyle = computed(
+    () => attrs.style as string | CSSProperties | undefined,
+);
+const attrsForComponent = computed(() => {
+    const { class: _class, style: _style, ...rest } = attrs;
+    return rest;
+});
+
 const isCombinedLoading = computed(
     () => isLoading.value || isChildLoading.value,
 );
-
-watch(isCombinedLoading, (newValue) => {
-    emit("update:isLoading", newValue);
-});
 
 const widgetComponent = computed(() => {
     if (!resolvedCardXNodeXWidgetData.value) {
@@ -84,15 +88,24 @@ const widgetComponent = computed(() => {
     });
 });
 
-const widgetValue = computed(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData as AliasedNodeData;
-    } else if (resolvedCardXNodeXWidgetData.value?.config?.defaultValue) {
-        return resolvedCardXNodeXWidgetData.value.config
-            .defaultValue as AliasedNodeData;
-    } else {
-        return null;
+const widgetNodeValue = computed<unknown>(() => {
+    if (value !== undefined) {
+        return value ?? null;
     }
+    const dv = resolvedCardXNodeXWidgetData.value?.config?.defaultValue;
+    if (
+        dv !== null &&
+        dv !== undefined &&
+        typeof dv === "object" &&
+        "node_value" in dv
+    ) {
+        return (dv as { node_value: unknown }).node_value ?? null;
+    }
+    return dv ?? null;
+});
+
+watch(isCombinedLoading, (newValue) => {
+    emit("update:isLoading", newValue);
 });
 
 watchEffect(async () => {
@@ -103,10 +116,11 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            graphSlug,
-            nodeAlias,
-        );
+        resolvedCardXNodeXWidgetData.value =
+            await useWidgetConfigStore().fetchWidgetConfig(
+                graphSlug,
+                nodeAlias,
+            );
         if (
             cardXNodeXWidgetDataOverrides &&
             resolvedCardXNodeXWidgetData.value
@@ -127,6 +141,8 @@ watchEffect(async () => {
 <template>
     <div
         class="widget"
+        :class="attrsClass"
+        :style="attrsStyle"
         :data-graph-slug="graphSlug"
         :data-node-alias="nodeAlias"
         @focusin="() => emit('update:isFocused', true)"
@@ -153,7 +169,7 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :aliased-node-data="widgetValue!"
+                :value="widgetNodeValue"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
@@ -161,14 +177,13 @@ watchEffect(async () => {
             >
                 <component
                     :is="widgetComponent"
-                    v-bind="$attrs"
+                    v-bind="attrsForComponent"
                     :key="resolvedCardXNodeXWidgetData.id"
                     :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
-                    :should-emit-simplified-value="shouldEmitSimplifiedValue"
-                    :aliased-node-data="widgetValue"
+                    :value="widgetNodeValue"
                     @update:is-loading="isChildLoading = $event"
                     @update:value="onUpdateValue($event)"
                 />
@@ -177,13 +192,13 @@ watchEffect(async () => {
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
-                v-bind="$attrs"
+                v-bind="attrsForComponent"
                 :key="resolvedCardXNodeXWidgetData.id"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
-                :aliased-node-data="widgetValue"
+                :value="widgetNodeValue"
                 @update:is-loading="isChildLoading = $event"
             />
         </template>

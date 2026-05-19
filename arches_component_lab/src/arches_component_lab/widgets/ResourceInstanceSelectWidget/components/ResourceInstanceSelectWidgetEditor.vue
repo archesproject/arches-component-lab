@@ -14,7 +14,7 @@ import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceValue,
+    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
     ResourceInstanceCardXNodeXWidgetData,
@@ -22,38 +22,28 @@ import type {
 
 import type { AliasedTileData } from "@/arches_component_lab/types";
 
-const {
-    cardXNodeXWidgetData,
-    nodeAlias,
-    graphSlug,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue,
-    defaultTerm,
-} = defineProps<{
-    cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
-    nodeAlias: string;
-    graphSlug: string;
-    aliasedNodeData: ResourceInstanceValue | null;
-    shouldEmitSimplifiedValue?: boolean;
-    defaultTerm?: string;
-}>();
+const ITEM_SIZE = 36;
+
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, value, defaultTerm } =
+    defineProps<{
+        cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
+        nodeAlias: string;
+        graphSlug: string;
+        value: ResourceInstanceReference | null;
+        defaultTerm?: string;
+    }>();
 
 const emit = defineEmits<{
     (
         event: "update:value",
-        updatedValue: ResourceInstanceValue | string[],
+        updatedValue: ResourceInstanceReference | null,
     ): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const { $gettext } = useGettext();
 
-// in future iteration these may be declared in the CardXNodeXWidgetData config
-const itemSize = 36;
-
-const options = ref<ResourceInstanceSelectOption[]>(
-    aliasedNodeData?.details ?? [],
-);
+const options = ref<ResourceInstanceSelectOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -64,10 +54,9 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
+const selectedValue = ref<string | null>(value?.resourceId ?? null);
+
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const selectedValue = ref<string | null>(
-    aliasedNodeData?.details?.[0]?.resource_id ?? null,
-);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -76,10 +65,6 @@ watch(isLoading, (newValue) => {
 watchEffect(() => {
     getOptions(1);
 });
-
-const onFilter = debounce((event: SelectFilterEvent) => {
-    getOptions(1, event.value);
-}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
@@ -97,7 +82,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerms,
-            selectedValue.value || aliasedNodeData?.details?.[0]?.resource_id,
+            selectedValue.value,
         );
 
         const references = resourceData.data.map(
@@ -121,10 +106,7 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (
-            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
-            0
-        ) {
+        if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
@@ -136,35 +118,26 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     if (
-        // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
         resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
     ) {
         return;
     }
 
-    if (
-        // if the user has NOT scrolled to the end of the list
-        event &&
-        event.last < resourceResultsCurrentCount.value - 1
-    ) {
+    if (event && event.last < resourceResultsCurrentCount.value - 1) {
         return;
     }
 
-    if (
-        // if the dropdown is opened and we already have data
-        !event &&
-        resourceResultsCurrentCount.value > 0
-    ) {
+    if (!event && resourceResultsCurrentCount.value > 0) {
         return;
     }
 
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id === value);
-}
+const onFilter = debounce(function onFilterDebounced(event: SelectFilterEvent) {
+    getOptions(1, event.value);
+}, 600);
 
 function onCreateNewResource(graphId: string) {
     selectedGraphId.value = graphId;
@@ -174,24 +147,15 @@ function onCreateNewResource(graphId: string) {
 
 function onUpdateModelValue(updatedValue: string | null) {
     selectedValue.value = updatedValue;
-
-    const option = updatedValue ? getOption(updatedValue) : undefined;
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue ? [updatedValue] : []);
-    } else {
+    if (updatedValue) {
         emit("update:value", {
-            display_value: option ? option.display_value : "",
-            node_value: updatedValue
-                ? {
-                      inverseOntologyProperty: "",
-                      ontologyProperty: "",
-                      resourceId: updatedValue,
-                      resourceXresourceId: "",
-                  }
-                : null,
-            details: option ? [option] : [],
-        } as ResourceInstanceValue);
+            inverseOntologyProperty: "",
+            ontologyProperty: "",
+            resourceId: updatedValue,
+            resourceXresourceId: "",
+        });
+    } else {
+        emit("update:value", null);
     }
 }
 
@@ -221,7 +185,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         :reset-filter-on-hide="true"
         :show-clear="true"
         :virtual-scroller-options="{
-            itemSize: itemSize,
+            itemSize: ITEM_SIZE,
             lazy: true,
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,

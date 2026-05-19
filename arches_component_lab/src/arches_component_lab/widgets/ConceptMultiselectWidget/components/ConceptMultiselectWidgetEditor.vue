@@ -1,39 +1,27 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
-import type { Ref } from "vue";
 
 import TreeSelect from "primevue/treeselect";
+
+import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
+
+import type { Ref } from "vue";
 import type { TreeNode } from "primevue/treenode";
-
-import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
-import type { ConceptListValue } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import { convertSelectionToModelValue } from "@/arches_component_lab/datatypes/concept-list/utils.ts";
-
 import type {
     CollectionItem,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    aliasedNodeData: ConceptListValue | null;
+    value: string[] | null;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ConceptListValue | string[] | null,
-    ): void;
+    (event: "update:value", updatedValue: string[] | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
@@ -47,12 +35,13 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(() => {
     return (
-        aliasedNodeData?.node_value?.reduce(
-            (acc: Record<string, boolean>, value: string) => {
-                return { ...acc, [value]: true };
-            },
-            {} as Record<string, boolean>,
-        ) || null
+        value?.reduce(
+            (acc: Record<string, boolean>, id: string) => ({
+                ...acc,
+                [id]: true,
+            }),
+            {},
+        ) ?? null
     );
 });
 
@@ -69,13 +58,10 @@ async function getOptions() {
         if (optionsLoaded.value) return;
         isLoading.value = true;
 
-        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            graphSlug,
-            nodeAlias,
-        );
+        const fetchedData: ConceptFetchResult =
+            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
         options.value = fetchedData.results as CollectionItem[];
-
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -85,16 +71,8 @@ async function getOptions() {
     }
 }
 
-function onUpdateModelValue(selectedConcepts: string[]) {
-    const formattedValue: ConceptListValue = convertSelectionToModelValue(
-        selectedConcepts,
-        options.value ?? ([] as CollectionItem[]),
-    );
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue.node_value);
-    } else {
-        emit("update:value", formattedValue);
-    }
+function onUpdateModelValue(selection: Record<string, boolean> | null) {
+    emit("update:value", selection ? Object.keys(selection) : null);
 }
 </script>
 

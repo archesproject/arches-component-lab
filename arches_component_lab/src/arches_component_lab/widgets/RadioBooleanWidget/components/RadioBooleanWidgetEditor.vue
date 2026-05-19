@@ -1,42 +1,19 @@
 <script setup lang="ts">
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
-import { useGettext } from "vue3-gettext";
-
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
-    aliasedNodeData: BooleanValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: boolean | null;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: BooleanValue | boolean | undefined | null,
-    ): void;
+    (event: "update:value", updatedValue: boolean | null): void;
 }>();
 
-function getDisplayValue(value: boolean | null | undefined): string {
-    if (value === true) {
-        return cardXNodeXWidgetData.node.config.trueLabel || $gettext("True");
-    } else if (value === false) {
-        return cardXNodeXWidgetData.node.config.falseLabel || $gettext("False");
-    } else {
-        return "";
-    }
-}
-
 function onUpdateModelValue(updatedValue: string | null) {
-    let booleanValue;
+    let booleanValue: boolean | null;
     switch (updatedValue) {
         case "true":
             booleanValue = true;
@@ -48,16 +25,7 @@ function onUpdateModelValue(updatedValue: string | null) {
             booleanValue = null;
             break;
     }
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", booleanValue);
-    } else {
-        emit("update:value", {
-            display_value: getDisplayValue(booleanValue),
-            node_value: booleanValue,
-            details: [],
-        });
-    }
+    emit("update:value", booleanValue);
 }
 </script>
 
@@ -65,7 +33,7 @@ function onUpdateModelValue(updatedValue: string | null) {
     <RadioButtonGroup
         fluid="true"
         class="button-group"
-        :model-value="aliasedNodeData?.node_value?.toString() || ''"
+        :model-value="value?.toString() ?? ''"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div class="radio-options">

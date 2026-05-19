@@ -1,67 +1,41 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useGettext } from "vue3-gettext";
 
+import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { URL, URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types";
+
+const { cardXNodeXWidgetData, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    value: URLNodeValue | null;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: URLNodeValue): void;
+}>();
 
 const { $gettext } = useGettext();
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: URLValue | null;
-    shouldEmitSimplifiedValue?: boolean;
-}>();
-
-const urlLabel = ref(aliasedNodeData!.node_value?.url_label || "");
-const url = ref(aliasedNodeData!.node_value?.url || "");
-
-const emit = defineEmits<{
-    (event: "update:value", updatedValue: URLValue | URL): void;
-}>();
+const urlLabel = ref(value?.url_label ?? "");
+const url = ref(value?.url ?? "");
 
 function onUpdateURLValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
-    url.value = updatedValue;
+    url.value = updatedValue ?? "";
     updateValue();
 }
 
 function onUpdateURLLabelValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
-    urlLabel.value = updatedValue;
+    urlLabel.value = updatedValue ?? "";
     updateValue();
 }
 
 function updateValue() {
-    let displayValue;
-    if (urlLabel.value) {
-        displayValue = `${urlLabel.value}(${url.value})`;
-    } else {
-        displayValue = url.value;
-    }
-    const formattedValue = {
+    emit("update:value", {
         url: url.value,
         url_label: urlLabel.value,
-    };
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue);
-    } else {
-        emit("update:value", {
-            display_value: displayValue,
-            node_value: formattedValue,
-            details: [],
-        });
-    }
+    });
 }
 </script>
 

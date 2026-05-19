@@ -1,5 +1,3 @@
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-
 export interface ConceptFetchResult {
     results: CollectionItem[];
     total_results: number;
@@ -11,10 +9,4 @@ export interface CollectionItem {
     conceptid: string;
     sortOrder: string;
     children: CollectionItem[];
-}
-
-export interface ConceptValue extends AliasedNodeData {
-    display_value: string;
-    node_value: string | null;
-    details: CollectionItem[];
 }

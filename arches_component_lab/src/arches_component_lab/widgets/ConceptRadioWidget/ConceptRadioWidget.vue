@@ -5,7 +5,6 @@ import ConceptRadioWidgetViewer from "@/arches_component_lab/widgets/ConceptRadi
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -13,8 +12,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    aliasedNodeData: ConceptValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    value: string | null;
 }>();
 
 const emit = defineEmits([
@@ -30,13 +28,14 @@ const emit = defineEmits([
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :value="value"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ConceptRadioWidgetViewer
         v-if="mode === VIEW"
-        :aliased-node-data="aliasedNodeData"
+        :value="value"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
     />
 </template>
