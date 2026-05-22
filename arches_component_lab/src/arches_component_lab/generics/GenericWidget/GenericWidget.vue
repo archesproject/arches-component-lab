@@ -4,7 +4,6 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
-    useAttrs,
     watch,
     watchEffect,
 } from "vue";
@@ -19,7 +18,6 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type { CSSProperties } from "vue";
 import type {
     AliasedNodeData,
     CardXNodeXWidgetData,
@@ -58,21 +56,10 @@ const emit = defineEmits([
 
 defineOptions({ inheritAttrs: false });
 
-const attrs = useAttrs();
-
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
-
-const attrsClass = computed(() => attrs.class as string | undefined);
-const attrsStyle = computed(
-    () => attrs.style as string | CSSProperties | undefined,
-);
-const attrsForComponent = computed(() => {
-    const { class: _class, style: _style, ...rest } = attrs;
-    return rest;
-});
 
 const isCombinedLoading = computed(
     () => isLoading.value || isChildLoading.value,
@@ -101,16 +88,7 @@ const widgetNodeValue = computed<unknown>(() => {
     if (value !== undefined) {
         return value ?? null;
     }
-    const dv = resolvedCardXNodeXWidgetData.value?.config?.defaultValue;
-    if (
-        dv !== null &&
-        dv !== undefined &&
-        typeof dv === "object" &&
-        "node_value" in dv
-    ) {
-        return (dv as { node_value: unknown }).node_value ?? null;
-    }
-    return dv ?? null;
+    return resolvedCardXNodeXWidgetData.value?.config?.defaultValue ?? null;
 });
 
 watch(isCombinedLoading, (newValue) => {
@@ -150,8 +128,6 @@ watchEffect(async () => {
 <template>
     <div
         class="widget"
-        :class="attrsClass"
-        :style="attrsStyle"
         :data-graph-slug="graphSlug"
         :data-node-alias="nodeAlias"
         @focusin="() => emit('update:isFocused', true)"
@@ -186,7 +162,7 @@ watchEffect(async () => {
             >
                 <component
                     :is="widgetComponent"
-                    v-bind="attrsForComponent"
+                    v-bind="$attrs"
                     :key="resolvedCardXNodeXWidgetData.id"
                     :aliased-node-data="aliasedNodeData"
                     :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
@@ -205,7 +181,7 @@ watchEffect(async () => {
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
-                v-bind="attrsForComponent"
+                v-bind="$attrs"
                 :key="resolvedCardXNodeXWidgetData.id"
                 :aliased-node-data="aliasedNodeData"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
