@@ -14,16 +14,21 @@ const { value, aliasedNodeData } = defineProps<{
     aliasedNodeData?: StringAliasedNodeData | null;
 }>();
 
-const gettext = useGettext();
+const { current } = useGettext();
 
-const cleanHtml = computed(() => {
-    const raw =
-        aliasedNodeData?.display_value ??
-        value?.[gettext.current]?.value ??
-        Object.values(value ?? {})[0]?.value ??
-        "";
-    return DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
+const rawHtml = computed(() => {
+    if (aliasedNodeData?.display_value) {
+        return aliasedNodeData.display_value;
+    }
+    if (!value) {
+        return "";
+    }
+    return value[current]?.value ?? "";
 });
+
+const cleanHtml = computed(() =>
+    DOMPurify.sanitize(rawHtml.value, { USE_PROFILES: { html: true } }),
+);
 </script>
 
 <template>

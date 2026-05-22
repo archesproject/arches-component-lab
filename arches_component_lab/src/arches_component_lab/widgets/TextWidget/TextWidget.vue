@@ -49,5 +49,6 @@ const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="resolvedNodeValue"
+        :aliased-node-data="aliasedNodeData ?? null"
     />
 </template>
