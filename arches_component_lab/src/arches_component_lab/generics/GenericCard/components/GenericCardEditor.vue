@@ -17,6 +17,10 @@ import Skeleton from "primevue/skeleton";
 
 import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
+import {
+    deepClone,
+    extractAliasedNodeDataEntries,
+} from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
 import type {
     AliasedData,
@@ -241,34 +245,6 @@ async function focusWidgetInputForNodeAlias(nodeAlias: string) {
             requestAnimationFrame(() => resolve());
         });
     }
-}
-
-function deepClone<T>(sourceObject: T): T {
-    return JSON.parse(JSON.stringify(sourceObject));
-}
-
-function isAliasedNodeData(value: unknown): value is AliasedNodeData {
-    return (
-        value !== null &&
-        value !== undefined &&
-        typeof value === "object" &&
-        "node_value" in value &&
-        "display_value" in value &&
-        "details" in value
-    );
-}
-
-function extractAliasedNodeDataEntries(
-    data: Record<string, unknown>,
-): Record<string, AliasedNodeData> {
-    return Object.fromEntries(
-        Object.entries(data)
-            .filter(([, rawNodeData]) => isAliasedNodeData(rawNodeData))
-            .map(([nodeAlias, rawNodeData]) => [
-                nodeAlias,
-                rawNodeData as AliasedNodeData,
-            ]),
-    );
 }
 
 function onUpdateWidgetAliasedNodeData(

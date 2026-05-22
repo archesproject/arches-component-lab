@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
+import { isAliasedNodeData } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
 import type {
     AliasedNodeData,
@@ -18,17 +19,7 @@ const { cardXNodeXWidgetData, graphSlug, mode, tileData } = defineProps<{
 
 function getAliasedNodeData(nodeAlias: string): AliasedNodeData | null {
     const entry = tileData?.aliased_data?.[nodeAlias];
-    if (
-        entry !== null &&
-        entry !== undefined &&
-        typeof entry === "object" &&
-        "node_value" in entry &&
-        "display_value" in entry &&
-        "details" in entry
-    ) {
-        return entry as AliasedNodeData;
-    }
-    return null;
+    return isAliasedNodeData(entry) ? entry : null;
 }
 </script>
 

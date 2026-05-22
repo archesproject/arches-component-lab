@@ -7,16 +7,14 @@ export function buildResourceInstanceAliasedNodeData(
     nodeValue: ResourceInstanceReference | null,
     displayName: string,
 ): ResourceInstanceAliasedNodeData {
+    if (!nodeValue) {
+        return { node_value: null, display_value: displayName, details: [] };
+    }
     return {
         node_value: nodeValue,
         display_value: displayName,
-        details: nodeValue
-            ? [
-                  {
-                      resource_id: nodeValue.resourceId,
-                      display_value: displayName,
-                  },
-              ]
-            : [],
+        details: [
+            { resource_id: nodeValue.resourceId, display_value: displayName },
+        ],
     };
 }

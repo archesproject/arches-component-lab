@@ -6,12 +6,12 @@ import type {
 export function buildURLAliasedNodeData(
     nodeValue: URLNodeValue | null,
 ): URLAliasedNodeData {
-    const display = nodeValue?.url_label
-        ? `${nodeValue.url_label}(${nodeValue.url})`
-        : nodeValue?.url ?? "";
-    return {
-        node_value: nodeValue,
-        display_value: display,
-        details: [],
-    };
+    if (!nodeValue) {
+        return { node_value: null, display_value: "", details: [] };
+    }
+    let displayValue = nodeValue.url;
+    if (nodeValue.url_label) {
+        displayValue = `${nodeValue.url_label}(${nodeValue.url})`;
+    }
+    return { node_value: nodeValue, display_value: displayValue, details: [] };
 }
