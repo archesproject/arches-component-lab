@@ -13,7 +13,7 @@ const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
 }>();
 
 const { labels } = useConceptLabelsResolver(
-    toRef(() => value),
+    toRef(() => (aliasedNodeData?.display_value ? null : value)),
     graphSlug ?? "",
     nodeAlias ?? "",
 );

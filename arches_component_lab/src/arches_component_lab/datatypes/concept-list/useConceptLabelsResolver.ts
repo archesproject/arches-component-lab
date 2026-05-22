@@ -16,21 +16,25 @@ export function useConceptLabelsResolver(
 
     watch(
         nodeValue,
-        async (val) => {
+        async (newConceptIds) => {
             const requestId = ++latestRequestId;
             resolved.value = [];
-            loading.value = !!val?.length;
-            if (!val?.length) {
+            loading.value = !!newConceptIds?.length;
+            if (!newConceptIds?.length) {
                 loading.value = false;
                 return;
             }
-            const tree = await useConceptTreeStore().fetchTree(
+            const conceptTree = await useConceptTreeStore().fetchTree(
                 graphSlug,
                 nodeAlias,
             );
             if (requestId === latestRequestId) {
-                resolved.value = val
-                    .map((id) => getOption(id, tree.results)?.label ?? id)
+                resolved.value = newConceptIds
+                    .map(
+                        (conceptId) =>
+                            getOption(conceptId, conceptTree.results)?.label ??
+                            conceptId,
+                    )
                     .filter(Boolean);
                 loading.value = false;
             }

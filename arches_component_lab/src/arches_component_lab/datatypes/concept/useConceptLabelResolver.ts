@@ -17,20 +17,20 @@ export function useConceptLabelResolver(
 
     watch(
         nodeValue,
-        async (val) => {
+        async (newConceptId) => {
             const requestId = ++latestRequestId;
             resolved.value = null;
-            loading.value = !!val;
-            if (!val) {
+            loading.value = !!newConceptId;
+            if (!newConceptId) {
                 loading.value = false;
                 return;
             }
-            const tree = await useConceptTreeStore().fetchTree(
+            const conceptTree = await useConceptTreeStore().fetchTree(
                 graphSlug,
                 nodeAlias,
             );
             if (requestId === latestRequestId) {
-                resolved.value = getOption(val, tree.results);
+                resolved.value = getOption(newConceptId, conceptTree.results);
                 loading.value = false;
             }
         },

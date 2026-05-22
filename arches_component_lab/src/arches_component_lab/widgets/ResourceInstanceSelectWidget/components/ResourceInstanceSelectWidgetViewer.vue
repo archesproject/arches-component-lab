@@ -16,7 +16,7 @@ const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
 
 const { displayValue: resolvedDisplayValue, resourceId } =
     useResourceDisplayNameResolver(
-        toRef(() => value),
+        toRef(() => (aliasedNodeData?.display_value ? null : value)),
         graphSlug ?? "",
         nodeAlias ?? "",
     );

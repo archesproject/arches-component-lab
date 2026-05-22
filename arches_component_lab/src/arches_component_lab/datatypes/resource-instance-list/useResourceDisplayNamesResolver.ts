@@ -19,11 +19,11 @@ export function useResourceDisplayNamesResolver(
 
     watch(
         nodeValue,
-        async (val) => {
+        async (newNodeValue) => {
             const requestId = ++latestRequestId;
             resolved.value = [];
             const resourceInstanceIds =
-                val
+                newNodeValue
                     ?.map((resourceReference) => resourceReference.resourceId)
                     .filter(Boolean) ?? [];
             loading.value = resourceInstanceIds.length > 0;
