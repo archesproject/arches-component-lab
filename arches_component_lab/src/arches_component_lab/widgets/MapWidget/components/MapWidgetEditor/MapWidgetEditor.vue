@@ -30,6 +30,7 @@ import {
     fetchDrawnFeaturesBuffer,
     fetchGeoJSONBounds,
 } from "@/arches_component_lab/widgets/MapWidget/api.ts";
+import { buildMapAliasedNodeData } from "@/arches_component_lab/widgets/MapWidget/utils.ts";
 
 import {
     BUFFER_FILL_COLOR,
@@ -52,6 +53,7 @@ import {
 
 import type { Ref } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 import type {
     AddLayerObject,
     GeoJSONSource,
@@ -87,6 +89,7 @@ const emit = defineEmits<{
     (event: "update:value", value: FeatureCollection): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:overlays"): void;
+    (event: "update:aliasedNodeData", updatedValue: AliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -493,6 +496,10 @@ async function updateDrawnFeatures() {
     }
 
     emit("update:value", drawnFeatureCollection);
+    emit(
+        "update:aliasedNodeData",
+        buildMapAliasedNodeData(drawnFeatureCollection),
+    );
 }
 
 function addOverlayToMap(overlay: MapLayer) {

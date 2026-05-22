@@ -6,15 +6,19 @@ import Button from "primevue/button";
 
 import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 
+import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
+
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
     value: string | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string): void;
+    (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -22,7 +26,9 @@ const { $gettext } = useGettext();
 const shouldShowHelpDrawer = ref(false);
 
 function handleUpdateModelValue(updatedValue: string | undefined) {
-    emit("update:value", updatedValue ?? "");
+    const newValue = updatedValue ?? "";
+    emit("update:value", newValue);
+    emit("update:aliasedNodeData", buildEDTFAliasedNodeData(newValue || null));
 }
 </script>
 
@@ -33,8 +39,8 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             type="text"
             :fluid="true"
             :model-value="value ?? ''"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+            :placeholder="cardXNodeXWidgetData?.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
             @update:model-value="handleUpdateModelValue"
         />
         <Button

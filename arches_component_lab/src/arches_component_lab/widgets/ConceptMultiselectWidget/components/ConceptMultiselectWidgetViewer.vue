@@ -1,21 +1,28 @@
 <script setup lang="ts">
-import { toRef } from "vue";
+import { computed, toRef } from "vue";
 
 import { useConceptLabelsResolver } from "@/arches_component_lab/datatypes/concept-list/useConceptLabelsResolver.ts";
 
-const props = defineProps<{
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+
+const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
     value: string[] | null;
-    graphSlug: string;
-    nodeAlias: string;
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: AliasedNodeData | null;
 }>();
 
 const { labels } = useConceptLabelsResolver(
-    toRef(props, "value"),
-    props.graphSlug,
-    props.nodeAlias,
+    toRef(() => value),
+    graphSlug ?? "",
+    nodeAlias ?? "",
+);
+
+const displayLabel = computed(
+    () => aliasedNodeData?.display_value || labels.value.join(", "),
 );
 </script>
 
 <template>
-    <div>{{ labels.join(", ") }}</div>
+    <div>{{ displayLabel }}</div>
 </template>

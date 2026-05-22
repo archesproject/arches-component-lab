@@ -8,20 +8,28 @@ import Select from "primevue/select";
 import FocusController from "./components/FocusController.vue";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
+import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
 import type {
     StringCardXNodeXWidgetData,
     Language,
 } from "@/arches_component_lab/types.ts";
-import type { LanguageValue } from "@/arches_component_lab/datatypes/string/types.ts";
+import type {
+    LanguageValue,
+    StringAliasedNodeData,
+} from "@/arches_component_lab/datatypes/string/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     value: Record<string, LanguageValue> | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: Record<string, LanguageValue>): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: StringAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -73,13 +81,18 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
         updatedValue = "";
     }
-    emit("update:value", {
+    const newNodeValue = {
         ...managedNodeValue.value,
         [selectedLanguage.value!.code]: {
             value: updatedValue,
             direction: selectedLanguage.value!.default_direction,
         },
-    });
+    };
+    emit("update:value", newNodeValue);
+    emit(
+        "update:aliasedNodeData",
+        buildStringAliasedNodeData(newNodeValue, selectedLanguage.value!.code),
+    );
 }
 </script>
 
@@ -93,12 +106,12 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
         />
-        <FocusController :node-alias="cardXNodeXWidgetData.node.alias">
+        <FocusController :node-alias="cardXNodeXWidgetData?.node.alias ?? ''">
             <Editor
                 :fluid="true"
                 :model-value="singleInputValue"
-                :placeholder="cardXNodeXWidgetData.config.placeholder ?? ''"
-                :required="cardXNodeXWidgetData.node.isrequired"
+                :placeholder="cardXNodeXWidgetData?.config.placeholder ?? ''"
+                :required="cardXNodeXWidgetData?.node.isrequired"
                 @update:model-value="onUpdateModelValue($event)"
             />
         </FocusController>

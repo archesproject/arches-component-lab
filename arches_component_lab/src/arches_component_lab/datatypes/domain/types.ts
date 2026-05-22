@@ -1,4 +1,7 @@
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export interface DomainDatatypeCardXNodeXWidgetData
     extends CardXNodeXWidgetData {
@@ -13,4 +16,14 @@ export interface DomainOption {
     id: string;
     text: string;
     selected: boolean;
+}
+
+export interface DomainAliasedNodeData extends AliasedNodeData {
+    node_value: string | null;
+    details: DomainOption[];
+}
+
+export interface DomainListAliasedNodeData extends AliasedNodeData {
+    node_value: string[] | null;
+    details: DomainOption[];
 }

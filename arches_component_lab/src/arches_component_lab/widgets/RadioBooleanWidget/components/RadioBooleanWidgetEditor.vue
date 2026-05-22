@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
+
+import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
+
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     value: boolean | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: boolean | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: BooleanAliasedNodeData,
+    ): void;
 }>();
 
 function onUpdateModelValue(updatedValue: string | null) {
@@ -26,34 +34,37 @@ function onUpdateModelValue(updatedValue: string | null) {
             break;
     }
     emit("update:value", booleanValue);
+    emit("update:aliasedNodeData", buildBooleanAliasedNodeData(booleanValue));
 }
 </script>
 
 <template>
     <RadioButtonGroup
+        :id="cardXNodeXWidgetData?.node.alias"
         fluid="true"
         class="button-group"
         :model-value="value?.toString() ?? ''"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div class="radio-options">
             <RadioButton
-                input-id="`${cardXNodeXWidgetData.node.alias}-true`"
+                :input-id="`${cardXNodeXWidgetData?.node.alias}-true`"
                 size="small"
                 value="true"
             />
-            <label for="`${cardXNodeXWidgetData.node.alias}-true`">{{
-                cardXNodeXWidgetData.node.config.trueLabel
+            <label :for="`${cardXNodeXWidgetData?.node.alias}-true`">{{
+                cardXNodeXWidgetData?.node.config.trueLabel
             }}</label>
         </div>
         <div class="radio-options">
             <RadioButton
-                input-id="`${cardXNodeXWidgetData.node.alias}-false`"
+                :input-id="`${cardXNodeXWidgetData?.node.alias}-false`"
                 size="small"
                 value="false"
             />
-            <label for="`${cardXNodeXWidgetData.node.alias}-false`">{{
-                cardXNodeXWidgetData.node.config.falseLabel
+            <label :for="`${cardXNodeXWidgetData?.node.alias}-false`">{{
+                cardXNodeXWidgetData?.node.config.falseLabel
             }}</label>
         </div>
     </RadioButtonGroup>

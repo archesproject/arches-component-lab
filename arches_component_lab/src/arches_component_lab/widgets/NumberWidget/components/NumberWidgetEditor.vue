@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import InputNumber from "primevue/inputnumber";
 
-import type { NumberCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/number/types.ts";
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
+import type {
+    NumberAliasedNodeData,
+    NumberCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/number/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
     value: number | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: number | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: NumberAliasedNodeData,
+    ): void;
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
     emit("update:value", updatedValue);
+    emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));
 }
 </script>
 
@@ -21,18 +31,18 @@ function onUpdateModelValue(updatedValue: number | null) {
     <InputNumber
         :model-value="value"
         :fluid="true"
-        :input-id="cardXNodeXWidgetData.node.alias"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
-        :prefix="cardXNodeXWidgetData.config.prefix ?? ''"
-        :suffix="cardXNodeXWidgetData.config.suffix ?? ''"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
+        :prefix="cardXNodeXWidgetData?.config.prefix ?? ''"
+        :suffix="cardXNodeXWidgetData?.config.suffix ?? ''"
         :min-fraction-digits="
-            Number(cardXNodeXWidgetData.config.precision) || 0
+            Number(cardXNodeXWidgetData?.config.precision) || 0
         "
         :max-fraction-digits="
-            Number(cardXNodeXWidgetData.config.precision) || 0
+            Number(cardXNodeXWidgetData?.config.precision) || 0
         "
-        :min="Number(cardXNodeXWidgetData.config.min) || -Infinity"
-        :max="Number(cardXNodeXWidgetData.config.max) || Infinity"
+        :min="Number(cardXNodeXWidgetData?.config.min) || -Infinity"
+        :max="Number(cardXNodeXWidgetData?.config.max) || Infinity"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

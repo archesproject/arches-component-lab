@@ -1,4 +1,7 @@
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export interface FileReference {
     url: string;
@@ -27,4 +30,9 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
         rerender: boolean;
         label: string;
     };
+}
+
+export interface FileListAliasedNodeData extends AliasedNodeData {
+    node_value: FileReference[] | null;
+    details: FileReference[];
 }

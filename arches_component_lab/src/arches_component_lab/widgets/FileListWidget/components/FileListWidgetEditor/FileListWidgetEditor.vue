@@ -6,7 +6,10 @@ import FileUpload from "primevue/fileupload";
 import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
+import { buildFileListAliasedNodeData } from "@/arches_component_lab/datatypes/file-list/utils.ts";
+
 import type {
+    FileListAliasedNodeData,
     FileListCardXNodeXWidgetData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
@@ -17,18 +20,24 @@ import type {
 
 const { value, cardXNodeXWidgetData } = defineProps<{
     value: FileReference[] | null;
-    cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: FileReference[]): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: FileListAliasedNodeData,
+    ): void;
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 
 const savedFiles = ref<FileReference[]>([]);
 const pendingFiles = ref<FileData[]>([]);
-const maxFiles = ref(cardXNodeXWidgetData.node.config.maxFiles as number);
+const maxFiles = ref(
+    (cardXNodeXWidgetData?.node.config.maxFiles ?? 0) as number,
+);
 
 const isDisabled = computed(() => {
     const totalFiles = savedFiles.value.length + pendingFiles.value.length;
@@ -37,8 +46,8 @@ const isDisabled = computed(() => {
 
 const acceptedFileTypes = computed(() => {
     const fileTypes: string[] = [];
-    const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
-    const imagesOnly = cardXNodeXWidgetData.node.config?.imagesOnly;
+    const acceptedFiles = cardXNodeXWidgetData?.config.acceptedFiles;
+    const imagesOnly = cardXNodeXWidgetData?.node.config?.imagesOnly;
 
     if (acceptedFiles) {
         fileTypes.push(...acceptedFiles.split(","));
@@ -54,7 +63,7 @@ watchEffect(() => {
     if (value) {
         savedFiles.value = value.map((file) => ({
             ...file,
-            node_id: cardXNodeXWidgetData.node.nodeid,
+            node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
         }));
     } else {
         savedFiles.value = [];
@@ -67,6 +76,7 @@ function emitUpdatedValue() {
         ...pendingFiles.value,
     ] as FileReference[];
     emit("update:value", allFiles);
+    emit("update:aliasedNodeData", buildFileListAliasedNodeData(allFiles));
 }
 
 function onSelect(event: { files: PrimeVueFile[] }): void {
@@ -76,7 +86,7 @@ function onSelect(event: { files: PrimeVueFile[] }): void {
         type: file.type,
         url: file.objectURL,
         file: file,
-        node_id: cardXNodeXWidgetData.node.nodeid,
+        node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
     }));
 
     emitUpdatedValue();

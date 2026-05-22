@@ -1,4 +1,7 @@
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export interface NumberCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
@@ -9,4 +12,8 @@ export interface NumberCardXNodeXWidgetData extends CardXNodeXWidgetData {
         step?: number;
         precision?: string | number;
     };
+}
+
+export interface NumberAliasedNodeData extends AliasedNodeData {
+    node_value: number | null;
 }

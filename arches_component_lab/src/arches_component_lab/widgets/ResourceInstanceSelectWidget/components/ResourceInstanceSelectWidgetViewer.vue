@@ -1,21 +1,28 @@
 <script setup lang="ts">
-import { toRef } from "vue";
+import { computed, toRef } from "vue";
 
 import arches from "arches";
 
 import { useResourceDisplayNameResolver } from "@/arches_component_lab/datatypes/resource-instance/useResourceDisplayNameResolver.ts";
 import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance/types";
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
-const props = defineProps<{
+const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
     value: ResourceInstanceReference | null;
-    graphSlug: string;
-    nodeAlias: string;
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: AliasedNodeData | null;
 }>();
 
-const { displayValue, resourceId } = useResourceDisplayNameResolver(
-    toRef(props, "value"),
-    props.graphSlug,
-    props.nodeAlias,
+const { displayValue: resolvedDisplayValue, resourceId } =
+    useResourceDisplayNameResolver(
+        toRef(() => value),
+        graphSlug ?? "",
+        nodeAlias ?? "",
+    );
+
+const displayValue = computed(
+    () => aliasedNodeData?.display_value || resolvedDisplayValue.value,
 );
 </script>
 

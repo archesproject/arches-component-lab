@@ -1,4 +1,7 @@
-import type { CollectionItem } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type {
+    CollectionItem,
+    ConceptAliasedNodeData,
+} from "@/arches_component_lab/datatypes/concept/types.ts";
 
 export function getOption(
     value: string,
@@ -21,6 +24,19 @@ export function getOption(
         options as CollectionItem[],
         (option: CollectionItem) => option.key == value,
     );
+}
+
+export function buildConceptAliasedNodeData(
+    nodeValue: string | null,
+    options: CollectionItem[],
+): ConceptAliasedNodeData {
+    if (!nodeValue) return { node_value: null, display_value: "", details: [] };
+    const option = getOption(nodeValue, options);
+    return {
+        node_value: nodeValue,
+        display_value: option?.label ?? "",
+        details: option ? [option] : [],
+    };
 }
 
 export function flattenCollectionItems(

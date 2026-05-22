@@ -6,10 +6,10 @@ import { Image, Galleria } from "primevue";
 
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types";
 
-const props = defineProps<{ value: FileReference[] | null }>();
+const { value } = defineProps<{ value: FileReference[] | null }>();
 
 const imageData = computed(() => {
-    return props.value?.map((fileReference: FileReference) => {
+    return value?.map((fileReference: FileReference) => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),

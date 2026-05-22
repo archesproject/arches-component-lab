@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
 
-defineProps<{ value: string | null }>();
+const { value } = defineProps<{ value: string | null }>();
 </script>
 
 <template>

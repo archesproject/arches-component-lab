@@ -20,10 +20,14 @@ import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetCon
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
 import type { CSSProperties } from "vue";
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
+    aliasedNodeData,
     cardXNodeXWidgetData,
     cardXNodeXWidgetDataOverrides,
     graphSlug,
@@ -33,6 +37,7 @@ const {
     shouldShowLabel = true,
     value,
 } = defineProps<{
+    aliasedNodeData?: AliasedNodeData | null | undefined;
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
     graphSlug: string;
@@ -48,6 +53,7 @@ const emit = defineEmits([
     "update:isFocused",
     "update:isLoading",
     "update:value",
+    "update:aliasedNodeData",
 ]);
 
 defineOptions({ inheritAttrs: false });
@@ -89,6 +95,9 @@ const widgetComponent = computed(() => {
 });
 
 const widgetNodeValue = computed<unknown>(() => {
+    if (aliasedNodeData !== undefined) {
+        return aliasedNodeData?.node_value ?? null;
+    }
     if (value !== undefined) {
         return value ?? null;
     }
@@ -179,6 +188,7 @@ watchEffect(async () => {
                     :is="widgetComponent"
                     v-bind="attrsForComponent"
                     :key="resolvedCardXNodeXWidgetData.id"
+                    :aliased-node-data="aliasedNodeData"
                     :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                     :graph-slug="graphSlug"
                     :mode="mode"
@@ -186,6 +196,9 @@ watchEffect(async () => {
                     :value="widgetNodeValue"
                     @update:is-loading="isChildLoading = $event"
                     @update:value="onUpdateValue($event)"
+                    @update:aliased-node-data="
+                        emit('update:aliasedNodeData', $event)
+                    "
                 />
             </GenericFormField>
 
@@ -194,12 +207,16 @@ watchEffect(async () => {
                 v-else-if="mode === VIEW"
                 v-bind="attrsForComponent"
                 :key="resolvedCardXNodeXWidgetData.id"
+                :aliased-node-data="aliasedNodeData"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
                 :value="widgetNodeValue"
                 @update:is-loading="isChildLoading = $event"
+                @update:aliased-node-data="
+                    emit('update:aliasedNodeData', $event)
+                "
             />
         </template>
     </div>

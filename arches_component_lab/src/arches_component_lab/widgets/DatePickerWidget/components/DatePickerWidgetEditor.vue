@@ -8,17 +8,24 @@ import {
     convertISO8601DatetimeFormatToPrimevueDatetimeFormat,
     convertViewMode,
 } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
-import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
+import {
+    buildDateAliasedNodeData,
+    formatDate,
+} from "@/arches_component_lab/datatypes/date/utils.ts";
 
-import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
+import type {
+    DateAliasedNodeData,
+    DateDatatypeCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/date/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
     value: string | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string | null): void;
+    (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
 }>();
 
 const shouldShowTime = ref(false);
@@ -45,7 +52,7 @@ const modelDate = computed(() => {
 watchEffect(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            cardXNodeXWidgetData.node.config.dateFormat,
+            cardXNodeXWidgetData?.node.config.dateFormat ?? "",
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
@@ -57,6 +64,7 @@ const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
 ) {
     if (!updatedValue) {
         emit("update:value", null);
+        emit("update:aliasedNodeData", buildDateAliasedNodeData(null));
         return;
     }
 
@@ -65,11 +73,13 @@ const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
     try {
         const formattedDate = formatDate(
             date,
-            cardXNodeXWidgetData.node.config.dateFormat,
+            cardXNodeXWidgetData?.node.config.dateFormat ?? "",
         );
         emit("update:value", formattedDate);
+        emit("update:aliasedNodeData", buildDateAliasedNodeData(formattedDate));
     } catch (_error) {
         emit("update:value", updatedValue);
+        emit("update:aliasedNodeData", buildDateAliasedNodeData(updatedValue));
     }
 }, 900);
 </script>
@@ -79,7 +89,7 @@ const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
         icon-display="input"
         :date-format="dateFormat"
         :fluid="true"
-        :input-id="cardXNodeXWidgetData.node.alias"
+        :input-id="cardXNodeXWidgetData?.node.alias"
         :manual-input="true"
         :show-clear="true"
         :model-value="modelDate"

@@ -4,16 +4,22 @@ import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
+import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
+
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types";
+import type {
+    URLAliasedNodeData,
+    URLNodeValue,
+} from "@/arches_component_lab/datatypes/url/types";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
     value: URLNodeValue | null;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLNodeValue): void;
+    (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -32,10 +38,9 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
 }
 
 function updateValue() {
-    emit("update:value", {
-        url: url.value,
-        url_label: urlLabel.value,
-    });
+    const newNodeValue = { url: url.value, url_label: urlLabel.value };
+    emit("update:value", newNodeValue);
+    emit("update:aliasedNodeData", buildURLAliasedNodeData(newNodeValue));
 }
 </script>
 
@@ -54,7 +59,7 @@ function updateValue() {
         required="true"
         :fluid="true"
         :model-value="url"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
         :placeholder="$gettext('Enter URL...')"
         @update:model-value="onUpdateURLValue($event)"
     />

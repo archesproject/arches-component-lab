@@ -4,6 +4,7 @@ import { computed, ref, watch, watchEffect } from "vue";
 import TreeSelect from "primevue/treeselect";
 
 import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
+import { buildConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeNode } from "primevue/treenode";
@@ -12,17 +13,22 @@ import type {
     CollectionItem,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 
 const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
+    graphSlug?: string;
+    nodeAlias?: string;
     value: string[] | null;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string[] | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ConceptListAliasedNodeData,
+    ): void;
 }>();
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
@@ -56,6 +62,7 @@ watchEffect(() => {
 async function getOptions() {
     try {
         if (optionsLoaded.value) return;
+        if (!graphSlug || !nodeAlias) return;
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult =
@@ -72,13 +79,18 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(selection: Record<string, boolean> | null) {
-    emit("update:value", selection ? Object.keys(selection) : null);
+    const nodeValues = selection ? Object.keys(selection) : null;
+    emit("update:value", nodeValues);
+    emit(
+        "update:aliasedNodeData",
+        buildConceptListAliasedNodeData(nodeValues, options.value ?? []),
+    );
 }
 </script>
 
 <template>
     <TreeSelect
-        :input-id="cardXNodeXWidgetData.node.alias"
+        :input-id="cardXNodeXWidgetData?.node.alias"
         selection-mode="multiple"
         :fluid="true"
         filter
@@ -86,7 +98,7 @@ function onUpdateModelValue(selection: Record<string, boolean> | null) {
         :loading="isLoading"
         :model-value="initialValue"
         :options="options as TreeNode[]"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
         @update:model-value="onUpdateModelValue"
     >
     </TreeSelect>

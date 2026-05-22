@@ -8,6 +8,7 @@ import Select from "primevue/select";
 import ResourceInstanceCreation from "@/arches_component_lab/widgets/components/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { buildResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/utils.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { SelectFilterEvent } from "primevue/select";
@@ -21,14 +22,15 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 import type { AliasedTileData } from "@/arches_component_lab/types";
+import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 const ITEM_SIZE = 36;
 
 const { cardXNodeXWidgetData, nodeAlias, graphSlug, value, defaultTerm } =
     defineProps<{
-        cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
-        nodeAlias: string;
-        graphSlug: string;
+        cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
+        nodeAlias?: string;
+        graphSlug?: string;
         value: ResourceInstanceReference | null;
         defaultTerm?: string;
     }>();
@@ -39,6 +41,10 @@ const emit = defineEmits<{
         updatedValue: ResourceInstanceReference | null,
     ): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ResourceInstanceAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -67,6 +73,7 @@ watchEffect(() => {
 });
 
 async function getOptions(page: number, filterTerm?: string) {
+    if (!graphSlug || !nodeAlias) return;
     try {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
@@ -148,14 +155,26 @@ function onCreateNewResource(graphId: string) {
 function onUpdateModelValue(updatedValue: string | null) {
     selectedValue.value = updatedValue;
     if (updatedValue) {
-        emit("update:value", {
+        const nodeValue: ResourceInstanceReference = {
             inverseOntologyProperty: "",
             ontologyProperty: "",
             resourceId: updatedValue,
             resourceXresourceId: "",
-        });
+        };
+        const displayName =
+            options.value.find((option) => option.resource_id === updatedValue)
+                ?.display_value ?? "";
+        emit("update:value", nodeValue);
+        emit(
+            "update:aliasedNodeData",
+            buildResourceInstanceAliasedNodeData(nodeValue, displayName),
+        );
     } else {
         emit("update:value", null);
+        emit(
+            "update:aliasedNodeData",
+            buildResourceInstanceAliasedNodeData(null, ""),
+        );
     }
 }
 
@@ -177,11 +196,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
-        :label-id="cardXNodeXWidgetData.node.alias"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :label-id="cardXNodeXWidgetData?.node.alias"
         :loading="isLoading"
         :model-value="selectedValue"
         :options="options"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :reset-filter-on-hide="true"
         :show-clear="true"
         :virtual-scroller-options="{
@@ -196,12 +216,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         @update:model-value="onUpdateModelValue($event)"
     >
         <template
-            v-if="cardXNodeXWidgetData.node.config.graphs?.length"
+            v-if="cardXNodeXWidgetData?.node.config.graphs?.length"
             #header
         >
             <div class="create-new-options-header">
                 <div
-                    v-for="graph in cardXNodeXWidgetData.node.config.graphs"
+                    v-for="graph in cardXNodeXWidgetData?.node.config.graphs"
                     :key="graph.graphid"
                     class="create-new-option"
                     @click="onCreateNewResource(graph.graphid)"

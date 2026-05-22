@@ -8,23 +8,37 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FeatureCollection } from "geojson";
 
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;
     renderContext?: string;
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    value: FeatureCollection | null;
+    aliasedNodeData?: AliasedNodeData | null;
+    value?: FeatureCollection | null;
 }>();
 
-const emit = defineEmits([
-    "update:isLoading",
-    "update:value",
-    "update:overlays",
-]);
+const emit = defineEmits<{
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [updatedValue: FeatureCollection];
+    "update:overlays": [];
+    "update:aliasedNodeData": [updatedValue: AliasedNodeData];
+}>();
+
+// aliasedNodeData !== undefined means the caller passed it (even if null);
+// undefined means the prop was omitted, so fall back to the raw value.
+const resolvedNodeValue = computed<FeatureCollection | null>(() => {
+    if (aliasedNodeData !== undefined) {
+        return (
+            (aliasedNodeData?.node_value as FeatureCollection | null) ?? null
+        );
+    }
+    return value ?? null;
+});
 
 const editorRef =
     useTemplateRef<InstanceType<typeof MapWidgetEditor>>("editor");
@@ -39,16 +53,17 @@ defineExpose({
         v-if="mode === EDIT"
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :value="resolvedNodeValue"
         :render-context="renderContext"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
+        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
         @update:overlays="emit('update:overlays')"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :value="resolvedNodeValue"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

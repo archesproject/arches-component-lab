@@ -8,7 +8,7 @@ import type {
 
 const { value, cardXNodeXWidgetData } = defineProps<{
     value: string[] | null;
-    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
 }>();
 
 const displayValue = computed(
@@ -16,7 +16,7 @@ const displayValue = computed(
         value
             ?.map(
                 (id) =>
-                    cardXNodeXWidgetData.node.config.options.find(
+                    (cardXNodeXWidgetData?.node.config.options ?? []).find(
                         (option: DomainOption) => option.id === id,
                     )?.text,
             )

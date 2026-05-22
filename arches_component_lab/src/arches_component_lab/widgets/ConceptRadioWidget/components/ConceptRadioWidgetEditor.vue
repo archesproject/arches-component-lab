@@ -10,27 +10,33 @@ import type {
     CollectionItem,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-import { flattenCollectionItems } from "@/arches_component_lab/datatypes/concept/utils.ts";
+import {
+    buildConceptAliasedNodeData,
+    flattenCollectionItems,
+} from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
+    graphSlug?: string;
+    nodeAlias?: string;
     value: string | null;
-    cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ConceptAliasedNodeData,
+    ): void;
 }>();
 
-let flexDirection: string;
-if (cardXNodeXWidgetData.config.groupDirection === "column") {
-    flexDirection = "flex-column";
-} else {
-    flexDirection = "flex-row";
-}
+const flexDirection =
+    cardXNodeXWidgetData?.config?.groupDirection === "column"
+        ? "flex-column"
+        : "flex-row";
 
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
@@ -49,6 +55,7 @@ watchEffect(() => {
 async function getOptions() {
     try {
         if (optionsLoaded.value) return;
+        if (!graphSlug || !nodeAlias) return;
         isLoading.value = true;
         const fetchedData: ConceptFetchResult =
             await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
@@ -64,14 +71,21 @@ async function getOptions() {
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
-    emit("update:value", updatedValue ?? null);
+    const nodeValue = updatedValue ?? null;
+    emit("update:value", nodeValue);
+    emit(
+        "update:aliasedNodeData",
+        buildConceptAliasedNodeData(nodeValue, options.value),
+    );
 }
 </script>
 
 <template>
     <RadioButtonGroup
+        :id="cardXNodeXWidgetData?.node.alias"
         :model-value="value"
         :class="['button-group', flexDirection]"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue"
     >
         <div

@@ -6,16 +6,18 @@ import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.t
 
 const { value, cardXNodeXWidgetData } = defineProps<{
     value: boolean | null;
-    cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
 }>();
 
 const { $gettext } = useGettext();
 
 const displayValue = computed(() => {
     if (value === true) {
-        return cardXNodeXWidgetData.node.config.trueLabel || $gettext("True");
+        return cardXNodeXWidgetData?.node.config.trueLabel || $gettext("True");
     } else if (value === false) {
-        return cardXNodeXWidgetData.node.config.falseLabel || $gettext("False");
+        return (
+            cardXNodeXWidgetData?.node.config.falseLabel || $gettext("False")
+        );
     }
     return null;
 });

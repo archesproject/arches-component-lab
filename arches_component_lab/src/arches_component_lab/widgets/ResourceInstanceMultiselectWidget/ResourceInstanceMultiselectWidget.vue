@@ -1,22 +1,43 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import ResourceInstanceMultiselectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceMultiselectWidgetEditor.vue";
 import ResourceInstanceMultiselectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceMultiselectWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
+import type {
+    ResourceInstanceListAliasedNodeData,
+    ResourceInstanceReference,
+} from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: ResourceInstanceReference[] | null;
+    nodeAlias?: string;
+    graphSlug?: string;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
+    value?: ResourceInstanceReference[] | null;
 }>();
 
-const emit = defineEmits(["update:isLoading", "update:value"]);
+const emit = defineEmits<{
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [updatedValue: ResourceInstanceReference[]];
+    "update:aliasedNodeData": [
+        updatedValue: ResourceInstanceListAliasedNodeData,
+    ];
+}>();
+
+// aliasedNodeData !== undefined means the caller passed it (even if null);
+// undefined means the prop was omitted, so fall back to the raw value.
+const resolvedNodeValue = computed<ResourceInstanceReference[] | null>(() => {
+    if (aliasedNodeData !== undefined) {
+        return aliasedNodeData?.node_value ?? null;
+    }
+    return value ?? null;
+});
 </script>
 
 <template>
@@ -25,13 +46,15 @@ const emit = defineEmits(["update:isLoading", "update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :value="value"
+        :value="resolvedNodeValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
+        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
-        :value="value"
+        :value="resolvedNodeValue"
+        :aliased-node-data="aliasedNodeData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
     />

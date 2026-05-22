@@ -2,28 +2,44 @@
 import Checkbox from "primevue/checkbox";
 import CheckboxGroup from "primevue/checkboxgroup";
 
-import type { DomainDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/domain/types.ts";
+import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
+
+import type {
+    DomainDatatypeCardXNodeXWidgetData,
+    DomainListAliasedNodeData,
+} from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { value, cardXNodeXWidgetData } = defineProps<{
-    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
     value: string[] | null;
 }>();
 
-const options = cardXNodeXWidgetData.node.config.options;
+const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string[] | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: DomainListAliasedNodeData,
+    ): void;
 }>();
 
 function onUpdateModelValue(updatedValue: string[] | null) {
-    emit("update:value", updatedValue?.length ? updatedValue : null);
+    const nodeValues = updatedValue?.length ? updatedValue : null;
+    emit("update:value", nodeValues);
+    emit(
+        "update:aliasedNodeData",
+        buildDomainListAliasedNodeData(nodeValues, options),
+    );
 }
 </script>
 
 <template>
     <CheckboxGroup
+        :id="cardXNodeXWidgetData?.node.alias"
         :model-value="value ?? []"
         class="button-group"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div

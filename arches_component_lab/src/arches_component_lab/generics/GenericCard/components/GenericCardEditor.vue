@@ -19,6 +19,8 @@ import GenericWidget from "@/arches_component_lab/generics/GenericWidget/Generic
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import type {
+    AliasedData,
+    AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
@@ -63,12 +65,13 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const extractedTileData = extractNodeValues(
-    (tileData?.aliased_data as Record<string, unknown>) || {},
+const originalAliasedNodeDataMap = deepClone(
+    extractAliasedNodeDataEntries(
+        (tileData?.aliased_data as Record<string, unknown>) || {},
+    ),
 );
-const originalAliasedData = deepClone(extractedTileData);
-const aliasedData = reactive<Record<string, unknown>>(
-    deepClone(extractedTileData),
+const aliasedNodeDataMap = reactive<Record<string, AliasedNodeData>>(
+    deepClone(originalAliasedNodeDataMap),
 );
 
 const localWidgetDirtyStates = reactive(
@@ -111,11 +114,11 @@ watch(
 );
 
 watch(
-    aliasedData,
+    aliasedNodeDataMap,
     () => {
         emit("update:tileData", {
             ...tileData,
-            aliased_data: toRaw(aliasedData),
+            aliased_data: toRaw(aliasedNodeDataMap) as AliasedData,
         });
     },
     { deep: true },
@@ -143,10 +146,6 @@ function onUpdateWidgetFocusedState(nodeAlias: string, isFocused: boolean) {
     localWidgetFocusedStates[nodeAlias] = isFocused;
 }
 
-function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
-    aliasedData[nodeAlias] = value;
-}
-
 function resetWidgetDirtyStates() {
     Object.keys(localWidgetDirtyStates).forEach((nodeAlias) => {
         localWidgetDirtyStates[nodeAlias] = false;
@@ -156,13 +155,14 @@ function resetWidgetDirtyStates() {
 function resetForm() {
     resetWidgetDirtyStates();
 
-    const originalAliasedDataClone = deepClone(originalAliasedData);
-
-    Object.assign(aliasedData, originalAliasedDataClone);
+    const originalAliasedNodeDataMapClone = deepClone(
+        originalAliasedNodeDataMap,
+    );
+    Object.assign(aliasedNodeDataMap, originalAliasedNodeDataMapClone);
     formKey.value += 1;
 
     nextTick(() => {
-        emit("reset", originalAliasedDataClone);
+        emit("reset", originalAliasedNodeDataMapClone);
     });
 }
 
@@ -177,18 +177,21 @@ async function save() {
             {
                 ...(tileData as AliasedTileData),
                 aliased_data: toRaw(
-                    aliasedData,
+                    aliasedNodeDataMap,
                 ) as AliasedTileData["aliased_data"],
             },
             tileData?.tileid ? tileData.tileid : undefined,
             resourceInstanceId,
         );
 
-        const freshValues = extractNodeValues(
+        const freshAliasedNodeDataMap = extractAliasedNodeDataEntries(
             updatedTileData.aliased_data as Record<string, unknown>,
         );
-        Object.assign(aliasedData, deepClone(freshValues));
-        Object.assign(originalAliasedData, deepClone(freshValues));
+        Object.assign(aliasedNodeDataMap, deepClone(freshAliasedNodeDataMap));
+        Object.assign(
+            originalAliasedNodeDataMap,
+            deepClone(freshAliasedNodeDataMap),
+        );
 
         resetWidgetDirtyStates();
 
@@ -244,24 +247,35 @@ function deepClone<T>(sourceObject: T): T {
     return JSON.parse(JSON.stringify(sourceObject));
 }
 
-function extractNodeValue(val: unknown): unknown {
-    if (
-        val !== null &&
-        val !== undefined &&
-        typeof val === "object" &&
-        "node_value" in val
-    ) {
-        return (val as { node_value: unknown }).node_value ?? null;
-    }
-    return val ?? null;
+function isAliasedNodeData(value: unknown): value is AliasedNodeData {
+    return (
+        value !== null &&
+        value !== undefined &&
+        typeof value === "object" &&
+        "node_value" in value &&
+        "display_value" in value &&
+        "details" in value
+    );
 }
 
-function extractNodeValues(
+function extractAliasedNodeDataEntries(
     data: Record<string, unknown>,
-): Record<string, unknown> {
+): Record<string, AliasedNodeData> {
     return Object.fromEntries(
-        Object.entries(data).map(([k, v]) => [k, extractNodeValue(v)]),
+        Object.entries(data)
+            .filter(([, rawNodeData]) => isAliasedNodeData(rawNodeData))
+            .map(([nodeAlias, rawNodeData]) => [
+                nodeAlias,
+                rawNodeData as AliasedNodeData,
+            ]),
     );
+}
+
+function onUpdateWidgetAliasedNodeData(
+    nodeAlias: string,
+    nodeData: AliasedNodeData,
+) {
+    aliasedNodeDataMap[nodeAlias] = nodeData;
 }
 </script>
 
@@ -289,6 +303,10 @@ function extractNodeValues(
                     v-if="cardXNodeXWidgetDatum.visible"
                     v-bind="$attrs"
                     ref="genericWidget"
+                    :aliased-node-data="
+                        aliasedNodeDataMap[cardXNodeXWidgetDatum.node.alias] ??
+                        null
+                    "
                     :is-dirty="
                         localWidgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
                     "
@@ -296,7 +314,16 @@ function extractNodeValues(
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
-                    :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
+                    :value="
+                        aliasedNodeDataMap[cardXNodeXWidgetDatum.node.alias]
+                            ?.node_value ?? null
+                    "
+                    @update:aliased-node-data="
+                        onUpdateWidgetAliasedNodeData(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
                     @update:is-dirty="
                         onUpdateWidgetDirtyState(
                             cardXNodeXWidgetDatum.node.alias,
@@ -305,12 +332,6 @@ function extractNodeValues(
                     "
                     @update:is-focused="
                         onUpdateWidgetFocusedState(
-                            cardXNodeXWidgetDatum.node.alias,
-                            $event,
-                        )
-                    "
-                    @update:value="
-                        onUpdateWidgetValue(
                             cardXNodeXWidgetDatum.node.alias,
                             $event,
                         )
