@@ -19,20 +19,18 @@ export function useResourceDisplayNameResolver(
 
     watch(
         nodeValue,
-        async (val) => {
+        async (value) => {
             const requestId = ++latestRequestId;
             resolved.value = null;
-            const resourceId = val?.resourceId ?? null;
-            loading.value = !!resourceId;
-            if (!resourceId) {
-                loading.value = false;
-                return;
-            }
+            loading.value = false;
 
+            if (!value?.resourceId) return;
+
+            loading.value = true;
             const result = await useResourceDisplayNameStore().fetchDisplayName(
                 graphSlug,
                 nodeAlias,
-                resourceId,
+                value.resourceId,
             );
             if (requestId === latestRequestId) {
                 resolved.value = result;
