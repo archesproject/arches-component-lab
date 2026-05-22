@@ -59,12 +59,17 @@ const resourceCreationDialogKey = ref(0);
 const selectedValues = ref<string[]>(
     value
         ?.map(
-            (r) =>
-                r.resourceId ??
-                (r as unknown as { resourceinstanceid?: string })
-                    .resourceinstanceid,
+            (resourceReference) =>
+                resourceReference.resourceId ??
+                (
+                    resourceReference as unknown as {
+                        resourceinstanceid?: string;
+                    }
+                ).resourceinstanceid,
         )
-        .filter((id): id is string => id !== undefined) ?? [],
+        .filter(
+            (resourceId): resourceId is string => resourceId !== undefined,
+        ) ?? [],
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
@@ -124,17 +129,26 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     if (
+        // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
         resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
     ) {
         return;
     }
 
-    if (event && event.last < resourceResultsCurrentCount.value - 1) {
+    if (
+        // if the user has NOT scrolled to the end of the list
+        event &&
+        event.last < resourceResultsCurrentCount.value - 1
+    ) {
         return;
     }
 
-    if (!event && resourceResultsCurrentCount.value > 0) {
+    if (
+        // if the dropdown is opened and we already have data
+        !event &&
+        resourceResultsCurrentCount.value > 0
+    ) {
         return;
     }
 
