@@ -116,7 +116,6 @@ defineExpose({
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
-                :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
                 :resource-instance-id="resourceInstanceId"
                 :selected-node-alias="selectedNodeAlias"
@@ -136,7 +135,6 @@ defineExpose({
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
-                :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
             />
         </template>

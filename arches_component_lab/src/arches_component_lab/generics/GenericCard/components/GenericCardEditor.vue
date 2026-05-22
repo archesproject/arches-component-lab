@@ -21,6 +21,7 @@ import {
     deepClone,
     extractAliasedNodeDataEntries,
 } from "@/arches_component_lab/generics/GenericCard/utils.ts";
+import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
     AliasedData,
@@ -28,12 +29,10 @@ import type {
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
     cardXNodeXWidgetData,
     graphSlug,
-    mode,
     nodegroupAlias,
     resourceInstanceId,
     selectedNodeAlias,
@@ -42,7 +41,6 @@ const {
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
-    mode: WidgetMode;
     nodegroupAlias: string;
     resourceInstanceId: string | null | undefined;
     selectedNodeAlias?: string | null;
@@ -288,7 +286,7 @@ function onUpdateWidgetAliasedNodeData(
                     "
                     :card-x-node-x-widget-data="cardXNodeXWidgetDatum"
                     :graph-slug="graphSlug"
-                    :mode="mode"
+                    :mode="EDIT"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
                     :value="
                         aliasedNodeDataMap[cardXNodeXWidgetDatum.node.alias]
