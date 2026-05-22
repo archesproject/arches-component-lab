@@ -22,12 +22,12 @@ export function useResourceDisplayNamesResolver(
         async (val) => {
             const requestId = ++latestRequestId;
             resolved.value = [];
-            const ids =
+            const resourceInstanceIds =
                 val
                     ?.map((resourceReference) => resourceReference.resourceId)
                     .filter(Boolean) ?? [];
-            loading.value = ids.length > 0;
-            if (!ids.length) {
+            loading.value = resourceInstanceIds.length > 0;
+            if (!resourceInstanceIds.length) {
                 loading.value = false;
                 return;
             }
@@ -36,7 +36,7 @@ export function useResourceDisplayNamesResolver(
                 await useResourceDisplayNameStore().fetchDisplayNames(
                     graphSlug,
                     nodeAlias,
-                    ids,
+                    resourceInstanceIds,
                 );
             if (requestId === latestRequestId) {
                 resolved.value = result;

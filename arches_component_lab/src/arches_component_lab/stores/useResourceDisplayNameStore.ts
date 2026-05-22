@@ -59,9 +59,9 @@ export const useResourceDisplayNameStore = defineStore(
         function fetchDisplayNames(
             graphSlug: string,
             nodeAlias: string,
-            ids: string[],
+            resourceInstanceIds: string[],
         ): Promise<ResourceInstanceListOption[]> {
-            const key = `${graphSlug}:${nodeAlias}:${[...ids].sort().join(",")}`;
+            const key = `${graphSlug}:${nodeAlias}:${[...resourceInstanceIds].sort().join(",")}`;
             if (!listCache.has(key)) {
                 listCache.set(
                     key,
@@ -70,7 +70,7 @@ export const useResourceDisplayNameStore = defineStore(
                         nodeAlias,
                         1,
                         undefined,
-                        ids,
+                        resourceInstanceIds,
                     ).then((data) =>
                         (
                             data.data as {
