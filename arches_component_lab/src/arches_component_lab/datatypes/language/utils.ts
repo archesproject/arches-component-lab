@@ -9,6 +9,6 @@ export function buildLanguageAliasedNodeData(
     return {
         node_value: nodeValue,
         display_value: language?.name ?? nodeValue ?? "",
-        details: language ? [language] : [],
+        details: [],
     };
 }

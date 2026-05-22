@@ -34,5 +34,5 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
 
 export interface FileListAliasedNodeData extends AliasedNodeData {
     node_value: FileReference[] | null;
-    details: FileReference[];
+    details: never[];
 }

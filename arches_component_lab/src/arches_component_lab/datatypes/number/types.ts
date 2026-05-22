@@ -16,4 +16,5 @@ export interface NumberCardXNodeXWidgetData extends CardXNodeXWidgetData {
 
 export interface NumberAliasedNodeData extends AliasedNodeData {
     node_value: number | null;
+    details: never[];
 }

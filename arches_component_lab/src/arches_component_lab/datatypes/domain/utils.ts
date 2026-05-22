@@ -12,7 +12,7 @@ export function buildDomainAliasedNodeData(
     return {
         node_value: nodeValue,
         display_value: option?.text ?? "",
-        details: option ? [option] : [],
+        details: [],
     };
 }
 
@@ -26,6 +26,6 @@ export function buildDomainListAliasedNodeData(
     return {
         node_value: nodeValues,
         display_value: selectedOptions.map((opt) => opt.text).join(", "),
-        details: selectedOptions,
+        details: [],
     };
 }

@@ -7,4 +7,5 @@ export interface URLNodeValue {
 
 export interface URLAliasedNodeData extends AliasedNodeData {
     node_value: URLNodeValue | null;
+    details: never[];
 }

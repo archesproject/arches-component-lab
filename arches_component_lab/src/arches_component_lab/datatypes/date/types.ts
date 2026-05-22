@@ -18,4 +18,5 @@ export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
 
 export interface DateAliasedNodeData extends AliasedNodeData {
     node_value: string | null;
+    details: never[];
 }

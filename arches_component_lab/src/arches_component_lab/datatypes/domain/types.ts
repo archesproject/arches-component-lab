@@ -20,10 +20,10 @@ export interface DomainOption {
 
 export interface DomainAliasedNodeData extends AliasedNodeData {
     node_value: string | null;
-    details: DomainOption[];
+    details: never[];
 }
 
 export interface DomainListAliasedNodeData extends AliasedNodeData {
     node_value: string[] | null;
-    details: DomainOption[];
+    details: never[];
 }

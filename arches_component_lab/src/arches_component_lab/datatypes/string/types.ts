@@ -7,4 +7,5 @@ export interface LanguageValue {
 
 export interface StringAliasedNodeData extends AliasedNodeData {
     node_value: Record<string, LanguageValue> | null;
+    details: never[];
 }

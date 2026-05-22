@@ -9,6 +9,6 @@ export function buildFileListAliasedNodeData(
     return {
         node_value: nodeValue,
         display_value: nodeValue?.map((file) => file.name).join(", ") ?? "",
-        details: nodeValue ?? [],
+        details: [],
     };
 }
