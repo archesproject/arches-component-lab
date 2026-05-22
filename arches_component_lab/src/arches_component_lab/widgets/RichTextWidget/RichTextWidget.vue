@@ -47,6 +47,7 @@ const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
     />
     <RichTextWidgetViewer
         v-if="mode === VIEW"
+        :value="resolvedNodeValue"
         :aliased-node-data="aliasedNodeData ?? null"
     />
 </template>
