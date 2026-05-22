@@ -60,7 +60,13 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const selectedValue = ref<string | null>(value?.resourceId ?? null);
+const normalizedValue = Array.isArray(value) ? value[0] ?? null : value;
+const selectedValue = ref<string | null>(
+    normalizedValue?.resourceId ??
+        (normalizedValue as unknown as { resourceinstanceid?: string })
+            ?.resourceinstanceid ??
+        null,
+);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
