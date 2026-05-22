@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 import Editor from "primevue/editor";
 import Select from "primevue/select";
 
-import FocusController from "./components/FocusController.vue";
+import FocusController from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";

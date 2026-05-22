@@ -24,6 +24,7 @@ import type {
 import type { AliasedTileData } from "@/arches_component_lab/types";
 import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
+// in future iteration these may be declared in the CardXNodeXWidgetData config
 const ITEM_SIZE = 36;
 
 const { cardXNodeXWidgetData, nodeAlias, graphSlug, value, defaultTerm } =
@@ -131,17 +132,26 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     }
 
     if (
+        // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
         resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
     ) {
         return;
     }
 
-    if (event && event.last < resourceResultsCurrentCount.value - 1) {
+    if (
+        // if the user has NOT scrolled to the end of the list
+        event &&
+        event.last < resourceResultsCurrentCount.value - 1
+    ) {
         return;
     }
 
-    if (!event && resourceResultsCurrentCount.value > 0) {
+    if (
+        // if the dropdown is opened and we already have data
+        !event &&
+        resourceResultsCurrentCount.value > 0
+    ) {
         return;
     }
 
