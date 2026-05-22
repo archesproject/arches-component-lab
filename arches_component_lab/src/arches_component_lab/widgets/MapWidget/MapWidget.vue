@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FeatureCollection } from "geojson";
 
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -18,7 +18,7 @@ const { aliasedNodeData, value } = defineProps<{
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    aliasedNodeData?: AliasedNodeData | null;
+    aliasedNodeData?: GeoJSONFeatureCollectionAliasedNodeData | null;
     value?: FeatureCollection | null;
 }>();
 
@@ -26,16 +26,16 @@ const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
     "update:value": [updatedValue: FeatureCollection];
     "update:overlays": [];
-    "update:aliasedNodeData": [updatedValue: AliasedNodeData];
+    "update:aliasedNodeData": [
+        updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
+    ];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
 // undefined means the prop was omitted, so fall back to the raw value.
 const resolvedNodeValue = computed<FeatureCollection | null>(() => {
     if (aliasedNodeData !== undefined) {
-        return (
-            (aliasedNodeData?.node_value as FeatureCollection | null) ?? null
-        );
+        return aliasedNodeData?.node_value ?? null;
     }
     return value ?? null;
 });
