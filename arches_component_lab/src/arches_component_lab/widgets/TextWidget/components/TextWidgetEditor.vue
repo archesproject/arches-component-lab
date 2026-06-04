@@ -4,7 +4,9 @@ import { useGettext } from "vue3-gettext";
 
 import InputText from "primevue/inputtext";
 import Select from "primevue/select";
+import Textarea from "primevue/textarea";
 
+import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/TextWidget/constants.ts";
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
@@ -17,9 +19,10 @@ import type {
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, value, renderContext } = defineProps<{
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     value: Record<string, LanguageValue> | null;
+    renderContext?: string;
 }>();
 
 const emit = defineEmits<{
@@ -101,7 +104,20 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
         />
+        <Textarea
+            v-if="renderContext === MULTILINE_RENDER_CONTEXT"
+            :auto-resize="true"
+            :fluid="true"
+            :maxlength="cardXNodeXWidgetData?.config.maxLength ?? undefined"
+            :model-value="singleInputValue"
+            :placeholder="cardXNodeXWidgetData?.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
+            :required="cardXNodeXWidgetData?.node.isrequired"
+            rows="4"
+            @update:model-value="onUpdateModelValue($event)"
+        />
         <InputText
+            v-else
             type="text"
             :fluid="true"
             :maxlength="cardXNodeXWidgetData?.config.maxLength ?? undefined"

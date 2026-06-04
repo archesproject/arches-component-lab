@@ -20,6 +20,7 @@ const { aliasedNodeData, value } = defineProps<{
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     aliasedNodeData?: StringAliasedNodeData | null;
     value?: Record<string, LanguageValue> | null;
+    renderContext?: string;
 }>();
 
 const emit = defineEmits<{
@@ -42,6 +43,7 @@ const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="resolvedNodeValue"
+        :render-context="renderContext"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
     />

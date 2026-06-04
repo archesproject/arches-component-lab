@@ -30,6 +30,12 @@ export interface Node {
     };
 }
 
+export interface NodeGroup {
+    nodegroupid: string;
+    parentnodegroup_id: string | null;
+    cardinality: string;
+}
+
 export interface Card {
     name: string;
     sortorder: number;
@@ -41,7 +47,7 @@ export interface Card {
 export interface CardXNodeXWidgetData {
     card: Card;
     config: {
-        defaultValue: unknown | null;
+        defaultValue?: unknown | null;
         placeholder?: string;
     };
     id: string;
