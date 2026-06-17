@@ -123,6 +123,18 @@ watchEffect(async () => {
         isLoading.value = false;
     }
 });
+
+function handleWidgetValueUpdate(nodeValue: unknown) {
+    emit("update:value", nodeValue);
+}
+
+function handleWidgetAliasedNodeDataUpdate(
+    nodeData: AliasedNodeData,
+    onUpdateValue: (value: unknown) => void,
+) {
+    onUpdateValue(nodeData);
+    emit("update:aliasedNodeData", nodeData);
+}
 </script>
 
 <template>
@@ -154,11 +166,10 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :value="widgetNodeValue"
+                :value="aliasedNodeData ?? widgetNodeValue"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
-                @update:value="emit('update:value', $event)"
             >
                 <component
                     :is="widgetComponent"
@@ -171,9 +182,9 @@ watchEffect(async () => {
                     :node-alias="nodeAlias"
                     :value="widgetNodeValue"
                     @update:is-loading="isChildLoading = $event"
-                    @update:value="onUpdateValue($event)"
+                    @update:value="handleWidgetValueUpdate($event)"
                     @update:aliased-node-data="
-                        emit('update:aliasedNodeData', $event)
+                        handleWidgetAliasedNodeDataUpdate($event, onUpdateValue)
                     "
                 />
             </GenericFormField>
