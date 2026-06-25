@@ -52,9 +52,7 @@ watchEffect(async () => {
         }) ?? response.languages[0];
 });
 
-watch(languages, () => {
-    const workingObject = { ...aliasedNodeData?.node_value };
-
+const ensureLanguages = (workingObject: any) => {
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -63,17 +61,33 @@ watch(languages, () => {
             };
         }
     }
+};
 
-    managedNodeValue.value = workingObject;
-});
 
-watch(selectedLanguage, () => {
+const setCurrentValue = () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
             managedNodeValue.value[selectedLanguage.value.code].value ?? "";
     } else {
         singleInputValue.value = "";
     }
+};
+
+watch(languages, () => {
+    const workingObject = { ...aliasedNodeData?.node_value };
+    ensureLanguages(workingObject);
+    managedNodeValue.value = workingObject;
+});
+
+watch(selectedLanguage, () => {
+    setCurrentValue()
+});
+
+watch(() => aliasedNodeData, () => {
+    const workingObject = { ...aliasedNodeData?.node_value };
+    ensureLanguages(workingObject);
+    managedNodeValue.value = workingObject;
+    setCurrentValue()
 });
 
 function onUpdateModelValue(updatedValue: string | undefined) {
