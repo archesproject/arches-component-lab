@@ -63,7 +63,6 @@ const ensureLanguages = (workingObject: any) => {
     }
 };
 
-
 const setCurrentValue = () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
@@ -80,15 +79,18 @@ watch(languages, () => {
 });
 
 watch(selectedLanguage, () => {
-    setCurrentValue()
+    setCurrentValue();
 });
 
-watch(() => aliasedNodeData, () => {
-    const workingObject = { ...aliasedNodeData?.node_value };
-    ensureLanguages(workingObject);
-    managedNodeValue.value = workingObject;
-    setCurrentValue()
-});
+watch(
+    () => aliasedNodeData,
+    () => {
+        const workingObject = { ...aliasedNodeData?.node_value };
+        ensureLanguages(workingObject);
+        managedNodeValue.value = workingObject;
+        setCurrentValue();
+    },
+);
 
 function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
