@@ -13,6 +13,7 @@ import type {
 } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
 import FocusController from "./components/FocusController.vue";
+import type { LanguageValue } from '../../../../datatypes/string/types.ts';
 
 const { $gettext } = useGettext();
 
@@ -52,7 +53,7 @@ watchEffect(async () => {
         }) ?? response.languages[0];
 });
 
-const ensureLanguages = (workingObject: any) => {
+const ensureLanguages = (workingObject: Record<string, LanguageValue>) => {
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
