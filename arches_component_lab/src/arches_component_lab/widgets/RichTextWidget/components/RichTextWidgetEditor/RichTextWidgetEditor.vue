@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Editor from "primevue/editor";
