@@ -13,7 +13,7 @@ import type {
 } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
 import FocusController from "./components/FocusController.vue";
-import type { LanguageValue } from '../../../../datatypes/string/types.ts';
+import type { LanguageValue } from "../../../../datatypes/string/types.ts";
 
 const { $gettext } = useGettext();
 
