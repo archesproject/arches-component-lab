@@ -12,8 +12,7 @@ import type {
     Language,
 } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
-import FocusController from "./components/FocusController.vue";
-import type { LanguageValue } from "../../../../datatypes/string/types.ts";
+import FocusController from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
 
 const { $gettext } = useGettext();
 
@@ -48,12 +47,13 @@ watchEffect(async () => {
     languages.value = response.languages;
 
     selectedLanguage.value =
-        languages.value.find((lang) => {
+        languages.value.find((lang: Language) => {
             return lang.code === response.request_language;
         }) ?? response.languages[0];
 });
 
-const ensureLanguages = (workingObject: Record<string, LanguageValue>) => {
+watchEffect(() => {
+    const workingObject = { ...aliasedNodeData?.node_value };
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -62,36 +62,15 @@ const ensureLanguages = (workingObject: Record<string, LanguageValue>) => {
             };
         }
     }
-};
+    managedNodeValue.value = workingObject;
 
-const setCurrentValue = () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
             managedNodeValue.value[selectedLanguage.value.code].value ?? "";
     } else {
         singleInputValue.value = "";
     }
-};
-
-watch(languages, () => {
-    const workingObject = { ...aliasedNodeData?.node_value };
-    ensureLanguages(workingObject);
-    managedNodeValue.value = workingObject;
 });
-
-watch(selectedLanguage, () => {
-    setCurrentValue();
-});
-
-watch(
-    () => aliasedNodeData,
-    () => {
-        const workingObject = { ...aliasedNodeData?.node_value };
-        ensureLanguages(workingObject);
-        managedNodeValue.value = workingObject;
-        setCurrentValue();
-    },
-);
 
 function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
