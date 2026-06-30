@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
@@ -18,7 +19,12 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
 }>();
+
+onMounted(() => {
+    emit("initialized", buildBooleanAliasedNodeData(value));
+});
 
 function onUpdateModelValue(updatedValue: string | null) {
     let booleanValue: boolean | null;

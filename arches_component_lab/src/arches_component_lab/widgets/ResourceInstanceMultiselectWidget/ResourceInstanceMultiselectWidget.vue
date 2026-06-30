@@ -28,6 +28,7 @@ const emit = defineEmits<{
     "update:aliasedNodeData": [
         updatedValue: ResourceInstanceListAliasedNodeData,
     ];
+    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -50,6 +51,7 @@ const resolvedNodeValue = computed<ResourceInstanceReference[] | null>(() => {
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"

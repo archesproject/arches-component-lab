@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
@@ -20,12 +20,20 @@ const { cardXNodeXWidgetData, value } = defineProps<{
 const emit = defineEmits<{
     (event: "update:value", updatedValue: URLNodeValue): void;
     (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
+    (event: "initialized", updatedValue: URLAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
 
 const urlLabel = ref(value?.url_label ?? "");
 const url = ref(value?.url ?? "");
+
+onMounted(() => {
+    emit(
+        "initialized",
+        buildURLAliasedNodeData({ url: url.value, url_label: urlLabel.value }),
+    );
+});
 
 function onUpdateURLValue(updatedValue: string | undefined) {
     url.value = updatedValue ?? "";

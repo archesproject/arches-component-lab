@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { useTemplateRef, watchEffect } from "vue";
+import { ref, useTemplateRef, watchEffect } from "vue";
 
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
+
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 type FormFieldType = {
     field: {
@@ -13,31 +15,38 @@ type FormFieldType = {
         };
         errors: Array<{ message: string }>;
         props: {
-            onChange: (event: { value: unknown }) => void;
+            onChange: (event: { value: AliasedNodeData }) => void;
         };
     };
 };
 
-const { isDirty, nodeAlias, value } = defineProps<{
+const { isDirty, nodeAlias } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    value: unknown;
 }>();
 
 const emit = defineEmits<{
-    (e: "update:value", newValue: unknown): void;
+    (e: "update:aliasedNodeData", newValue: AliasedNodeData): void;
     (e: "update:isDirty", dirty: boolean): void;
+    (e: "initialized"): void;
 }>();
 
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
-
-const initialValue = value;
+const isInitialized = ref(false);
+const resolvedInitialValue = ref<AliasedNodeData | null>(null);
 
 watchEffect(() => {
     if (isDirty) {
         markFormFieldAsDirty();
     }
 });
+
+function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
+    if (isInitialized.value) return;
+    resolvedInitialValue.value = aliasedNodeData;
+    isInitialized.value = true;
+    emit("initialized");
+}
 
 function markFormFieldAsDirty() {
     if (!formFieldRef.value) {
@@ -58,29 +67,29 @@ function validate(_value: FormFieldResolverOptions): string[] {
     return [];
 }
 
-function onUpdateValue(updatedNodeValue: unknown) {
-    if (value === updatedNodeValue) {
-        return;
-    }
-
+function onUpdateAliasedNodeData(aliasedNodeData: AliasedNodeData) {
     formFieldRef.value?.field?.props?.onChange({
-        value: updatedNodeValue,
+        value: aliasedNodeData,
     });
 
-    emit("update:value", updatedNodeValue);
+    emit("update:aliasedNodeData", aliasedNodeData);
     emit("update:isDirty", true);
 }
 </script>
 
 <template>
-    <slot :on-update-value="onUpdateValue" />
+    <slot
+        :on-widget-initialized="onWidgetInitialized"
+        :on-update-aliased-node-data="onUpdateAliasedNodeData"
+    />
 
     <FormField
+        v-if="isInitialized"
         ref="formField"
         v-slot="$field"
         :name="nodeAlias"
         :resolver="resolver"
-        :initial-value="initialValue"
+        :initial-value="resolvedInitialValue"
     >
         <Message
             v-for="error in $field.errors"

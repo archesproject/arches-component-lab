@@ -25,6 +25,7 @@ const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];
     "update:value": [updatedValue: number | null];
     "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
+    initialized: [updatedValue: NumberAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -44,6 +45,7 @@ const resolvedNodeValue = computed<number | null>(() => {
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <NumberWidgetViewer
         v-if="mode === VIEW"

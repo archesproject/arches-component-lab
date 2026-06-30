@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import ToggleSwitch from "primevue/toggleswitch";
 
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
@@ -17,7 +18,12 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
 }>();
+
+onMounted(() => {
+    emit("initialized", buildBooleanAliasedNodeData(value));
+});
 
 function onUpdateModelValue(updatedValue: boolean | null) {
     emit("update:value", updatedValue);

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import Checkbox from "primevue/checkbox";
 import CheckboxGroup from "primevue/checkboxgroup";
 
@@ -22,7 +23,12 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: DomainListAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: DomainListAliasedNodeData): void;
 }>();
+
+onMounted(() => {
+    emit("initialized", buildDomainListAliasedNodeData(value, options));
+});
 
 function onUpdateModelValue(updatedValue: string[] | null) {
     const nodeValues = updatedValue?.length ? updatedValue : null;

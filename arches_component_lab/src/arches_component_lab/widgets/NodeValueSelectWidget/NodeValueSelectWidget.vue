@@ -22,6 +22,7 @@ const { aliasedNodeData, value } = defineProps<{
 const emit = defineEmits<{
     "update:value": [updatedValue: string];
     "update:aliasedNodeData": [updatedValue: NodeValueAliasedNodeData];
+    initialized: [updatedValue: NodeValueAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -39,6 +40,7 @@ const resolvedNodeValue = computed<string | null>(() => {
         v-if="mode === EDIT"
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <NodeValueSelectWidgetViewer
         v-if="mode === VIEW"

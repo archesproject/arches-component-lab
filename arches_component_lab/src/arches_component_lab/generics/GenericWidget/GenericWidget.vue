@@ -58,11 +58,28 @@ defineOptions({ inheritAttrs: false });
 
 const isLoading = ref(false);
 const isChildLoading = ref(false);
+const isWidgetInitialized = ref(false);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
 const isCombinedLoading = computed(
     () => isLoading.value || isChildLoading.value,
+);
+
+const shouldShowSkeleton = computed(
+    () =>
+        isLoading.value ||
+        (mode === EDIT &&
+            resolvedCardXNodeXWidgetData.value &&
+            !isWidgetInitialized.value),
+);
+
+const shouldShowWidget = computed(
+    () =>
+        !isLoading.value &&
+        !configurationError.value &&
+        widgetComponent.value &&
+        resolvedCardXNodeXWidgetData.value,
 );
 
 const widgetComponent = computed(() => {
@@ -94,6 +111,13 @@ const widgetNodeValue = computed<unknown>(() => {
 watch(isCombinedLoading, (newValue) => {
     emit("update:isLoading", newValue);
 });
+
+watch(
+    () => resolvedCardXNodeXWidgetData.value?.id,
+    () => {
+        isWidgetInitialized.value = false;
+    },
+);
 
 watchEffect(async () => {
     if (resolvedCardXNodeXWidgetData.value) {
@@ -134,57 +158,67 @@ watchEffect(async () => {
         @focusout="() => emit('update:isFocused', false)"
     >
         <Skeleton
-            v-if="isLoading"
+            v-if="shouldShowSkeleton"
             style="height: 2rem"
         />
         <Message
-            v-else-if="configurationError"
+            v-if="!isLoading && configurationError"
             severity="error"
             size="small"
         >
             {{ configurationError.message }}
         </Message>
-        <template v-else-if="widgetComponent && resolvedCardXNodeXWidgetData">
+        <template v-if="shouldShowWidget">
             <GenericWidgetLabel
                 v-if="shouldShowLabel"
                 :mode="mode"
-                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
+                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData!"
             />
 
             <GenericFormField
                 v-if="mode === EDIT"
-                v-slot="{ onUpdateValue }"
-                :value="widgetNodeValue"
+                v-slot="{ onWidgetInitialized, onUpdateAliasedNodeData }"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
-                @update:value="emit('update:value', $event)"
+                @update:aliased-node-data="
+                    emit('update:aliasedNodeData', $event)
+                "
+                @initialized="isWidgetInitialized = true"
             >
-                <component
-                    :is="widgetComponent"
-                    v-bind="$attrs"
-                    :key="resolvedCardXNodeXWidgetData.id"
-                    :aliased-node-data="aliasedNodeData"
-                    :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
-                    :graph-slug="graphSlug"
-                    :mode="mode"
-                    :node-alias="nodeAlias"
-                    :value="widgetNodeValue"
-                    @update:is-loading="isChildLoading = $event"
-                    @update:value="onUpdateValue($event)"
-                    @update:aliased-node-data="
-                        emit('update:aliasedNodeData', $event)
-                    "
-                />
+                <div
+                    v-show="isWidgetInitialized"
+                    style="display: contents"
+                >
+                    <component
+                        :is="widgetComponent"
+                        v-bind="$attrs"
+                        :key="resolvedCardXNodeXWidgetData!.id"
+                        :aliased-node-data="aliasedNodeData"
+                        :card-x-node-x-widget-data="
+                            resolvedCardXNodeXWidgetData!
+                        "
+                        :graph-slug="graphSlug"
+                        :mode="mode"
+                        :node-alias="nodeAlias"
+                        :value="widgetNodeValue"
+                        @update:is-loading="isChildLoading = $event"
+                        @update:value="emit('update:value', $event)"
+                        @update:aliased-node-data="
+                            onUpdateAliasedNodeData($event)
+                        "
+                        @initialized="onWidgetInitialized($event)"
+                    />
+                </div>
             </GenericFormField>
 
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
                 v-bind="$attrs"
-                :key="resolvedCardXNodeXWidgetData.id"
+                :key="resolvedCardXNodeXWidgetData!.id"
                 :aliased-node-data="aliasedNodeData"
-                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
+                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData!"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"

@@ -29,6 +29,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: ConceptListAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
 }>();
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
@@ -74,6 +75,12 @@ async function getOptions() {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (!optionsLoaded.value) {
+            emit(
+                "initialized",
+                buildConceptListAliasedNodeData(value, options.value ?? []),
+            );
+        }
         optionsLoaded.value = true;
     }
 }

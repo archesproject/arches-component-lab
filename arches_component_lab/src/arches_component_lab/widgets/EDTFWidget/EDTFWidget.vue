@@ -23,6 +23,7 @@ const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];
     "update:value": [updatedValue: string];
     "update:aliasedNodeData": [updatedValue: EDTFAliasedNodeData];
+    initialized: [updatedValue: EDTFAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -42,6 +43,7 @@ const resolvedNodeValue = computed<string | null>(() => {
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"

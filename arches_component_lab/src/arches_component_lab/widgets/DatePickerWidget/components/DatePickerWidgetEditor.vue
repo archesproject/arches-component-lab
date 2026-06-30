@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watchEffect } from "vue";
 
 import { debounce } from "es-toolkit/function";
 import DatePicker from "primevue/datepicker";
@@ -26,6 +26,7 @@ const { cardXNodeXWidgetData, value } = defineProps<{
 const emit = defineEmits<{
     (event: "update:value", updatedValue: string | null): void;
     (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
+    (event: "initialized", updatedValue: DateAliasedNodeData): void;
 }>();
 
 const shouldShowTime = ref(false);
@@ -57,6 +58,10 @@ watchEffect(() => {
 
     dateFormat.value = convertedDateFormat.dateFormat;
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
+});
+
+onMounted(() => {
+    emit("initialized", buildDateAliasedNodeData(value));
 });
 
 const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(

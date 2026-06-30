@@ -25,6 +25,7 @@ const { aliasedNodeData, value } = defineProps<{
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue>];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
+    initialized: [updatedValue: StringAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -44,6 +45,7 @@ const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <RichTextWidgetViewer
         v-if="mode === VIEW"

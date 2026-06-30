@@ -23,6 +23,7 @@ const { aliasedNodeData, value } = defineProps<{
 const emit = defineEmits<{
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: NonLocalizedTextAliasedNodeData];
+    initialized: [updatedValue: NonLocalizedTextAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -43,6 +44,7 @@ const resolvedNodeValue = computed<string | null>(() => {
         :render-context="renderContext"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <NonLocalizedTextWidgetViewer
         v-if="mode === VIEW"

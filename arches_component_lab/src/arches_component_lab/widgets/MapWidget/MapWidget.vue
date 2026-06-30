@@ -29,6 +29,7 @@ const emit = defineEmits<{
     "update:aliasedNodeData": [
         updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
     ];
+    initialized: [updatedValue: GeoJSONFeatureCollectionAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -59,6 +60,7 @@ defineExpose({
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
         @update:overlays="emit('update:overlays')"
+        @initialized="emit('initialized', $event)"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"

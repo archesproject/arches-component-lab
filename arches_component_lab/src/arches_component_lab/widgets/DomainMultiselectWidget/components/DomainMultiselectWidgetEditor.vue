@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import MultiSelect from "primevue/multiselect";
 
 import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
@@ -21,7 +22,12 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: DomainListAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: DomainListAliasedNodeData): void;
 }>();
+
+onMounted(() => {
+    emit("initialized", buildDomainListAliasedNodeData(value, options));
+});
 
 function onUpdateModelValue(updatedValue: string[] | null) {
     const nodeValues = updatedValue?.length ? updatedValue : null;

@@ -25,10 +25,12 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: LanguageAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
 }>();
 
 const languages: Ref<Language[] | null> = ref<Language[] | null>(null);
 const isLoading = ref(false);
+const hasInitialized = ref(false);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -45,6 +47,13 @@ watchEffect(async () => {
         languages.value = response.languages;
     } finally {
         isLoading.value = false;
+        if (!hasInitialized.value) {
+            hasInitialized.value = true;
+            emit(
+                "initialized",
+                buildLanguageAliasedNodeData(value, languages.value ?? []),
+            );
+        }
     }
 });
 

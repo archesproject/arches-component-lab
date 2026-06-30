@@ -25,6 +25,7 @@ const { aliasedNodeData, value } = defineProps<{
 const emit = defineEmits<{
     "update:value": [updatedValue: FileReference[]];
     "update:aliasedNodeData": [updatedValue: FileListAliasedNodeData];
+    initialized: [updatedValue: FileListAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -44,6 +45,7 @@ const resolvedNodeValue = computed<FileReference[] | null>(() => {
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"

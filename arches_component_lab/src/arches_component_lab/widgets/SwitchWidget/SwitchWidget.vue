@@ -22,6 +22,7 @@ const { aliasedNodeData, value } = defineProps<{
 const emit = defineEmits<{
     "update:value": [updatedValue: boolean | null];
     "update:aliasedNodeData": [updatedValue: BooleanAliasedNodeData];
+    initialized: [updatedValue: BooleanAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -41,6 +42,7 @@ const resolvedNodeValue = computed<boolean | null>(() => {
         :value="resolvedNodeValue"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <SwitchWidgetViewer
         v-if="mode === VIEW"

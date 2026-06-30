@@ -46,6 +46,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: ResourceInstanceAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: ResourceInstanceAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -70,6 +71,7 @@ const selectedValue = ref<string | null>(
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
+const hasInitialized = ref(false);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -122,6 +124,20 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = false;
         if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
+        }
+        if (page === 1 && !hasInitialized.value) {
+            hasInitialized.value = true;
+            const displayName =
+                options.value.find(
+                    (option) => option.resource_id === selectedValue.value,
+                )?.display_value ?? "";
+            emit(
+                "initialized",
+                buildResourceInstanceAliasedNodeData(
+                    normalizedValue,
+                    displayName,
+                ),
+            );
         }
     }
 }

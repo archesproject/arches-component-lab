@@ -41,6 +41,10 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: ResourceInstanceListAliasedNodeData,
     ): void;
+    (
+        event: "initialized",
+        updatedValue: ResourceInstanceListAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -73,6 +77,7 @@ const selectedValues = ref<string[]>(
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
+const hasInitialized = ref(false);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -119,6 +124,32 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = false;
         if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
+        }
+        if (page === 1 && !hasInitialized.value) {
+            hasInitialized.value = true;
+            const resolvedOptions = selectedValues.value
+                .map((selectedId) =>
+                    options.value.find(
+                        (option) => option.resource_id === selectedId,
+                    ),
+                )
+                .filter(
+                    (option): option is ResourceInstanceListOption =>
+                        option !== undefined,
+                );
+            const nodeValues = selectedValues.value.map((selectedId) => ({
+                inverseOntologyProperty: "",
+                ontologyProperty: "",
+                resourceId: selectedId,
+                resourceXresourceId: "",
+            }));
+            emit(
+                "initialized",
+                buildResourceInstanceListAliasedNodeData(
+                    nodeValues,
+                    resolvedOptions,
+                ),
+            );
         }
     }
 }

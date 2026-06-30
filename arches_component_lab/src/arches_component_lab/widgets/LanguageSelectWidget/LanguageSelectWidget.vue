@@ -23,6 +23,7 @@ const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: LanguageAliasedNodeData];
+    initialized: [updatedValue: LanguageAliasedNodeData];
 }>();
 
 // aliasedNodeData !== undefined means the caller passed it (even if null);
@@ -43,6 +44,7 @@ const resolvedNodeValue = computed<string | null>(() => {
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @initialized="emit('initialized', $event)"
     />
     <LanguageSelectWidgetViewer
         v-if="mode === VIEW"

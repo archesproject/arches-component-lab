@@ -93,6 +93,10 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
     ): void;
+    (
+        event: "initialized",
+        updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -231,6 +235,12 @@ onMounted(async () => {
     });
 
     await loadMapData();
+    emit(
+        "initialized",
+        buildGeoJSONFeatureCollectionAliasedNodeData(
+            value ?? { type: "FeatureCollection", features: [] },
+        ),
+    );
 });
 
 onUnmounted(() => {
