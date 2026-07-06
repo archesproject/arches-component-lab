@@ -13,10 +13,11 @@ import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetCon
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
+    AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { GenericCardProps } from "./types.ts";
 
 const {
     mode,
@@ -27,24 +28,15 @@ const {
     shouldShowFormButtons = true,
     tileData,
     tileId,
-} = defineProps<{
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    graphSlug: string;
-    resourceInstanceId?: string | null;
-    selectedNodeAlias?: string | null;
-    shouldShowFormButtons?: boolean;
-    tileData?: AliasedTileData;
-    tileId?: string | null;
-}>();
+} = defineProps<GenericCardProps>();
 
-const emit = defineEmits([
-    "update:tileData",
-    "update:widgetDirtyStates",
-    "update:widgetFocusStates",
-    "save",
-    "reset",
-]);
+const emit = defineEmits<{
+    "update:tileData": [tileData: AliasedTileData];
+    "update:widgetDirtyStates": [widgetDirtyStates: Record<string, boolean>];
+    "update:widgetFocusStates": [widgetFocusStates: Record<string, boolean>];
+    save: [tileData: AliasedTileData];
+    reset: [aliasedNodeDataMap: Record<string, AliasedNodeData>];
+}>();
 
 const isLoading = ref(true);
 const configurationError = ref();

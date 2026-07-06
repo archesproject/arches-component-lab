@@ -6,21 +6,14 @@ import ResourceInstanceMultiselectWidgetViewer from "@/arches_component_lab/widg
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
     ResourceInstanceListAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { ResourceInstanceMultiselectWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
-    value?: ResourceInstanceReference[] | null;
-}>();
+const { aliasedNodeData, value } =
+    defineProps<ResourceInstanceMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

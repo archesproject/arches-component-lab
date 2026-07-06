@@ -6,18 +6,10 @@ import LanguageSelectWidgetViewer from "@/arches_component_lab/widgets/LanguageS
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { LanguageSelectWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: LanguageAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<LanguageSelectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

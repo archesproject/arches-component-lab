@@ -14,14 +14,14 @@ import {
     buildConceptAliasedNodeData,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { ConceptCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
     graphSlug?: string;
     nodeAlias?: string;
     value: string | null;
-    cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{

@@ -15,11 +15,11 @@ import {
 
 import type {
     DateAliasedNodeData,
-    DateDatatypeCardXNodeXWidgetData,
+    DateCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
 const { cardXNodeXWidgetData, value } = defineProps<{
-    cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DateCardXNodeXWidgetData;
     value: string | null;
 }>();
 

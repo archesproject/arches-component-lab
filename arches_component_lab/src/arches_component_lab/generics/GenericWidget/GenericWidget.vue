@@ -18,11 +18,8 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type {
-    AliasedNodeData,
-    CardXNodeXWidgetData,
-} from "@/arches_component_lab/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type { GenericWidgetProps } from "./types.ts";
 
 const {
     aliasedNodeData,
@@ -34,25 +31,15 @@ const {
     nodeAlias,
     shouldShowLabel = true,
     value,
-} = defineProps<{
-    aliasedNodeData?: AliasedNodeData | null | undefined;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
-    graphSlug: string;
-    isDirty?: boolean;
-    mode: WidgetMode;
-    nodeAlias: string;
-    shouldShowLabel?: boolean;
-    value?: unknown | null | undefined;
-}>();
+} = defineProps<GenericWidgetProps>();
 
-const emit = defineEmits([
-    "update:isDirty",
-    "update:isFocused",
-    "update:isLoading",
-    "update:value",
-    "update:aliasedNodeData",
-]);
+const emit = defineEmits<{
+    "update:isDirty": [isDirty: boolean];
+    "update:isFocused": [isFocused: boolean];
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [value: unknown];
+    "update:aliasedNodeData": [aliasedNodeData: AliasedNodeData];
+}>();
 
 defineOptions({ inheritAttrs: false });
 

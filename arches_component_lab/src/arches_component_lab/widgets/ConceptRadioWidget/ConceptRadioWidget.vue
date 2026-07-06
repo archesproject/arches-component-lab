@@ -6,18 +6,10 @@ import ConceptRadioWidgetViewer from "@/arches_component_lab/widgets/ConceptRadi
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { ConceptRadioWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
-    aliasedNodeData?: ConceptAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<ConceptRadioWidgetProps>();
 
 const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];

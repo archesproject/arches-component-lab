@@ -6,20 +6,10 @@ import DomainMultiselectWidgetViewer from "@/arches_component_lab/widgets/Domain
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    DomainDatatypeCardXNodeXWidgetData,
-    DomainListAliasedNodeData,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainMultiselectWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData?: DomainListAliasedNodeData | null;
-    value?: string[] | null;
-}>();
+const { aliasedNodeData, value } = defineProps<DomainMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string[] | null];

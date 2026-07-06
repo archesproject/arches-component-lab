@@ -2,13 +2,13 @@
 import { computed } from "vue";
 
 import type {
-    DomainDatatypeCardXNodeXWidgetData,
+    DomainCardXNodeXWidgetData,
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { value, cardXNodeXWidgetData } = defineProps<{
     value: string[] | null;
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
 }>();
 
 const displayValue = computed(

@@ -6,20 +6,10 @@ import DomainCheckboxWidgetViewer from "@/arches_component_lab/widgets/DomainChe
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    DomainDatatypeCardXNodeXWidgetData,
-    DomainListAliasedNodeData,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainCheckboxWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData?: DomainListAliasedNodeData | null;
-    value?: string[] | null;
-}>();
+const { aliasedNodeData, value } = defineProps<DomainCheckboxWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string[] | null];

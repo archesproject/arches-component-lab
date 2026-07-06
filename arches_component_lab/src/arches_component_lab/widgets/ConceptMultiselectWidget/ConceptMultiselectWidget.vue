@@ -6,18 +6,10 @@ import ConceptMultiSelectWidgetViewer from "@/arches_component_lab/widgets/Conce
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { ConceptMultiselectWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: ConceptListAliasedNodeData | null;
-    value?: string[] | null;
-}>();
+const { aliasedNodeData, value } = defineProps<ConceptMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

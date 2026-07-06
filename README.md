@@ -1,182 +1,198 @@
-# Welcome to Arches Component Lab!
+# Arches Component Lab
 
-Arches Component Lab is an experimental collection components that can be used to build custom applications on top of the Arches platform. It includes a set data management components and services designed for working with Arches data in Vue 3 and PrimeVue.
-
-Please see the [project page](http://archesproject.org/) for more information on the Arches project.
-
+A Vue 3 / PrimeVue component library for building custom Arches applications.
 
 ## Installation
 
-If you are installing Arches Component Lab for the first time, we strongly recommend that you install it as an Arches application into a existing (or new) project. Running Arches Component Lab as a standalone project can provide some convenience if you are a developer contributing to the Arches Component Lab project but you risk conflicts when upgrading to the next version of Arches Component Lab.
-
-Install Arches Component Lab using the following command:
 ```
 pip install arches-component-lab
 ```
-
-For developer install instructions, see the [Developer Setup](#developer-setup-for-contributing-to-the-arches-component-lab-project) section below.
 
 
 ## Project Configuration
 
 1. If you don't already have an Arches project, you'll need to create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
 
-2. When your project is ready, add "arches_querysets" and "arches_component_lab" to INSTALLED_APPS **below** the name of your project, but **above** "arches"
-For projects using Arches >= 8.x also add "pgtrigger" as follows:
+2. Add `arches_querysets` and `arches_component_lab` to `INSTALLED_APPS` below the name of your project but above `arches`. For Arches >= 8.x, also add `pgtrigger`:
 ```python
-    INSTALLED_APPS = (
-        "my_project_name",
-        ...
-        "arches_querysets",
-        "arches_component_lab",
-        "arches",
-        ...
-        "pgtrigger",             # Only when using Arches >= 8.x
-    )
+INSTALLED_APPS = (
+    "my_project_name",
+    ...
+    "arches_querysets",
+    "arches_component_lab",
+    "arches",
+    ...
+    "pgtrigger",
+)
 ```
 
-1. Next ensure arches and arches_component_lab are included as dependencies in package.json
-    ```
-    "dependencies": {
-        "arches": "archesproject/arches#dev/8.0.x",
-        "arches_component_lab": "archesproject/arches-component-lab#main"
-    }
-    ```
+3. Add `arches_component_lab` as a dependency in `package.json`:
+```json
+"dependencies": {
+    "arches_component_lab": "archesproject/arches-component-lab#main"
+}
+```
 
-2. Update urls.py to include the arches_component_lab urls
-    ```
-    urlpatterns = [
-        path("", include("arches_component_lab.urls")),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    ```
+4. Add the `arches_component_lab` URLs to `urls.py`:
+```python
+urlpatterns = [
+    path("", include("arches_component_lab.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
 
-3. Start your project
-    ```
-    python manage.py runserver
-    ```
+5. Start your project and install frontend dependencies:
+```
+python manage.py runserver
+```
+```
+npm install && npm run build_development
+```
 
-4. Next cd into your project's app directory (the one with package.json) install and build front-end dependencies:
-    ```
-    npm install
-    npm run build_development
-    ```
-
-5. Perform a quick health check to ensure that you are not missing WidgetMapping records.
+6. Check for missing `WidgetMapping` records:
 ```
 python manage.py validate --codes 2001 --verbosity 2
 ```
-For instructions on how to fix these issues, see [Extending Arches Component Lab](#extending-arches-component-lab).
-
-## Developer Setup (for contributing to the Arches Component Lab project)
-
-1. Download the arches-component-lab repo:
-
-    a.  If using the [Github CLI](https://cli.github.com/): `gh repo clone archesproject/arches-component-lab`
-    
-    b.  If not using the Github CLI: `git clone https://github.com/archesproject/arches-component-lab.git`
-
-2. Download the arches package:
-
-    a.  If using the [Github CLI](https://cli.github.com/): `gh repo clone archesproject/arches`
-
-    b.  If not using the Github CLI: `git clone https://github.com/archesproject/arches.git`
-
-3. Create a virtual environment outside of both repositories: 
-    ```
-    python3 -m venv ENV
-    ```
-
-4. Activate the virtual enviroment in your terminal:
-    ```
-    source ENV/bin/activate
-    ```
-
-5. Navigate to the `arches-component-lab` directory, and install the project (with development dependencies):
-    ```
-    cd arches-component-lab
-    pip install -e . --group dev
-    ```
-
-6. Also install core arches for local development:
-    ```
-    pip install -e ../arches
-    ```
+See [Extending Arches Component Lab](#extending-arches-component-lab) if any are missing.
 
 
-7. Run the Django server:
-    ```
-    python manage.py runserver
-    ```
+## Frontend API
 
-8.  (From the `arches-component-lab` top-level directory) install the frontend dependencies:
-    ```
-    npm install
-    ```
+### Bootstrapping an app
 
-9.  Once the dependencies have been installed, generate the static asset bundle:
+```typescript
+import MyComponent from '@/my_project/MyComponent.vue';
 
-    a. If you're planning on editing HTML/CSS/JavaScript files, run `npm start`. This will start a development server that will automatically detect changes to static assets and rebuild the bundle.
+import { createVueApplication } from '@/arches_component_lab/application';
 
-    b. If you're not planning on editing HTML/CSS/JavaScript files, run `npm run build_development`
+createVueApplication({ component: MyComponent }).then(app => app.mount('#app'));
+```
 
-10. If you ran `npm start` in the previous step, you will need to open a new terminal window and activate the virtual environment in the new terminal window. If you ran `npm run build_development` then you can skip this step.
+### Using a widget
 
-11. Setup the database:
-    ```
-    python manage.py setup_db
-    ```
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
 
-12. In the terminal window that is running the Django server, halt the server and restart it.
-    ```
-    (ctrl+c to halt the server)
-    python manage.py runserver
-    ```
+import { TextWidget } from '@/arches_component_lab/widgets';
 
-## Committing changes
+import type { WidgetMode } from '@/arches_component_lab/widgets';
+import type { StringAliasedNodeData } from '@/arches_component_lab/datatypes';
 
-NOTE: Changes are committed to the arches-component-lab repository. 
+const MODE: WidgetMode = 'edit';
+const nodeData = ref<StringAliasedNodeData | null>(null);
+</script>
 
-1. Navigate to the repository
-    ```
-    cd arches-component-lab
-    ```
+<template>
+    <TextWidget
+        node-alias="my_text_node"
+        :mode="MODE"
+        :aliased-node-data="nodeData"
+        @update:aliased-node-data="nodeData = $event"
+    />
+</template>
+```
 
-2. Cut a new git branch
-    ```
-    git checkout origin/main -b my-descriptive-branch-name
-    ```
+### Using GenericCard
 
-3. If updating models or branches
+```vue
+<GenericCard
+    graph-slug="my_graph"
+    :tile-id="tileId"
+/>
+```
 
-    1. Manually export the model or branch from the project
+### Reference
 
-    2. Manually move the exported model or branch into one of the subdirectories in the `arches-component-lab/arches_component_lab/pkg/graphs` directory.
+#### `@/arches_component_lab/widgets`
 
-4. Add your changes to the current git commit
-    ```
-    git status
-    git add -- path/to/file path/to/second/file
-    git commit -m "Descriptive commit message"
-    ```
+| Name | Type |
+|------|------|
+| `WidgetMode` | `'edit' \| 'view' \| 'configure'` |
+| `BaseWidgetProps` | `{ mode: WidgetMode; nodeAlias?: string; graphSlug?: string }` |
 
-5. Update the remote repository with your commits:
-    ```
-    git push origin HEAD
-    ```
+Widget → `aliasedNodeData` type (import from `@/arches_component_lab/datatypes`):
 
-6. Navigate to https://github.com/archesproject/arches-component-lab/pulls to see and commit the pull request
+| Component | `aliasedNodeData` type |
+|-----------|----------------------|
+| `TextWidget`, `RichTextWidget` | `StringAliasedNodeData` |
+| `NonLocalizedTextWidget` | `NonLocalizedTextAliasedNodeData` |
+| `NumberWidget` | `NumberAliasedNodeData` |
+| `DatePickerWidget` | `DateAliasedNodeData` |
+| `EDTFWidget` | `EDTFAliasedNodeData` |
+| `ConceptSelectWidget`, `ConceptRadioWidget` | `ConceptAliasedNodeData` |
+| `ConceptMultiselectWidget` | `ConceptListAliasedNodeData` |
+| `DomainSelectWidget`, `DomainRadioWidget` | `DomainAliasedNodeData` |
+| `DomainCheckboxWidget`, `DomainMultiselectWidget` | `DomainListAliasedNodeData` |
+| `LanguageSelectWidget` | `LanguageAliasedNodeData` |
+| `RadioBooleanWidget`, `SwitchWidget` | `BooleanAliasedNodeData` |
+| `ResourceInstanceSelectWidget` | `ResourceInstanceAliasedNodeData` |
+| `ResourceInstanceMultiselectWidget` | `ResourceInstanceListAliasedNodeData` |
+| `FileListWidget` | `FileListAliasedNodeData` |
+| `NodeValueSelectWidget` | `NodeValueAliasedNodeData` |
+| `URLWidget` | `URLAliasedNodeData` |
+| `MapWidget` | `GeoJSONFeatureCollectionAliasedNodeData` |
+
+Widget config types (for `cardXNodeXWidgetData`):
+
+| Type | Used by |
+|------|---------|
+| `CardXNodeXWidgetData` | base type for all widgets |
+| `StringCardXNodeXWidgetData` | `TextWidget`, `RichTextWidget` |
+| `BooleanCardXNodeXWidgetData` | `RadioBooleanWidget`, `SwitchWidget` |
+| `ConceptCardXNodeXWidgetData` | `ConceptRadioWidget` |
+| `DateCardXNodeXWidgetData` | `DatePickerWidget` |
+| `DomainCardXNodeXWidgetData` | domain widgets |
+| `FileListCardXNodeXWidgetData` | `FileListWidget` |
+| `NumberCardXNodeXWidgetData` | `NumberWidget` |
+| `ResourceInstanceCardXNodeXWidgetData` | `ResourceInstanceSelectWidget` |
+| `ResourceInstanceListCardXNodeXWidgetData` | `ResourceInstanceMultiselectWidget` |
+| `MapCardXNodeXWidgetData` | `MapWidget` |
+
+#### `@/arches_component_lab/generics`
+
+| Export | Description |
+|--------|-------------|
+| `GenericCard` | Card editor/viewer for a nodegroup |
+| `GenericWidget` | Single widget resolved from widget config |
+| `GenericCardProps`, `GenericWidgetProps` | Props interfaces |
+| `AliasedNodeData`, `AliasedTileData` | Node/tile value types |
+
+#### `@/arches_component_lab/datatypes`
+
+`*AliasedNodeData` types are listed in the widget table above. Supporting types:
+
+| Export | Description |
+|--------|-------------|
+| `LanguageValue` | Per-language string value (`{ value: string; direction: 'ltr' \| 'rtl' }`) |
+| `URLNodeValue` | URL node value (`{ url: string; url_label: string }`) |
+| `FileReference` | File attachment reference |
+| `ResourceInstanceReference` | Resource instance link reference |
+| `DomainOption` | Domain value option |
+
+#### `@/arches_component_lab/application`
+
+| Name | Type |
+|------|------|
+| `createVueApplication` | `(options: CreateVueApplicationOptions) => Promise<App>` |
+| `generateArchesURL` | `(urlName: string, urlParameters?: Record<string, string \| number>, queryParameters?: Record<string, string \| number>, languageCode?: string) => string` |
+| `CreateVueApplicationOptions` | `{ component: Component; themeConfiguration?: ArchesThemeConfiguration; initialProps?: Record<string, unknown> }` |
+
+#### `@/arches_component_lab/themes`
+
+| Name | Type |
+|------|------|
+| `DEFAULT_THEME` | `ArchesThemeConfiguration` |
+| `ArchesThemeConfiguration` | PrimeVue theme configuration |
 
 
 ## Extending Arches Component Lab
 
-Arches Component Lab uses the `WidgetMapping` model to map Widgets to their Vue components in the file system. To identify missing mappings, run:
+Arches Component Lab uses the `WidgetMapping` model to map widgets to their Vue components. To check for missing mappings:
 ```
 python manage.py widget check_mappings
 ```
 
-If a mapping is missing, you should use the `add_mapping` operation of the `widget` command module.
-
-This command takes two parameters, `widget_name` (`-wn`) and `component_path` (`-cp`):
+To add a mapping:
 ```
 python manage.py widget add_mapping -wn language-select -cp arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue
 ```
