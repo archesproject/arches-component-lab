@@ -60,10 +60,12 @@ function markFormFieldAsDirty() {
 
 function resolver(updatedNodeValue: FormFieldResolverOptions) {
     const errors = validate(updatedNodeValue);
-    return { errors };
+    return errors.length ? { errors } : {};
 }
 
-function validate(_value: FormFieldResolverOptions): string[] {
+function validate(
+    _value: FormFieldResolverOptions,
+): Array<{ message: string }> {
     return [];
 }
 
