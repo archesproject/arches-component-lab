@@ -1,3 +1,8 @@
+console.warn(
+    "[arches-component-lab] This package is deprecated and no longer maintained. " +
+        "Please migrate to arches-vue-components instead.",
+);
+
 export { default as ConceptMultiselectWidget } from "@/arches_component_lab/widgets/ConceptMultiselectWidget/ConceptMultiselectWidget.vue";
 export { default as ConceptRadioWidget } from "@/arches_component_lab/widgets/ConceptRadioWidget/ConceptRadioWidget.vue";
 export { default as ConceptSelectWidget } from "@/arches_component_lab/widgets/ConceptSelectWidget/ConceptSelectWidget.vue";

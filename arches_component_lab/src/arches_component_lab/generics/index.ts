@@ -1,3 +1,8 @@
+console.warn(
+    "[arches-component-lab] This package is deprecated and no longer maintained. " +
+        "Please migrate to arches-vue-components instead.",
+);
+
 export { default as GenericCard } from "@/arches_component_lab/generics/GenericCard/GenericCard.vue";
 export { default as GenericWidget } from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
 
