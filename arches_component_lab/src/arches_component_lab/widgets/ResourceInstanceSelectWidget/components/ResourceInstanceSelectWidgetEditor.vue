@@ -62,13 +62,7 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const normalizedValue = Array.isArray(value) ? value[0] ?? null : value;
-const selectedValue = ref<string | null>(
-    normalizedValue?.resourceId ??
-        (normalizedValue as unknown as { resourceinstanceid?: string })
-            ?.resourceinstanceid ??
-        null,
-);
+const selectedValue = ref<string | null>(value?.resourceId ?? null);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 const hasInitialized = ref(false);
@@ -133,10 +127,7 @@ async function getOptions(page: number, filterTerm?: string) {
                 )?.display_value ?? "";
             emit(
                 "initialized",
-                buildResourceInstanceAliasedNodeData(
-                    normalizedValue,
-                    displayName,
-                ),
+                buildResourceInstanceAliasedNodeData(value, displayName),
             );
         }
     }
