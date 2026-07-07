@@ -24,34 +24,33 @@ export const useResourceDisplayNameStore = defineStore(
             resourceId: string,
         ): Promise<ResourceInstanceSelectOption | null> {
             const key = `${graphSlug}:${nodeAlias}:${resourceId}`;
+
             if (!singleCache.has(key)) {
-                singleCache.set(
-                    key,
-                    fetchSingleRelatableResource(
-                        graphSlug,
-                        nodeAlias,
-                        1,
-                        undefined,
-                        resourceId,
-                    ).then((data) => {
-                        const item = (
-                            data.data as {
-                                resourceinstanceid: string;
-                                display_value: string;
-                            }[]
-                        ).find(
-                            (resourceRecord) =>
-                                resourceRecord.resourceinstanceid ===
-                                resourceId,
-                        );
-                        return item
-                            ? {
-                                  resource_id: resourceId,
-                                  display_value: item.display_value,
-                              }
-                            : null;
-                    }),
-                );
+                const fetchRequest = fetchSingleRelatableResource(
+                    graphSlug,
+                    nodeAlias,
+                    1,
+                    undefined,
+                    resourceId,
+                ).then((data) => {
+                    const item = (
+                        data.data as {
+                            resourceinstanceid: string;
+                            display_value: string;
+                        }[]
+                    ).find(
+                        (resourceRecord) =>
+                            resourceRecord.resourceinstanceid === resourceId,
+                    );
+                    return item
+                        ? {
+                              resource_id: resourceId,
+                              display_value: item.display_value,
+                          }
+                        : null;
+                });
+                fetchRequest.catch(() => singleCache.delete(key));
+                singleCache.set(key, fetchRequest);
             }
             return singleCache.get(key)!;
         }
@@ -62,27 +61,27 @@ export const useResourceDisplayNameStore = defineStore(
             resourceInstanceIds: string[],
         ): Promise<ResourceInstanceListOption[]> {
             const key = `${graphSlug}:${nodeAlias}:${[...resourceInstanceIds].sort().join(",")}`;
+
             if (!listCache.has(key)) {
-                listCache.set(
-                    key,
-                    fetchListRelatableResources(
-                        graphSlug,
-                        nodeAlias,
-                        1,
-                        undefined,
-                        resourceInstanceIds,
-                    ).then((data) =>
-                        (
-                            data.data as {
-                                resourceinstanceid: string;
-                                display_value: string;
-                            }[]
-                        ).map((resourceRecord) => ({
-                            resource_id: resourceRecord.resourceinstanceid,
-                            display_value: resourceRecord.display_value,
-                        })),
-                    ),
+                const fetchRequest = fetchListRelatableResources(
+                    graphSlug,
+                    nodeAlias,
+                    1,
+                    undefined,
+                    resourceInstanceIds,
+                ).then((data) =>
+                    (
+                        data.data as {
+                            resourceinstanceid: string;
+                            display_value: string;
+                        }[]
+                    ).map((resourceRecord) => ({
+                        resource_id: resourceRecord.resourceinstanceid,
+                        display_value: resourceRecord.display_value,
+                    })),
                 );
+                fetchRequest.catch(() => listCache.delete(key));
+                listCache.set(key, fetchRequest);
             }
             return listCache.get(key)!;
         }

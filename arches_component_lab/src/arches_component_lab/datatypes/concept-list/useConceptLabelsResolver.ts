@@ -24,6 +24,10 @@ export function useConceptLabelsResolver(
                 loading.value = false;
                 return;
             }
+            if (!graphSlug || !nodeAlias) {
+                loading.value = false;
+                return;
+            }
             const conceptTree = await useConceptTreeStore().fetchTree(
                 graphSlug,
                 nodeAlias,

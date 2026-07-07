@@ -8,7 +8,7 @@ import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/compo
 import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
 import { fetchTileData } from "@/arches_component_lab/generics/GenericCard/api.ts";
-import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
+import { useNodegroupWidgetConfigStore } from "@/arches_component_lab/stores/useNodegroupWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -58,7 +58,7 @@ watchEffect(async () => {
 
     try {
         const cardXNodeXWidgetDataPromise =
-            useWidgetConfigStore().fetchNodegroupWidgetConfigs(
+            useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
                 graphSlug,
                 nodegroupAlias,
             );
