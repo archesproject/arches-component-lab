@@ -26,8 +26,6 @@ const emit = defineEmits<{
     initialized: [updatedValue: NonLocalizedTextAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
 const resolvedNodeValue = computed<string | null>(() => {
     if (aliasedNodeData !== undefined) {
         return aliasedNodeData?.node_value ?? null;

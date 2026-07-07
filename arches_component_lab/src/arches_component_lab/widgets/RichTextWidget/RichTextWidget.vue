@@ -28,8 +28,6 @@ const emit = defineEmits<{
     initialized: [updatedValue: StringAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
 const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
     if (aliasedNodeData !== undefined) {
         return aliasedNodeData?.node_value ?? null;
