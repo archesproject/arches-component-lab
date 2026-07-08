@@ -17,7 +17,7 @@ import type {
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
-import type { GenericCardProps } from "./types.ts";
+import type { GenericCardProps } from "@/arches_component_lab/generics/GenericCard/types.ts";
 
 const {
     mode,

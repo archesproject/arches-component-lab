@@ -8,7 +8,7 @@ import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { DomainMultiselectWidgetProps } from "./types.ts";
+import type { DomainMultiselectWidgetProps } from "@/arches_component_lab/widgets/DomainMultiselectWidget/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData, value } =
     defineProps<DomainMultiselectWidgetProps>();

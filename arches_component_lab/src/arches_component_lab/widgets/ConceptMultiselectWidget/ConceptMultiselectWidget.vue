@@ -10,7 +10,7 @@ import { buildConceptListAliasedNodeData } from "@/arches_component_lab/datatype
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
-import type { ConceptMultiselectWidgetProps } from "./types.ts";
+import type { ConceptMultiselectWidgetProps } from "@/arches_component_lab/widgets/ConceptMultiselectWidget/types.ts";
 
 const { aliasedNodeData, graphSlug, nodeAlias, value } =
     defineProps<ConceptMultiselectWidgetProps>();

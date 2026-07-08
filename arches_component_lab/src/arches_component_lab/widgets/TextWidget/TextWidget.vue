@@ -13,7 +13,7 @@ import type {
     LanguageValue,
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
-import type { TextWidgetProps } from "./types.ts";
+import type { TextWidgetProps } from "@/arches_component_lab/widgets/TextWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<TextWidgetProps>();
 

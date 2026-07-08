@@ -12,7 +12,7 @@ import type {
     ResourceInstanceListAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { ResourceInstanceMultiselectWidgetProps } from "./types.ts";
+import type { ResourceInstanceMultiselectWidgetProps } from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/types.ts";
 
 const { aliasedNodeData, graphSlug, nodeAlias, value } =
     defineProps<ResourceInstanceMultiselectWidgetProps>();

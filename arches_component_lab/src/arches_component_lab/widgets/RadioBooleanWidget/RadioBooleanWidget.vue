@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
-import type { RadioBooleanWidgetProps } from "./types.ts";
+import type { RadioBooleanWidgetProps } from "@/arches_component_lab/widgets/RadioBooleanWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<RadioBooleanWidgetProps>();
 

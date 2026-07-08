@@ -8,7 +8,7 @@ import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/dom
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { DomainSelectWidgetProps } from "./types.ts";
+import type { DomainSelectWidgetProps } from "@/arches_component_lab/widgets/DomainSelectWidget/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData, value } =
     defineProps<DomainSelectWidgetProps>();

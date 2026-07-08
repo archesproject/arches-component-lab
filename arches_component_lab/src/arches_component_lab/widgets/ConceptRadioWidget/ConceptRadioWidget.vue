@@ -10,7 +10,7 @@ import { buildConceptAliasedNodeData } from "@/arches_component_lab/datatypes/co
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
-import type { ConceptRadioWidgetProps } from "./types.ts";
+import type { ConceptRadioWidgetProps } from "@/arches_component_lab/widgets/ConceptRadioWidget/types.ts";
 
 const { aliasedNodeData, graphSlug, nodeAlias, value } =
     defineProps<ConceptRadioWidgetProps>();

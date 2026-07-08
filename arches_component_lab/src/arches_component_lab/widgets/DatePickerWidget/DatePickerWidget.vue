@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildDateAliasedNodeData } from "@/arches_component_lab/datatypes/date/utils.ts";
 
 import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
-import type { DatePickerWidgetProps } from "./types.ts";
+import type { DatePickerWidgetProps } from "@/arches_component_lab/widgets/DatePickerWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<DatePickerWidgetProps>();
 

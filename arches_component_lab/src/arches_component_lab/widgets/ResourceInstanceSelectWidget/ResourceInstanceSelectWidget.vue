@@ -12,7 +12,7 @@ import type {
     ResourceInstanceAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance/types";
-import type { ResourceInstanceSelectWidgetProps } from "./types.ts";
+import type { ResourceInstanceSelectWidgetProps } from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/types.ts";
 
 const {
     aliasedNodeData,

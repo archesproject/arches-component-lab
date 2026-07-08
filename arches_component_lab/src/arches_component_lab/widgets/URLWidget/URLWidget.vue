@@ -11,7 +11,7 @@ import type {
     URLAliasedNodeData,
     URLNodeValue,
 } from "@/arches_component_lab/datatypes/url/types.ts";
-import type { URLWidgetProps } from "./types.ts";
+import type { URLWidgetProps } from "@/arches_component_lab/widgets/URLWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<URLWidgetProps>();
 

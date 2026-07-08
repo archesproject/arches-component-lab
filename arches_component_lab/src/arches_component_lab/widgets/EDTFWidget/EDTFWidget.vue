@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
-import type { EDTFWidgetProps } from "./types.ts";
+import type { EDTFWidgetProps } from "@/arches_component_lab/widgets/EDTFWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<EDTFWidgetProps>();
 

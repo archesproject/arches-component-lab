@@ -9,7 +9,7 @@ import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore
 import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
-import type { LanguageSelectWidgetProps } from "./types.ts";
+import type { LanguageSelectWidgetProps } from "@/arches_component_lab/widgets/LanguageSelectWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<LanguageSelectWidgetProps>();
 

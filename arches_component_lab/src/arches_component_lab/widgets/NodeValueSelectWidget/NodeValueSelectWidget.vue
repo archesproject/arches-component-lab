@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/utils.ts";
 
 import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
-import type { NodeValueSelectWidgetProps } from "./types.ts";
+import type { NodeValueSelectWidgetProps } from "@/arches_component_lab/widgets/NodeValueSelectWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<NodeValueSelectWidgetProps>();
 

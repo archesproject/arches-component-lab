@@ -8,7 +8,7 @@ import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/dom
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { DomainRadioWidgetProps } from "./types.ts";
+import type { DomainRadioWidgetProps } from "@/arches_component_lab/widgets/DomainRadioWidget/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData, value } =
     defineProps<DomainRadioWidgetProps>();

@@ -19,7 +19,7 @@ import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetCon
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-import type { GenericWidgetProps } from "./types.ts";
+import type { GenericWidgetProps } from "@/arches_component_lab/generics/GenericWidget/types.ts";
 
 const {
     aliasedNodeData,

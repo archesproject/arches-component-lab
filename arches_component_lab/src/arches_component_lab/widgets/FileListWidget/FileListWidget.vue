@@ -11,7 +11,7 @@ import type {
     FileListAliasedNodeData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
-import type { FileListWidgetProps } from "./types.ts";
+import type { FileListWidgetProps } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<FileListWidgetProps>();
 

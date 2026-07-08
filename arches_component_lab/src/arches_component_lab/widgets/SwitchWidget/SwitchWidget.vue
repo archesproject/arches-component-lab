@@ -8,7 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
-import type { SwitchWidgetProps } from "./types.ts";
+import type { SwitchWidgetProps } from "@/arches_component_lab/widgets/SwitchWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps<SwitchWidgetProps>();
 
