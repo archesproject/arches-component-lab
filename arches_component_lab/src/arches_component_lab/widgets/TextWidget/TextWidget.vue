@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { useGettext } from "vue3-gettext";
+
 import TextWidgetEditor from "@/arches_component_lab/widgets/TextWidget/components/TextWidgetEditor.vue";
 import TextWidgetViewer from "@/arches_component_lab/widgets/TextWidget/components/TextWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
 import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
@@ -24,33 +27,36 @@ const { aliasedNodeData, value } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    "update:value": [updatedValue: Record<string, LanguageValue>];
+    "update:value": [updatedValue: Record<string, LanguageValue> | null];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
     initialized: [updatedValue: StringAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const { current } = useGettext();
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildStringAliasedNodeData(value ?? null, current),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: StringAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <TextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <TextWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        :aliased-node-data="aliasedNodeData ?? null"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

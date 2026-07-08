@@ -18,13 +18,12 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
-    value: FileReference[] | null;
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+    aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: FileReference[]): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: FileListAliasedNodeData,
@@ -61,8 +60,8 @@ const acceptedFileTypes = computed(() => {
 });
 
 watchEffect(() => {
-    if (value) {
-        savedFiles.value = value.map((file) => ({
+    if (aliasedNodeData?.node_value) {
+        savedFiles.value = aliasedNodeData.node_value.map((file) => ({
             ...file,
             node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
         }));
@@ -72,7 +71,7 @@ watchEffect(() => {
 });
 
 onMounted(() => {
-    emit("initialized", buildFileListAliasedNodeData(value ?? []));
+    emit("initialized", aliasedNodeData ?? buildFileListAliasedNodeData(null));
 });
 
 function emitUpdatedValue() {
@@ -80,7 +79,6 @@ function emitUpdatedValue() {
         ...savedFiles.value,
         ...pendingFiles.value,
     ] as FileReference[];
-    emit("update:value", allFiles);
     emit("update:aliasedNodeData", buildFileListAliasedNodeData(allFiles));
 }
 
@@ -125,7 +123,7 @@ function openFileChooser(): void {
         :accept="
             acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
         "
-        :model-value="value"
+        :model-value="aliasedNodeData?.node_value"
         :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
         :show-upload-button="false"

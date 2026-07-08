@@ -5,6 +5,7 @@ import MapWidgetEditor from "@/arches_component_lab/widgets/MapWidget/components
 import MapWidgetViewer from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildGeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/utils.ts";
 
 import type { FeatureCollection } from "geojson";
 
@@ -32,12 +33,11 @@ const emit = defineEmits<{
     initialized: [updatedValue: GeoJSONFeatureCollectionAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<FeatureCollection | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildGeoJSONFeatureCollectionAliasedNodeData(value ?? null),
+);
 
 const editorRef =
     useTemplateRef<InstanceType<typeof MapWidgetEditor>>("editor");
@@ -52,7 +52,7 @@ defineExpose({
         v-if="mode === EDIT"
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
@@ -63,7 +63,7 @@ defineExpose({
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

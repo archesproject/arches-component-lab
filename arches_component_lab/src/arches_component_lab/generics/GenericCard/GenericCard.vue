@@ -44,6 +44,7 @@ const emit = defineEmits([
     "update:widgetFocusStates",
     "save",
     "reset",
+    "initialized",
 ]);
 
 const isLoading = ref(true);
@@ -129,6 +130,7 @@ defineExpose({
                 @update:widget-focus-states="
                     emit('update:widgetFocusStates', $event)
                 "
+                @initialized="emit('initialized', $event)"
             />
             <GenericCardViewer
                 v-else-if="mode === VIEW"
@@ -136,6 +138,7 @@ defineExpose({
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :nodegroup-alias="nodegroupAlias"
+                @initialized="emit('initialized', $event)"
             />
         </template>
     </div>

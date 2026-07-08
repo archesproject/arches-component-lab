@@ -27,20 +27,21 @@ import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/dat
 // in future iteration these may be declared in the CardXNodeXWidgetData config
 const ITEM_SIZE = 36;
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value, defaultTerm } =
-    defineProps<{
-        cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
-        nodeAlias?: string;
-        graphSlug?: string;
-        value: ResourceInstanceReference | null;
-        defaultTerm?: string;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    graphSlug,
+    aliasedNodeData,
+    defaultTerm,
+} = defineProps<{
+    cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
+    nodeAlias?: string;
+    graphSlug?: string;
+    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
+    defaultTerm?: string;
+}>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ResourceInstanceReference | null,
-    ): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
@@ -62,7 +63,9 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const selectedValue = ref<string | null>(value?.resourceId ?? null);
+const selectedValue = ref<string | null>(
+    aliasedNodeData?.node_value?.resourceId ?? null,
+);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 const hasInitialized = ref(false);
@@ -127,7 +130,8 @@ async function getOptions(page: number, filterTerm?: string) {
                 )?.display_value ?? "";
             emit(
                 "initialized",
-                buildResourceInstanceAliasedNodeData(value, displayName),
+                aliasedNodeData ??
+                    buildResourceInstanceAliasedNodeData(null, displayName),
             );
         }
     }
@@ -187,13 +191,11 @@ function onUpdateModelValue(updatedValue: string | null) {
         const displayName =
             options.value.find((option) => option.resource_id === updatedValue)
                 ?.display_value ?? "";
-        emit("update:value", nodeValue);
         emit(
             "update:aliasedNodeData",
             buildResourceInstanceAliasedNodeData(nodeValue, displayName),
         );
     } else {
-        emit("update:value", null);
         emit(
             "update:aliasedNodeData",
             buildResourceInstanceAliasedNodeData(null, ""),

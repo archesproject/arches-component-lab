@@ -1,7 +1,21 @@
 <script setup lang="ts">
-const { value } = defineProps<{ value: string | null }>();
+import { onMounted } from "vue";
+
+import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: NonLocalizedTextAliasedNodeData;
+}>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: NonLocalizedTextAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>
-    <div>{{ value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

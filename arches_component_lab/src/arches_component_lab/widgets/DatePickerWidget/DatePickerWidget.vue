@@ -5,6 +5,7 @@ import DatePickerWidgetEditor from "@/arches_component_lab/widgets/DatePickerWid
 import DatePickerWidgetViewer from "@/arches_component_lab/widgets/DatePickerWidget/components/DatePickerWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildDateAliasedNodeData } from "@/arches_component_lab/datatypes/date/utils.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type {
@@ -27,26 +28,28 @@ const emit = defineEmits<{
     initialized: [updatedValue: DateAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<string | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildDateAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(updatedAliasedNodeData: DateAliasedNodeData) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <DatePickerWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <DatePickerWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

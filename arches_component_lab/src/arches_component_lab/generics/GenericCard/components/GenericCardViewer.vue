@@ -16,6 +16,29 @@ const { cardXNodeXWidgetData, graphSlug, tileData } = defineProps<{
     tileData?: AliasedTileData;
 }>();
 
+const emit = defineEmits<{
+    initialized: [aliasedNodeData: Record<string, AliasedNodeData>];
+}>();
+
+const initializedNodeAliases = new Set<string>();
+const initializedNodeData: Record<string, AliasedNodeData> = {};
+
+function onWidgetInitialized(
+    nodeAlias: string,
+    aliasedNodeData: AliasedNodeData,
+) {
+    initializedNodeData[nodeAlias] = aliasedNodeData;
+    initializedNodeAliases.add(nodeAlias);
+
+    const allVisibleWidgetsInitialized = cardXNodeXWidgetData
+        .filter((datum) => datum.visible)
+        .every((datum) => initializedNodeAliases.has(datum.node.alias));
+
+    if (allVisibleWidgetsInitialized) {
+        emit("initialized", initializedNodeData);
+    }
+}
+
 function getAliasedNodeData(nodeAlias: string): AliasedNodeData | null {
     const entry = tileData?.aliased_data?.[nodeAlias];
     return isAliasedNodeData(entry) ? entry : null;
@@ -37,6 +60,12 @@ function getAliasedNodeData(nodeAlias: string): AliasedNodeData | null {
                 :graph-slug="graphSlug"
                 :mode="VIEW"
                 :node-alias="cardXNodeXWidgetDatum.node.alias"
+                @initialized="
+                    onWidgetInitialized(
+                        cardXNodeXWidgetDatum.node.alias,
+                        $event,
+                    )
+                "
             />
         </template>
     </div>

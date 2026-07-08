@@ -10,15 +10,14 @@ import type {
     DomainDatatypeCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
-    value: string | null;
+    aliasedNodeData: DomainAliasedNodeData | null;
 }>();
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
@@ -27,11 +26,13 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-    emit("initialized", buildDomainAliasedNodeData(value, options));
+    emit(
+        "initialized",
+        aliasedNodeData ?? buildDomainAliasedNodeData(null, options),
+    );
 });
 
 function onUpdateModelValue(updatedValue: string | null) {
-    emit("update:value", updatedValue);
     emit(
         "update:aliasedNodeData",
         buildDomainAliasedNodeData(updatedValue, options),
@@ -42,7 +43,7 @@ function onUpdateModelValue(updatedValue: string | null) {
 <template>
     <RadioButtonGroup
         :id="cardXNodeXWidgetData?.node.alias"
-        :model-value="value"
+        :model-value="aliasedNodeData?.node_value ?? null"
         class="button-group"
         tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"

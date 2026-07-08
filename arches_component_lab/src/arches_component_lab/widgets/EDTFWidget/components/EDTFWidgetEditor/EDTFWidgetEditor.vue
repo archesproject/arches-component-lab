@@ -11,13 +11,12 @@ import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    value: string | null;
+    aliasedNodeData: EDTFAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string): void;
     (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
     (event: "initialized", updatedValue: EDTFAliasedNodeData): void;
 }>();
@@ -27,12 +26,11 @@ const { $gettext } = useGettext();
 const shouldShowHelpDrawer = ref(false);
 
 onMounted(() => {
-    emit("initialized", buildEDTFAliasedNodeData(value || null));
+    emit("initialized", aliasedNodeData ?? buildEDTFAliasedNodeData(null));
 });
 
 function handleUpdateModelValue(updatedValue: string | undefined) {
     const newValue = updatedValue ?? "";
-    emit("update:value", newValue);
     emit("update:aliasedNodeData", buildEDTFAliasedNodeData(newValue || null));
 }
 </script>
@@ -43,7 +41,7 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             class="flex-input"
             type="text"
             :fluid="true"
-            :model-value="value ?? ''"
+            :model-value="aliasedNodeData?.node_value ?? ''"
             :placeholder="cardXNodeXWidgetData?.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
             @update:model-value="handleUpdateModelValue"

@@ -15,15 +15,15 @@ import type {
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
-    graphSlug?: string;
-    nodeAlias?: string;
-    value: string | null;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug?: string;
+        nodeAlias?: string;
+        aliasedNodeData?: ConceptAliasedNodeData | null;
+        cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
@@ -42,8 +42,10 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(
     (): Record<string, boolean> | null => {
-        if (!value) return null;
-        return { [value]: true };
+        if (!aliasedNodeData?.node_value) {
+            return null;
+        }
+        return { [aliasedNodeData.node_value]: true };
     },
 );
 
@@ -57,8 +59,13 @@ watchEffect(() => {
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value) return;
-        if (!graphSlug || !nodeAlias) return;
+        if (optionsLoaded.value) {
+            return;
+        }
+        if (!graphSlug || !nodeAlias) {
+            return;
+        }
+
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult =
@@ -73,7 +80,8 @@ async function getOptions() {
         if (!optionsLoaded.value) {
             emit(
                 "initialized",
-                buildConceptAliasedNodeData(value, options.value ?? []),
+                aliasedNodeData ??
+                    buildConceptAliasedNodeData(null, options.value ?? []),
             );
         }
         optionsLoaded.value = true;
@@ -82,7 +90,6 @@ async function getOptions() {
 
 function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
     const id = selectedOption ? Object.keys(selectedOption)[0] ?? null : null;
-    emit("update:value", id);
     emit(
         "update:aliasedNodeData",
         buildConceptAliasedNodeData(id, options.value ?? []),

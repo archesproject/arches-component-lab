@@ -1,38 +1,36 @@
 <script setup lang="ts">
-import { computed, toRef } from "vue";
+import { watch } from "vue";
 
 import arches from "arches";
 
-import { useResourceDisplayNameResolver } from "@/arches_component_lab/datatypes/resource-instance/useResourceDisplayNameResolver.ts";
-import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance/types";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/types";
 
-const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
-    value: ResourceInstanceReference | null;
-    graphSlug?: string;
-    nodeAlias?: string;
-    aliasedNodeData?: AliasedNodeData | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
 }>();
 
-const { displayValue: resolvedDisplayValue, resourceId } =
-    useResourceDisplayNameResolver(
-        toRef(() => (aliasedNodeData?.display_value ? null : value)),
-        graphSlug ?? "",
-        nodeAlias ?? "",
-    );
+const emit = defineEmits<{
+    initialized: [updatedValue: ResourceInstanceAliasedNodeData];
+}>();
 
-const displayValue = computed(
-    () => aliasedNodeData?.display_value || resolvedDisplayValue.value,
+watch(
+    () => aliasedNodeData,
+    (newValue) => {
+        if (newValue) {
+            emit("initialized", newValue);
+        }
+    },
+    { immediate: true },
 );
 </script>
 
 <template>
-    <div :key="resourceId ?? undefined">
+    <div :key="aliasedNodeData?.node_value?.resourceId ?? undefined">
         <a
-            :href="`${arches.urls.resource_editor}${resourceId}`"
+            :href="`${arches.urls.resource_editor}${aliasedNodeData?.node_value?.resourceId}`"
             class="resource-instance-link"
         >
-            {{ displayValue }}
+            {{ aliasedNodeData?.display_value }}
         </a>
     </div>
 </template>

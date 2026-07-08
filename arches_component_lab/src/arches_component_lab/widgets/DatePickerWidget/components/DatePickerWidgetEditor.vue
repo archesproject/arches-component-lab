@@ -18,13 +18,12 @@ import type {
     DateDatatypeCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
-    value: string | null;
+    aliasedNodeData: DateAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
     (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
     (event: "initialized", updatedValue: DateAliasedNodeData): void;
 }>();
@@ -37,13 +36,14 @@ const viewMode = computed(() => {
 });
 
 const modelDate = computed(() => {
-    if (!value) {
+    const nodeValue = aliasedNodeData?.node_value ?? null;
+    if (!nodeValue) {
         return null;
     }
     if (shouldShowTime.value) {
-        return new Date(value);
+        return new Date(nodeValue);
     }
-    const incomingDate = new Date(value);
+    const incomingDate = new Date(nodeValue);
     const day = incomingDate.getUTCDate();
     const month = incomingDate.getUTCMonth();
     const year = incomingDate.getUTCFullYear();
@@ -61,14 +61,13 @@ watchEffect(() => {
 });
 
 onMounted(() => {
-    emit("initialized", buildDateAliasedNodeData(value));
+    emit("initialized", aliasedNodeData ?? buildDateAliasedNodeData(null));
 });
 
 const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
     updatedValue: string,
 ) {
     if (!updatedValue) {
-        emit("update:value", null);
         emit("update:aliasedNodeData", buildDateAliasedNodeData(null));
         return;
     }
@@ -80,10 +79,8 @@ const onUpdateModelValue = debounce(function onUpdateModelValueDebounced(
             date,
             cardXNodeXWidgetData?.node.config.dateFormat ?? "",
         );
-        emit("update:value", formattedDate);
         emit("update:aliasedNodeData", buildDateAliasedNodeData(formattedDate));
     } catch (_error) {
-        emit("update:value", updatedValue);
         emit("update:aliasedNodeData", buildDateAliasedNodeData(updatedValue));
     }
 }, 900);

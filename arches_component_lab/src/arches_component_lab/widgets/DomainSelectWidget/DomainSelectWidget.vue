@@ -4,6 +4,7 @@ import { computed } from "vue";
 import DomainSelectWidgetEditor from "@/arches_component_lab/widgets/DomainSelectWidget/components/DomainSelectWidgetEditor.vue";
 import DomainSelectWidgetViewer from "@/arches_component_lab/widgets/DomainSelectWidget/components/DomainSelectWidgetViewer.vue";
 
+import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
@@ -12,7 +13,7 @@ import type {
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
+const { aliasedNodeData, value, cardXNodeXWidgetData } = defineProps<{
     mode: WidgetMode;
     nodeAlias?: string;
     graphSlug?: string;
@@ -27,26 +28,34 @@ const emit = defineEmits<{
     initialized: [updatedValue: DomainAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<string | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildDomainAliasedNodeData(
+            value ?? null,
+            cardXNodeXWidgetData?.node.config.options ?? [],
+        ),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: DomainAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <DomainSelectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <DomainSelectWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

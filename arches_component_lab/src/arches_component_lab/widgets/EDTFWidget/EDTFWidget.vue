@@ -5,6 +5,7 @@ import EDTFWidgetEditor from "@/arches_component_lab/widgets/EDTFWidget/componen
 import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
@@ -21,30 +22,32 @@ const { aliasedNodeData, value } = defineProps<{
 
 const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];
-    "update:value": [updatedValue: string];
+    "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: EDTFAliasedNodeData];
     initialized: [updatedValue: EDTFAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<string | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildEDTFAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(updatedAliasedNodeData: EDTFAliasedNodeData) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <EDTFWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

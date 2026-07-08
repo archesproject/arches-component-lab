@@ -5,6 +5,7 @@ import NumberWidgetEditor from "@/arches_component_lab/widgets/NumberWidget/comp
 import NumberWidgetViewer from "@/arches_component_lab/widgets/NumberWidget/components/NumberWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
 import type {
     NumberAliasedNodeData,
@@ -28,25 +29,29 @@ const emit = defineEmits<{
     initialized: [updatedValue: NumberAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<number | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: NumberAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <NumberWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <NumberWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

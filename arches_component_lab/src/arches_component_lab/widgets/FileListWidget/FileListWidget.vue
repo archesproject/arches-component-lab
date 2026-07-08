@@ -5,6 +5,7 @@ import FileListWidgetViewer from "@/arches_component_lab/widgets/FileListWidget/
 import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/FileListWidgetEditor.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildFileListAliasedNodeData } from "@/arches_component_lab/datatypes/file-list/utils.ts";
 
 import type {
     FileListAliasedNodeData,
@@ -23,30 +24,34 @@ const { aliasedNodeData, value } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    "update:value": [updatedValue: FileReference[]];
+    "update:value": [updatedValue: FileReference[] | null];
     "update:aliasedNodeData": [updatedValue: FileListAliasedNodeData];
     initialized: [updatedValue: FileListAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<FileReference[] | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildFileListAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: FileListAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <FileListWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

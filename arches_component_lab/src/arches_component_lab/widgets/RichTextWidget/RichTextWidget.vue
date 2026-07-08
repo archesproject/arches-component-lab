@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { useGettext } from "vue3-gettext";
+
 import RichTextWidgetEditor from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/RichTextWidgetEditor.vue";
 import RichTextWidgetViewer from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
 import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
@@ -23,31 +26,35 @@ const { aliasedNodeData, value } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    "update:value": [updatedValue: Record<string, LanguageValue>];
+    "update:value": [updatedValue: Record<string, LanguageValue> | null];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
     initialized: [updatedValue: StringAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<Record<string, LanguageValue> | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const { current } = useGettext();
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildStringAliasedNodeData(value ?? null, current),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: StringAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <RichTextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <RichTextWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
-        :aliased-node-data="aliasedNodeData ?? null"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

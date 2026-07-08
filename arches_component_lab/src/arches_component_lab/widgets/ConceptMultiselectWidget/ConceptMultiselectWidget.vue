@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 
 import ConceptMultiSelectWidgetEditor from "@/arches_component_lab/widgets/ConceptMultiselectWidget/components/ConceptMultiselectWidgetEditor.vue";
 import ConceptMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ConceptMultiselectWidget/components/ConceptMultiselectWidgetViewer.vue";
+
+import { useConceptLabelsResolver } from "@/arches_component_lab/datatypes/concept-list/useConceptLabelsResolver.ts";
+import { buildConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -10,7 +13,7 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
+const { aliasedNodeData, value, mode, graphSlug, nodeAlias } = defineProps<{
     mode: WidgetMode;
     nodeAlias?: string;
     graphSlug?: string;
@@ -26,12 +29,40 @@ const emit = defineEmits<{
     initialized: [updatedValue: ConceptListAliasedNodeData];
 }>();
 
-const resolvedNodeValue = computed<string[] | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
+const { resolvedItems, loading } = useConceptLabelsResolver(
+    toRef(() => {
+        if (!aliasedNodeData) {
+            return value ?? null;
+        }
+        return null;
+    }),
+    graphSlug ?? "",
+    nodeAlias ?? "",
+);
+
+const isEditorLoading = ref(false);
+
+const resolvedAliasedNodeData = computed(() => {
+    if (aliasedNodeData) {
+        return aliasedNodeData;
     }
-    return value ?? null;
+    if (loading.value) {
+        return null;
+    }
+
+    return buildConceptListAliasedNodeData(value ?? null, resolvedItems.value);
 });
+
+watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
+    emit("update:isLoading", resolverLoading || editorLoading),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: ConceptListAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
@@ -40,17 +71,14 @@ const resolvedNodeValue = computed<string[] | null>(() => {
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :value="resolvedNodeValue"
-        @update:is-loading="emit('update:isLoading', $event)"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:is-loading="isEditorLoading = $event"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <ConceptMultiSelectWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
-        :aliased-node-data="aliasedNodeData"
-        :graph-slug="graphSlug"
-        :node-alias="nodeAlias"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

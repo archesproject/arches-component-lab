@@ -1,26 +1,20 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { onMounted } from "vue";
 
 import Select from "primevue/select";
 
-import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
+import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
 import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
-import type { Ref } from "vue";
-import type {
-    CardXNodeXWidgetData,
-    Language,
-} from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    value: string | null;
+    aliasedNodeData: LanguageAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
-    (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: LanguageAliasedNodeData,
@@ -28,40 +22,21 @@ const emit = defineEmits<{
     (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
 }>();
 
-const languages: Ref<Language[] | null> = ref<Language[] | null>(null);
-const isLoading = ref(false);
-const hasInitialized = ref(false);
+const languageStore = useLanguageStore();
+languageStore.fetchAllLanguages();
 
-watch(isLoading, (newValue) => {
-    emit("update:isLoading", newValue);
-});
-
-watchEffect(async () => {
-    isLoading.value = true;
-    try {
-        const response = (await fetchLanguages()) as {
-            languages: Language[];
-            request_language: string;
-        };
-
-        languages.value = response.languages;
-    } finally {
-        isLoading.value = false;
-        if (!hasInitialized.value) {
-            hasInitialized.value = true;
-            emit(
-                "initialized",
-                buildLanguageAliasedNodeData(value, languages.value ?? []),
-            );
-        }
-    }
+onMounted(() => {
+    emit(
+        "initialized",
+        aliasedNodeData ??
+            buildLanguageAliasedNodeData(null, languageStore.languages),
+    );
 });
 
 function onUpdateModelValue(updatedValue: string | null) {
-    emit("update:value", updatedValue);
     emit(
         "update:aliasedNodeData",
-        buildLanguageAliasedNodeData(updatedValue, languages.value ?? []),
+        buildLanguageAliasedNodeData(updatedValue, languageStore.languages),
     );
 }
 </script>
@@ -71,11 +46,10 @@ function onUpdateModelValue(updatedValue: string | null) {
         option-value="code"
         option-label="name"
         :input-id="cardXNodeXWidgetData?.node.alias"
-        :loading="isLoading"
-        :options="languages as Language[]"
+        :options="languageStore.languages"
         :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :fluid="true"
-        :model-value="value"
+        :model-value="aliasedNodeData?.node_value ?? null"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>
