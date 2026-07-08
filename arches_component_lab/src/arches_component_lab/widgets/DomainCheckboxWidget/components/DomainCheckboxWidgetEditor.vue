@@ -10,15 +10,14 @@ import type {
     DomainListAliasedNodeData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
-    value: string[] | null;
+    aliasedNodeData: DomainListAliasedNodeData | null;
 }>();
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string[] | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainListAliasedNodeData,
@@ -27,12 +26,14 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-    emit("initialized", buildDomainListAliasedNodeData(value, options));
+    emit(
+        "initialized",
+        aliasedNodeData ?? buildDomainListAliasedNodeData(null, options),
+    );
 });
 
 function onUpdateModelValue(updatedValue: string[] | null) {
     const nodeValues = updatedValue?.length ? updatedValue : null;
-    emit("update:value", nodeValues);
     emit(
         "update:aliasedNodeData",
         buildDomainListAliasedNodeData(nodeValues, options),
@@ -43,7 +44,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
 <template>
     <CheckboxGroup
         :id="cardXNodeXWidgetData?.node.alias"
-        :model-value="value ?? []"
+        :model-value="aliasedNodeData?.node_value ?? []"
         class="button-group"
         tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"

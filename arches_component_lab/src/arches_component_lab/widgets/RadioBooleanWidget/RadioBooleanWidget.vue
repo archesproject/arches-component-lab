@@ -5,6 +5,7 @@ import RadioBooleanWidgetEditor from "@/arches_component_lab/widgets/RadioBoolea
 import RadioBooleanWidgetViewer from "@/arches_component_lab/widgets/RadioBooleanWidget/components/RadioBooleanWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 import type { RadioBooleanWidgetProps } from "./types.ts";
@@ -17,29 +18,31 @@ const emit = defineEmits<{
     initialized: [updatedValue: BooleanAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
-const resolvedNodeValue = computed<boolean | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildBooleanAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: BooleanAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <RadioBooleanWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <RadioBooleanWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>
 

@@ -7,31 +7,31 @@ import InputText from "primevue/inputtext";
 import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type {
-    URLAliasedNodeData,
-    URLNodeValue,
-} from "@/arches_component_lab/datatypes/url/types";
+import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    value: URLNodeValue | null;
+    aliasedNodeData: URLAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: URLNodeValue): void;
     (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
     (event: "initialized", updatedValue: URLAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
 
-const urlLabel = ref(value?.url_label ?? "");
-const url = ref(value?.url ?? "");
+const urlLabel = ref(aliasedNodeData?.node_value?.url_label ?? "");
+const url = ref(aliasedNodeData?.node_value?.url ?? "");
 
 onMounted(() => {
     emit(
         "initialized",
-        buildURLAliasedNodeData({ url: url.value, url_label: urlLabel.value }),
+        aliasedNodeData ??
+            buildURLAliasedNodeData({
+                url: url.value,
+                url_label: urlLabel.value,
+            }),
     );
 });
 
@@ -47,7 +47,6 @@ function onUpdateURLLabelValue(updatedValue: string | undefined) {
 
 function updateValue() {
     const newNodeValue = { url: url.value, url_label: urlLabel.value };
-    emit("update:value", newNodeValue);
     emit("update:aliasedNodeData", buildURLAliasedNodeData(newNodeValue));
 }
 </script>

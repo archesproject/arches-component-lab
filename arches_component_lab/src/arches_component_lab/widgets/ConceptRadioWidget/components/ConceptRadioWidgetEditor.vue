@@ -8,6 +8,7 @@ import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTre
 import type {
     ConceptFetchResult,
     CollectionItem,
+    ConceptAliasedNodeData,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 import {
@@ -15,17 +16,16 @@ import {
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const { graphSlug, nodeAlias, value, cardXNodeXWidgetData } = defineProps<{
-    graphSlug?: string;
-    nodeAlias?: string;
-    value: string | null;
-    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug?: string;
+        nodeAlias?: string;
+        aliasedNodeData?: ConceptAliasedNodeData | null;
+        cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
@@ -55,8 +55,13 @@ watchEffect(() => {
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value) return;
-        if (!graphSlug || !nodeAlias) return;
+        if (optionsLoaded.value) {
+            return;
+        }
+        if (!graphSlug || !nodeAlias) {
+            return;
+        }
+
         isLoading.value = true;
         const fetchedData: ConceptFetchResult =
             await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
@@ -70,7 +75,8 @@ async function getOptions() {
         if (!optionsLoaded.value) {
             emit(
                 "initialized",
-                buildConceptAliasedNodeData(value, options.value ?? []),
+                aliasedNodeData ??
+                    buildConceptAliasedNodeData(null, options.value ?? []),
             );
         }
         optionsLoaded.value = true;
@@ -79,7 +85,6 @@ async function getOptions() {
 
 function onUpdateModelValue(updatedValue: string | null) {
     const nodeValue = updatedValue ?? null;
-    emit("update:value", nodeValue);
     emit(
         "update:aliasedNodeData",
         buildConceptAliasedNodeData(nodeValue, options.value),
@@ -90,7 +95,7 @@ function onUpdateModelValue(updatedValue: string | null) {
 <template>
     <RadioButtonGroup
         :id="cardXNodeXWidgetData?.node.alias"
-        :model-value="value"
+        :model-value="aliasedNodeData?.node_value ?? null"
         :class="['button-group', flexDirection]"
         tabindex="-1"
         @update:model-value="onUpdateModelValue"

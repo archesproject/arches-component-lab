@@ -19,13 +19,12 @@ import type {
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
-    value: Record<string, LanguageValue> | null;
+    aliasedNodeData: StringAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: Record<string, LanguageValue>): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
@@ -58,16 +57,20 @@ watchEffect(async () => {
         hasInitialized.value = true;
         emit(
             "initialized",
-            buildStringAliasedNodeData(
-                (value ?? {}) as Record<string, LanguageValue>,
-                selectedLanguage.value.code,
-            ),
+            aliasedNodeData ??
+                buildStringAliasedNodeData(
+                    (managedNodeValue.value ?? {}) as Record<
+                        string,
+                        LanguageValue
+                    >,
+                    selectedLanguage.value.code,
+                ),
         );
     }
 });
 
 watchEffect(() => {
-    const workingObject = { ...value };
+    const workingObject = { ...(aliasedNodeData?.node_value ?? {}) };
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -97,7 +100,6 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             direction: selectedLanguage.value!.default_direction,
         },
     };
-    emit("update:value", newNodeValue);
     emit(
         "update:aliasedNodeData",
         buildStringAliasedNodeData(newNodeValue, selectedLanguage.value!.code),

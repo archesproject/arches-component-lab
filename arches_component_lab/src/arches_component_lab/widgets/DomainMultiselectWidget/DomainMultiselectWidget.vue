@@ -4,12 +4,14 @@ import { computed } from "vue";
 import DomainMultiselectWidgetEditor from "@/arches_component_lab/widgets/DomainMultiselectWidget/components/DomainMultiselectWidgetEditor.vue";
 import DomainMultiselectWidgetViewer from "@/arches_component_lab/widgets/DomainMultiselectWidget/components/DomainMultiselectWidgetViewer.vue";
 
+import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { DomainMultiselectWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<DomainMultiselectWidgetProps>();
+const { aliasedNodeData, cardXNodeXWidgetData, value } =
+    defineProps<DomainMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string[] | null];
@@ -17,28 +19,34 @@ const emit = defineEmits<{
     initialized: [updatedValue: DomainListAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
-const resolvedNodeValue = computed<string[] | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildDomainListAliasedNodeData(
+            value ?? null,
+            cardXNodeXWidgetData?.node.config.options ?? [],
+        ),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: DomainListAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <DomainMultiselectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <DomainMultiselectWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

@@ -54,6 +54,7 @@ const emit = defineEmits([
     "update:widgetFocusStates",
     "save",
     "reset",
+    "initialized",
 ]);
 
 defineOptions({ inheritAttrs: false });
@@ -95,6 +96,9 @@ const localWidgetFocusedStates = reactive(
         {},
     ),
 );
+
+const initializedNodeAliases = new Set<string>();
+const initializedNodeData: Record<string, AliasedNodeData> = {};
 
 const areButtonsDisabled = computed(() => {
     return Object.values(localWidgetDirtyStates).every(
@@ -245,6 +249,22 @@ async function focusWidgetInputForNodeAlias(nodeAlias: string) {
     }
 }
 
+function onWidgetInitialized(
+    nodeAlias: string,
+    aliasedNodeData: AliasedNodeData,
+) {
+    initializedNodeData[nodeAlias] = aliasedNodeData;
+    initializedNodeAliases.add(nodeAlias);
+
+    const allVisibleWidgetsInitialized = cardXNodeXWidgetData
+        .filter((datum) => datum.visible)
+        .every((datum) => initializedNodeAliases.has(datum.node.alias));
+
+    if (allVisibleWidgetsInitialized) {
+        emit("initialized", initializedNodeData);
+    }
+}
+
 function onUpdateWidgetAliasedNodeData(
     nodeAlias: string,
     nodeData: AliasedNodeData,
@@ -306,6 +326,12 @@ function onUpdateWidgetAliasedNodeData(
                     "
                     @update:is-focused="
                         onUpdateWidgetFocusedState(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
+                    @initialized="
+                        onWidgetInitialized(
                             cardXNodeXWidgetDatum.node.alias,
                             $event,
                         )

@@ -79,8 +79,8 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const { value, cardXNodeXWidgetData, renderContext } = defineProps<{
-    value: FeatureCollection | null;
+const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps<{
+    aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
 }>();
@@ -238,7 +238,10 @@ onMounted(async () => {
     emit(
         "initialized",
         buildGeoJSONFeatureCollectionAliasedNodeData(
-            value ?? { type: "FeatureCollection", features: [] },
+            aliasedNodeData?.node_value ?? {
+                type: "FeatureCollection",
+                features: [],
+            },
         ),
     );
 });
@@ -391,8 +394,8 @@ function setupDraw() {
 
     map.value!.addControl(draw);
 
-    if (value?.features?.length) {
-        for (const feature of value.features) {
+    if (aliasedNodeData?.node_value?.features?.length) {
+        for (const feature of aliasedNodeData.node_value.features) {
             draw.add(feature);
         }
 

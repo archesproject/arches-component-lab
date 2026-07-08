@@ -1,31 +1,21 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { onMounted } from "vue";
 
-import { useGettext } from "vue3-gettext";
+import type { StringAliasedNodeData } from "@/arches_component_lab/datatypes/string/types";
 
-import type {
-    LanguageValue,
-    StringAliasedNodeData,
-} from "@/arches_component_lab/datatypes/string/types";
-
-const { value, aliasedNodeData } = defineProps<{
-    value?: Record<string, LanguageValue> | null;
-    aliasedNodeData?: StringAliasedNodeData | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: StringAliasedNodeData;
 }>();
 
-const { current } = useGettext();
+const emit = defineEmits<{
+    initialized: [updatedValue: StringAliasedNodeData];
+}>();
 
-const displayValue = computed(() => {
-    if (aliasedNodeData?.display_value) {
-        return aliasedNodeData.display_value;
-    }
-    if (!value) {
-        return "";
-    }
-    return value[current]?.value ?? "";
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
 });
 </script>
 
 <template>
-    <div>{{ displayValue }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

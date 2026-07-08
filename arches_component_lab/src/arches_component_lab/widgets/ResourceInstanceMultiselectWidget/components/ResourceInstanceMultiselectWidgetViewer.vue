@@ -1,38 +1,32 @@
 <script setup lang="ts">
-import { computed, toRef } from "vue";
+import { watch } from "vue";
 
 import arches from "arches";
 
-import { useResourceDisplayNamesResolver } from "@/arches_component_lab/datatypes/resource-instance-list/useResourceDisplayNamesResolver.ts";
-import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance-list/types";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
-const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
-    value: ResourceInstanceReference[] | null;
-    graphSlug?: string;
-    nodeAlias?: string;
-    aliasedNodeData?: AliasedNodeData | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
 }>();
 
-const { resolved: resolvedItems } = useResourceDisplayNamesResolver(
-    toRef(() => (aliasedNodeData?.details?.length ? null : value)),
-    graphSlug ?? "",
-    nodeAlias ?? "",
-);
+const emit = defineEmits<{
+    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
+}>();
 
-const resolved = computed(() =>
-    aliasedNodeData?.details?.length
-        ? (aliasedNodeData.details as {
-              resource_id: string;
-              display_value: string;
-          }[])
-        : resolvedItems.value,
+watch(
+    () => aliasedNodeData,
+    (newValue) => {
+        if (newValue) {
+            emit("initialized", newValue);
+        }
+    },
+    { immediate: true },
 );
 </script>
 
 <template>
     <div
-        v-for="item in resolved"
+        v-for="item in aliasedNodeData?.details"
         :key="item.resource_id"
     >
         <a

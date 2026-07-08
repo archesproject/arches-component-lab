@@ -5,41 +5,31 @@ import arches from "arches";
 import type { ConceptFetchResult } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 export const useConceptTreeStore = defineStore("conceptTree", () => {
-    const inflightFetches = new Map<
-        string,
-        Map<string, Promise<ConceptFetchResult>>
-    >();
-
-    function getNodeAliasCache(
-        graphSlug: string,
-    ): Map<string, Promise<ConceptFetchResult>> {
-        if (!inflightFetches.has(graphSlug)) {
-            inflightFetches.set(graphSlug, new Map());
-        }
-        return inflightFetches.get(graphSlug)!;
-    }
+    const cache = new Map<string, Map<string, Promise<ConceptFetchResult>>>();
 
     function fetchTree(
         graphSlug: string,
         nodeAlias: string,
     ): Promise<ConceptFetchResult> {
-        const nodeAliasCache = getNodeAliasCache(graphSlug);
-        if (!nodeAliasCache.has(nodeAlias)) {
-            nodeAliasCache.set(
-                nodeAlias,
-                (async () => {
-                    const response = await fetch(
-                        arches.urls.api_concepts_tree(graphSlug, nodeAlias),
-                    );
-                    const parsed = await response.json();
-                    if (!response.ok) {
-                        throw new Error(parsed.message || response.statusText);
-                    }
-                    return parsed;
-                })(),
-            );
+        if (!cache.has(graphSlug)) {
+            cache.set(graphSlug, new Map());
         }
-        return nodeAliasCache.get(nodeAlias)!;
+        const inner = cache.get(graphSlug)!;
+        if (!inner.has(nodeAlias)) {
+            const promise = (async () => {
+                const response = await fetch(
+                    arches.urls.api_concepts_tree(graphSlug, nodeAlias),
+                );
+                const parsed = await response.json();
+                if (!response.ok) {
+                    throw new Error(parsed.message || response.statusText);
+                }
+                return parsed;
+            })();
+            promise.catch(() => inner.delete(nodeAlias));
+            inner.set(nodeAlias, promise);
+        }
+        return inner.get(nodeAlias)!;
     }
 
     return { fetchTree };

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 
 import LanguageSelectWidgetEditor from "@/arches_component_lab/widgets/LanguageSelectWidget/components/LanguageSelectWidgetEditor.vue";
 import LanguageSelectWidgetViewer from "@/arches_component_lab/widgets/LanguageSelectWidget/components/LanguageSelectWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
+import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 import type { LanguageSelectWidgetProps } from "./types.ts";
@@ -18,28 +20,49 @@ const emit = defineEmits<{
     initialized: [updatedValue: LanguageAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
-const resolvedNodeValue = computed<string | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
+const languageStore = useLanguageStore();
+const isLanguagesLoading = ref(true);
+
+languageStore
+    .fetchAllLanguages()
+    .then(() => {
+        isLanguagesLoading.value = false;
+    })
+    .catch(() => {
+        isLanguagesLoading.value = false;
+    });
+
+const resolvedAliasedNodeData = computed(() => {
+    if (aliasedNodeData) {
+        return aliasedNodeData;
     }
-    return value ?? null;
+    if (isLanguagesLoading.value) {
+        return null;
+    }
+    return buildLanguageAliasedNodeData(value ?? null, languageStore.languages);
 });
+
+watch(isLanguagesLoading, (isLoading) => emit("update:isLoading", isLoading));
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: LanguageAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <LanguageSelectWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:is-loading="emit('update:isLoading', $event)"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <LanguageSelectWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

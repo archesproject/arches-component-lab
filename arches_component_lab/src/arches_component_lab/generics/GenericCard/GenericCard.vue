@@ -8,7 +8,7 @@ import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/compo
 import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
 import { fetchTileData } from "@/arches_component_lab/generics/GenericCard/api.ts";
-import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
+import { useNodegroupWidgetConfigStore } from "@/arches_component_lab/stores/useNodegroupWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -36,6 +36,7 @@ const emit = defineEmits<{
     "update:widgetFocusStates": [widgetFocusStates: Record<string, boolean>];
     save: [tileData: AliasedTileData];
     reset: [aliasedNodeDataMap: Record<string, AliasedNodeData>];
+    initialized: [aliasedNodeData: Record<string, AliasedNodeData>];
 }>();
 
 const isLoading = ref(true);
@@ -50,7 +51,7 @@ watchEffect(async () => {
 
     try {
         const cardXNodeXWidgetDataPromise =
-            useWidgetConfigStore().fetchNodegroupWidgetConfigs(
+            useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
                 graphSlug,
                 nodegroupAlias,
             );
@@ -121,6 +122,7 @@ defineExpose({
                 @update:widget-focus-states="
                     emit('update:widgetFocusStates', $event)
                 "
+                @initialized="emit('initialized', $event)"
             />
             <GenericCardViewer
                 v-else-if="mode === VIEW"
@@ -128,6 +130,7 @@ defineExpose({
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :nodegroup-alias="nodegroupAlias"
+                @initialized="emit('initialized', $event)"
             />
         </template>
     </div>

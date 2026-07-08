@@ -8,13 +8,12 @@ import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/bo
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
-    value: boolean | null;
+    aliasedNodeData: BooleanAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: boolean | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
@@ -23,7 +22,10 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-    emit("initialized", buildBooleanAliasedNodeData(value));
+    emit(
+        "initialized",
+        buildBooleanAliasedNodeData(aliasedNodeData?.node_value ?? null),
+    );
 });
 
 function onUpdateModelValue(updatedValue: string | null) {
@@ -39,7 +41,6 @@ function onUpdateModelValue(updatedValue: string | null) {
             booleanValue = null;
             break;
     }
-    emit("update:value", booleanValue);
     emit("update:aliasedNodeData", buildBooleanAliasedNodeData(booleanValue));
 }
 </script>
@@ -49,7 +50,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :id="cardXNodeXWidgetData?.node.alias"
         fluid="true"
         class="button-group"
-        :model-value="value?.toString() ?? ''"
+        :model-value="aliasedNodeData?.node_value?.toString() ?? ''"
         tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"
     >

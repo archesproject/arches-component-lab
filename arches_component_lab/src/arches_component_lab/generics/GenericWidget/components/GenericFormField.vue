@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watchEffect } from "vue";
+import { useTemplateRef, watchEffect } from "vue";
 
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
@@ -20,33 +20,23 @@ type FormFieldType = {
     };
 };
 
-const { isDirty, nodeAlias } = defineProps<{
+const { isDirty, nodeAlias, initialValue } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
+    initialValue: AliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (e: "update:aliasedNodeData", newValue: AliasedNodeData): void;
     (e: "update:isDirty", dirty: boolean): void;
-    (e: "initialized"): void;
 }>();
 
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
-const isInitialized = ref(false);
-const resolvedInitialValue = ref<AliasedNodeData | null>(null);
 
 watchEffect(() => {
     if (isDirty) {
         markFormFieldAsDirty();
     }
 });
-
-function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
-    if (isInitialized.value) return;
-    resolvedInitialValue.value = aliasedNodeData;
-    isInitialized.value = true;
-    emit("initialized");
-}
 
 function markFormFieldAsDirty() {
     if (!formFieldRef.value) {
@@ -74,24 +64,20 @@ function onUpdateAliasedNodeData(aliasedNodeData: AliasedNodeData) {
         value: aliasedNodeData,
     });
 
-    emit("update:aliasedNodeData", aliasedNodeData);
     emit("update:isDirty", true);
 }
 </script>
 
 <template>
-    <slot
-        :on-widget-initialized="onWidgetInitialized"
-        :on-update-aliased-node-data="onUpdateAliasedNodeData"
-    />
+    <slot :on-update-aliased-node-data="onUpdateAliasedNodeData" />
 
     <FormField
-        v-if="isInitialized"
+        v-if="initialValue"
         ref="formField"
         v-slot="$field"
         :name="nodeAlias"
         :resolver="resolver"
-        :initial-value="resolvedInitialValue"
+        :initial-value="initialValue"
     >
         <Message
             v-for="error in $field.errors"

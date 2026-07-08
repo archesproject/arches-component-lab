@@ -1,28 +1,27 @@
 <script setup lang="ts">
-import { computed, toRef } from "vue";
+import { watch } from "vue";
 
-import { useConceptLabelResolver } from "@/arches_component_lab/datatypes/concept/useConceptLabelResolver.ts";
+import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-
-const { value, graphSlug, nodeAlias, aliasedNodeData } = defineProps<{
-    value: string | null;
-    graphSlug?: string;
-    nodeAlias?: string;
-    aliasedNodeData?: AliasedNodeData | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData?: ConceptAliasedNodeData | null;
 }>();
 
-const { label } = useConceptLabelResolver(
-    toRef(() => (aliasedNodeData?.display_value ? null : value)),
-    graphSlug ?? "",
-    nodeAlias ?? "",
-);
+const emit = defineEmits<{
+    initialized: [updatedValue: ConceptAliasedNodeData];
+}>();
 
-const displayLabel = computed(
-    () => aliasedNodeData?.display_value || label.value,
+watch(
+    () => aliasedNodeData,
+    (newValue) => {
+        if (newValue) {
+            emit("initialized", newValue);
+        }
+    },
+    { immediate: true },
 );
 </script>
 
 <template>
-    <div>{{ displayLabel }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

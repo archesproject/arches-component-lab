@@ -4,12 +4,14 @@ import { computed } from "vue";
 import DomainCheckboxWidgetEditor from "@/arches_component_lab/widgets/DomainCheckboxWidget/components/DomainCheckboxWidgetEditor.vue";
 import DomainCheckboxWidgetViewer from "@/arches_component_lab/widgets/DomainCheckboxWidget/components/DomainCheckboxWidgetViewer.vue";
 
+import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { DomainCheckboxWidgetProps } from "./types.ts";
 
-const { aliasedNodeData, value } = defineProps<DomainCheckboxWidgetProps>();
+const { aliasedNodeData, cardXNodeXWidgetData, value } =
+    defineProps<DomainCheckboxWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string[] | null];
@@ -17,28 +19,34 @@ const emit = defineEmits<{
     initialized: [updatedValue: DomainListAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
-const resolvedNodeValue = computed<string[] | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildDomainListAliasedNodeData(
+            value ?? null,
+            cardXNodeXWidgetData?.node.config.options ?? [],
+        ),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: DomainListAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <DomainCheckboxWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
-        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <DomainCheckboxWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

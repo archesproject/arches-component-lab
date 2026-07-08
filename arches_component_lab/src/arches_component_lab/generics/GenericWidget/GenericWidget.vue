@@ -39,6 +39,7 @@ const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
     "update:value": [value: unknown];
     "update:aliasedNodeData": [aliasedNodeData: AliasedNodeData];
+    initialized: [aliasedNodeData: AliasedNodeData];
 }>();
 
 defineOptions({ inheritAttrs: false });
@@ -46,6 +47,7 @@ defineOptions({ inheritAttrs: false });
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const isWidgetInitialized = ref(false);
+const resolvedInitialValue = ref<AliasedNodeData | null>(null);
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
@@ -134,6 +136,12 @@ watchEffect(async () => {
         isLoading.value = false;
     }
 });
+
+function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
+    isWidgetInitialized.value = true;
+    resolvedInitialValue.value = aliasedNodeData;
+    emit("initialized", aliasedNodeData);
+}
 </script>
 
 <template>
@@ -164,14 +172,11 @@ watchEffect(async () => {
 
             <GenericFormField
                 v-if="mode === EDIT"
-                v-slot="{ onWidgetInitialized, onUpdateAliasedNodeData }"
+                v-slot="{ onUpdateAliasedNodeData: notifyFormField }"
                 :is-dirty="isDirty"
+                :initial-value="resolvedInitialValue"
                 :node-alias="nodeAlias"
                 @update:is-dirty="emit('update:isDirty', $event)"
-                @update:aliased-node-data="
-                    emit('update:aliasedNodeData', $event)
-                "
-                @initialized="isWidgetInitialized = true"
             >
                 <div
                     v-show="isWidgetInitialized"
@@ -192,9 +197,12 @@ watchEffect(async () => {
                         @update:is-loading="isChildLoading = $event"
                         @update:value="emit('update:value', $event)"
                         @update:aliased-node-data="
-                            onUpdateAliasedNodeData($event)
+                            (e: AliasedNodeData) => {
+                                notifyFormField(e);
+                                emit('update:aliasedNodeData', e);
+                            }
                         "
-                        @initialized="onWidgetInitialized($event)"
+                        @initialized="onWidgetInitialized"
                     />
                 </div>
             </GenericFormField>
@@ -214,6 +222,7 @@ watchEffect(async () => {
                 @update:aliased-node-data="
                     emit('update:aliasedNodeData', $event)
                 "
+                @initialized="emit('initialized', $event)"
             />
         </template>
     </div>

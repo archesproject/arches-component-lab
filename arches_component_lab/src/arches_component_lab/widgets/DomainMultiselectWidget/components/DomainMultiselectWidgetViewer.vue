@@ -1,30 +1,21 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { onMounted } from "vue";
 
-import type {
-    DomainCardXNodeXWidgetData,
-    DomainOption,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
-    value: string[] | null;
-    cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: DomainListAliasedNodeData;
 }>();
 
-const displayValue = computed(
-    () =>
-        value
-            ?.map(
-                (id) =>
-                    (cardXNodeXWidgetData?.node.config.options ?? []).find(
-                        (option: DomainOption) => option.id === id,
-                    )?.text,
-            )
-            .filter(Boolean)
-            .join(", ") ?? null,
-);
+const emit = defineEmits<{
+    initialized: [updatedValue: DomainListAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>
-    <div>{{ displayValue }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

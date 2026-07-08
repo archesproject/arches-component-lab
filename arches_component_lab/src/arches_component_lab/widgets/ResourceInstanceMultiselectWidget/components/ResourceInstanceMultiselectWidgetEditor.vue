@@ -17,7 +17,6 @@ import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
     ResourceInstanceListCardXNodeXWidgetData,
@@ -27,15 +26,15 @@ import type { ResourceInstanceListAliasedNodeData } from "@/arches_component_lab
 
 const ITEM_SIZE = 36;
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
-    cardXNodeXWidgetData?: ResourceInstanceListCardXNodeXWidgetData;
-    nodeAlias?: string;
-    graphSlug?: string;
-    value: ResourceInstanceReference[] | null;
-}>();
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
+    defineProps<{
+        cardXNodeXWidgetData?: ResourceInstanceListCardXNodeXWidgetData;
+        nodeAlias?: string;
+        graphSlug?: string;
+        aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceReference[]): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
@@ -61,7 +60,7 @@ const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const selectedValues = ref<string[]>(
-    value
+    aliasedNodeData?.node_value
         ?.map(
             (resourceReference) =>
                 resourceReference.resourceId ??
@@ -145,10 +144,11 @@ async function getOptions(page: number, filterTerm?: string) {
             }));
             emit(
                 "initialized",
-                buildResourceInstanceListAliasedNodeData(
-                    nodeValues,
-                    resolvedOptions,
-                ),
+                aliasedNodeData ??
+                    buildResourceInstanceListAliasedNodeData(
+                        nodeValues,
+                        resolvedOptions,
+                    ),
             );
         }
     }
@@ -218,7 +218,6 @@ function onUpdateModelValue(updatedValue: string[]) {
             (option): option is ResourceInstanceListOption =>
                 option !== undefined,
         );
-    emit("update:value", nodeValues);
     emit(
         "update:aliasedNodeData",
         buildResourceInstanceListAliasedNodeData(nodeValues, resolvedOptions),

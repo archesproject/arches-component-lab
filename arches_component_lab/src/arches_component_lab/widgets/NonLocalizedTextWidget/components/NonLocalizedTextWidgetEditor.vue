@@ -10,14 +10,13 @@ import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/dat
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-const { cardXNodeXWidgetData, renderContext, value } = defineProps<{
+const { cardXNodeXWidgetData, renderContext, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     renderContext?: string;
-    value: string | null;
+    aliasedNodeData: NonLocalizedTextAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: NonLocalizedTextAliasedNodeData,
@@ -26,12 +25,14 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-    emit("initialized", buildNonLocalizedTextAliasedNodeData(value));
+    emit(
+        "initialized",
+        aliasedNodeData ?? buildNonLocalizedTextAliasedNodeData(null),
+    );
 });
 
 function onUpdateModelValue(updatedValue: string | undefined) {
     const newValue = updatedValue ?? null;
-    emit("update:value", newValue);
     emit(
         "update:aliasedNodeData",
         buildNonLocalizedTextAliasedNodeData(newValue),
@@ -44,7 +45,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         v-if="renderContext === MULTILINE_RENDER_CONTEXT"
         :auto-resize="true"
         :fluid="true"
-        :model-value="value ?? ''"
+        :model-value="aliasedNodeData?.node_value ?? ''"
         :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
         rows="4"
@@ -54,7 +55,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         v-else
         type="text"
         :fluid="true"
-        :model-value="value ?? ''"
+        :model-value="aliasedNodeData?.node_value ?? ''"
         :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
         @update:model-value="onUpdateModelValue($event)"

@@ -1,15 +1,28 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import arches from "arches";
 import { Image, Galleria } from "primevue";
 
-import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types";
+import type {
+    FileListAliasedNodeData,
+    FileReference,
+} from "@/arches_component_lab/datatypes/file-list/types";
 
-const { value } = defineProps<{ value: FileReference[] | null }>();
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: FileListAliasedNodeData;
+}>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: FileListAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 
 const imageData = computed(() => {
-    return value?.map((fileReference: FileReference) => {
+    return aliasedNodeData?.node_value?.map((fileReference: FileReference) => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),

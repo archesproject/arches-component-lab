@@ -5,6 +5,7 @@ import NodeValueSelectWidgetEditor from "@/arches_component_lab/widgets/NodeValu
 import NodeValueSelectWidgetViewer from "@/arches_component_lab/widgets/NodeValueSelectWidget/components/NodeValueSelectWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildNodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/utils.ts";
 
 import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
 import type { NodeValueSelectWidgetProps } from "./types.ts";
@@ -12,30 +13,33 @@ import type { NodeValueSelectWidgetProps } from "./types.ts";
 const { aliasedNodeData, value } = defineProps<NodeValueSelectWidgetProps>();
 
 const emit = defineEmits<{
-    "update:value": [updatedValue: string];
+    "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: NodeValueAliasedNodeData];
     initialized: [updatedValue: NodeValueAliasedNodeData];
 }>();
 
-// aliasedNodeData !== undefined means the caller passed it (even if null);
-// undefined means the prop was omitted, so fall back to the raw value.
-const resolvedNodeValue = computed<string | null>(() => {
-    if (aliasedNodeData !== undefined) {
-        return aliasedNodeData?.node_value ?? null;
-    }
-    return value ?? null;
-});
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildNodeValueAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: NodeValueAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <NodeValueSelectWidgetEditor
         v-if="mode === EDIT"
-        :value="resolvedNodeValue"
-        @update:value="emit('update:value', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
         @initialized="emit('initialized', $event)"
     />
     <NodeValueSelectWidgetViewer
         v-if="mode === VIEW"
-        :value="resolvedNodeValue"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

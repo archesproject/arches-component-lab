@@ -9,13 +9,12 @@ import type {
     NumberCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
-    value: number | null;
+    aliasedNodeData: NumberAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: number | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: NumberAliasedNodeData,
@@ -24,18 +23,17 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-    emit("initialized", buildNumberAliasedNodeData(value));
+    emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
 });
 
 function onUpdateModelValue(updatedValue: number | null) {
-    emit("update:value", updatedValue);
     emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));
 }
 </script>
 
 <template>
     <InputNumber
-        :model-value="value"
+        :model-value="aliasedNodeData?.node_value ?? null"
         :fluid="true"
         :input-id="cardXNodeXWidgetData?.node.alias"
         :placeholder="cardXNodeXWidgetData?.config.placeholder"

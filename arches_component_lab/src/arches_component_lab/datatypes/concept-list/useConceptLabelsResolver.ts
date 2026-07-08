@@ -4,6 +4,7 @@ import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTre
 import { getOption } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
 import type { Ref } from "vue";
+import type { CollectionItem } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 export function useConceptLabelsResolver(
     nodeValue: Ref<string[] | null>,
@@ -11,6 +12,7 @@ export function useConceptLabelsResolver(
     nodeAlias: string,
 ) {
     const resolved = ref<string[]>([]);
+    const resolvedItems = ref<CollectionItem[]>([]);
     const loading = ref(false);
     let latestRequestId = 0;
 
@@ -19,8 +21,13 @@ export function useConceptLabelsResolver(
         async (newConceptIds) => {
             const requestId = ++latestRequestId;
             resolved.value = [];
+            resolvedItems.value = [];
             loading.value = !!newConceptIds?.length;
             if (!newConceptIds?.length) {
+                loading.value = false;
+                return;
+            }
+            if (!graphSlug || !nodeAlias) {
                 loading.value = false;
                 return;
             }
@@ -29,6 +36,11 @@ export function useConceptLabelsResolver(
                 nodeAlias,
             );
             if (requestId === latestRequestId) {
+                resolvedItems.value = newConceptIds
+                    .map((conceptId) =>
+                        getOption(conceptId, conceptTree.results),
+                    )
+                    .filter((item): item is CollectionItem => item !== null);
                 resolved.value = newConceptIds
                     .map(
                         (conceptId) =>
@@ -43,5 +55,5 @@ export function useConceptLabelsResolver(
     );
 
     const labels = computed(() => resolved.value);
-    return { labels, loading };
+    return { labels, resolvedItems, loading };
 }

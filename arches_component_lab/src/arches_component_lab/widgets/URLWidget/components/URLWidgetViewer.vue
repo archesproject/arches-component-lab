@@ -1,18 +1,34 @@
 <script setup lang="ts">
-import { useGettext } from "vue3-gettext";
-import type { URLNodeValue } from "@/arches_component_lab/datatypes/url/types.ts";
+import { onMounted } from "vue";
 
-const { value } = defineProps<{ value: URLNodeValue | null }>();
+import { useGettext } from "vue3-gettext";
+
+import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: URLAliasedNodeData;
+}>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: URLAliasedNodeData];
+}>();
 
 const { $gettext } = useGettext();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>
     <a
-        v-if="value?.url"
-        :href="value.url"
+        v-if="aliasedNodeData?.node_value?.url"
+        :href="aliasedNodeData.node_value.url"
     >
-        {{ value.url_label || value.url }}
+        {{
+            aliasedNodeData.node_value.url_label ||
+            aliasedNodeData.node_value.url
+        }}
     </a>
 
     <span v-else>
