@@ -76,7 +76,7 @@ function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ResourceInstanceAliasedNodeData,
 ) {
     emit("update:aliasedNodeData", updatedAliasedNodeData);
-    emit("update:value", updatedAliasedNodeData.node_value);
+    emit("update:value", updatedAliasedNodeData.node_value?.[0] ?? null);
 }
 </script>
 

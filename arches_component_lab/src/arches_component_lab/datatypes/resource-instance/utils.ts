@@ -11,7 +11,7 @@ export function buildResourceInstanceAliasedNodeData(
         return { node_value: null, display_value: displayName, details: [] };
     }
     return {
-        node_value: nodeValue,
+        node_value: [nodeValue],
         display_value: displayName,
         details: [
             { resource_id: nodeValue.resourceId, display_value: displayName },

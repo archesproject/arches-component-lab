@@ -36,6 +36,6 @@ export interface ResourceInstanceCardXNodeXWidgetData
 }
 
 export interface ResourceInstanceAliasedNodeData extends AliasedNodeData {
-    node_value: ResourceInstanceReference | null;
+    node_value: ResourceInstanceReference[] | null;
     details: ResourceInstanceSelectOption[];
 }

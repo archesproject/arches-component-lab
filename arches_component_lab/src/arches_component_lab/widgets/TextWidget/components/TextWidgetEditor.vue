@@ -62,7 +62,9 @@ watchEffect(async () => {
     selectedLanguage.value =
         languages.value.find(
             (lang: Language) => lang.code === targetLanguageCode,
-        ) ?? response.languages[0];
+        ) ??
+        response.languages.find((lang: Language) => lang.isdefault) ??
+        response.languages[0];
 
     if (!hasInitialized.value && selectedLanguage.value) {
         hasInitialized.value = true;
