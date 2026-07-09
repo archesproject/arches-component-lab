@@ -21,27 +21,33 @@ async function requestWidgetConfig(
     return parsed;
 }
 
-export const useWidgetConfigStore = defineStore("widgetConfig", () => {
-    const cache = new Map<string, Map<string, Promise<CardXNodeXWidgetData>>>();
+export const useWidgetConfigStore = defineStore(
+    "arches_component_lab:widgetConfig",
+    () => {
+        const cache = new Map<
+            string,
+            Map<string, Promise<CardXNodeXWidgetData>>
+        >();
 
-    function fetchWidgetConfig(
-        graphSlug: string,
-        nodeAlias: string,
-    ): Promise<CardXNodeXWidgetData> {
-        if (!cache.has(graphSlug)) {
-            cache.set(graphSlug, new Map());
+        function fetchWidgetConfig(
+            graphSlug: string,
+            nodeAlias: string,
+        ): Promise<CardXNodeXWidgetData> {
+            if (!cache.has(graphSlug)) {
+                cache.set(graphSlug, new Map());
+            }
+
+            const inner = cache.get(graphSlug)!;
+
+            if (!inner.has(nodeAlias)) {
+                const promise = requestWidgetConfig(graphSlug, nodeAlias);
+                promise.catch(() => inner.delete(nodeAlias));
+                inner.set(nodeAlias, promise);
+            }
+
+            return inner.get(nodeAlias)!;
         }
 
-        const inner = cache.get(graphSlug)!;
-
-        if (!inner.has(nodeAlias)) {
-            const promise = requestWidgetConfig(graphSlug, nodeAlias);
-            promise.catch(() => inner.delete(nodeAlias));
-            inner.set(nodeAlias, promise);
-        }
-
-        return inner.get(nodeAlias)!;
-    }
-
-    return { fetchWidgetConfig };
-});
+        return { fetchWidgetConfig };
+    },
+);

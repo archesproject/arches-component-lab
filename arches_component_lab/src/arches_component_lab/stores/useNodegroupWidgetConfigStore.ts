@@ -25,7 +25,7 @@ async function requestNodegroupWidgetConfigs(
 }
 
 export const useNodegroupWidgetConfigStore = defineStore(
-    "nodegroupWidgetConfig",
+    "arches_component_lab:nodegroupWidgetConfig",
     () => {
         const cache = new Map<
             string,

@@ -7,7 +7,7 @@ import type { ResourceInstanceSelectOption } from "@/arches_component_lab/dataty
 import type { ResourceInstanceListOption } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 
 export const useResourceDisplayNameStore = defineStore(
-    "resourceDisplayName",
+    "arches_component_lab:resourceDisplayName",
     () => {
         const singleCache = new Map<
             string,
