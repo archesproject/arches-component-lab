@@ -8,10 +8,9 @@ A Vue 3 / PrimeVue component library for building custom Arches applications.
 pip install arches-component-lab
 ```
 
-
 ## Project Configuration
 
-1. If you don't already have an Arches project, you'll need to create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
+1. If you do not already have an Arches project, create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
 
 2. Add `arches_querysets` and `arches_component_lab` to `INSTALLED_APPS` below the name of your project but above `arches`. For Arches >= 8.x, also add `pgtrigger`:
 ```python
@@ -67,7 +66,47 @@ import { createVueApplication } from '@/arches_component_lab/application';
 createVueApplication({ component: MyComponent }).then(app => app.mount('#app'));
 ```
 
-### Using a widget
+### Widgets
+
+`GenericWidget` looks up the widget mapped to a node (see [Extending Arches Component Lab](#extending-arches-component-lab)) and resolves the real component at runtime. In `edit` mode it wraps the resolved widget in a `GenericFormField`, which registers the node as a PrimeVue Forms `FormField` keyed by `nodeAlias`, ties its dirty/touched state and validation errors into an ancestor `<Form>`, and renders those errors:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+
+import GenericWidget from '@/arches_component_lab/generics/GenericWidget/GenericWidget.vue';
+
+import type { WidgetMode } from '@/arches_component_lab/widgets';
+import type { AliasedNodeData } from '@/arches_component_lab/generics';
+
+const MODE: WidgetMode = 'edit';
+const nodeData = ref<AliasedNodeData | null>(null);
+</script>
+
+<template>
+    <GenericWidget
+        node-alias="my_text_node"
+        graph-slug="my_graph"
+        :mode="MODE"
+        :aliased-node-data="nodeData"
+        @update:aliased-node-data="nodeData = $event"
+    />
+</template>
+```
+
+`aliasedNodeData`/`value` are both optional. Without either, `GenericWidget` falls back to the node's configured default (`cardXNodeXWidgetData.config.defaultValue`, part of the widget config it already fetches), so it renders from just `graphSlug`/`nodeAlias`/`mode`:
+
+```vue
+<template>
+    <GenericWidget
+        node-alias="my_text_node"
+        graph-slug="my_graph"
+        mode="edit"
+    />
+</template>
+```
+
+Importing a widget directly skips the runtime resolution and the `FormField` integration described above. The widget emits `update:aliasedNodeData`/`update:value` on its own (some widgets also emit `update:isDirty`); the caller wires that into any surrounding form:
 
 ```vue
 <script setup lang="ts">
@@ -84,7 +123,6 @@ const nodeData = ref<StringAliasedNodeData | null>(null);
 
 <template>
     <TextWidget
-        node-alias="my_text_node"
         :mode="MODE"
         :aliased-node-data="nodeData"
         @update:aliased-node-data="nodeData = $event"
@@ -92,63 +130,71 @@ const nodeData = ref<StringAliasedNodeData | null>(null);
 </template>
 ```
 
-### Using GenericCard
+### Cards
+
+`GenericCard` renders a whole nodegroup. It fetches the tile (`fetchTileData`) and every node's widget config, then renders `GenericCardEditor` or `GenericCardViewer` depending on `mode`. The editor wraps a PrimeVue `Form` and renders one `GenericWidget` per node, and saves the collected tile with `upsertTile` — from its own save button, or by calling `.save()` on it directly (exposed via `defineExpose`).
 
 ```vue
-<GenericCard
-    graph-slug="my_graph"
-    :tile-id="tileId"
-/>
+<script setup lang="ts">
+import { ref } from 'vue';
+
+import GenericCard from '@/arches_component_lab/generics/GenericCard/GenericCard.vue';
+
+import type { AliasedTileData } from '@/arches_component_lab/generics';
+
+const tileData = ref<AliasedTileData>();
+</script>
+
+<template>
+    <GenericCard
+        graph-slug="my_graph"
+        nodegroup-alias="my_nodegroup"
+        :resource-instance-id="resourceInstanceId"
+        :tile-id="tileId"
+        :tile-data="tileData"
+        mode="edit"
+        @update:tile-data="tileData = $event"
+        @save="tileData = $event"
+        @reset="() => {}"
+    />
+</template>
 ```
 
 ### Reference
 
 #### `@/arches_component_lab/widgets`
 
-| Name | Type |
-|------|------|
-| `WidgetMode` | `'edit' \| 'view' \| 'configure'` |
-| `BaseWidgetProps` | `{ mode: WidgetMode; nodeAlias?: string; graphSlug?: string }` |
+| Name | Type | Description |
+|------|------|--------------|
+| `WidgetMode` | `'edit' \| 'view' \| 'configure'` | The three states a widget can render in |
+| `BaseWidgetProps` | `{ mode: WidgetMode; nodeAlias?: string; graphSlug?: string }` | Props every widget accepts |
 
-Widget → `aliasedNodeData` type (import from `@/arches_component_lab/datatypes`):
+Every widget's `aliasedNodeData`/`cardXNodeXWidgetData` prop is typed to one specific datatype. Where no widget-specific `cardXNodeXWidgetData` type is listed, the widget uses the base `CardXNodeXWidgetData` (no extra config fields). Both columns import from `@/arches_component_lab/datatypes`:
 
-| Component | `aliasedNodeData` type |
-|-----------|----------------------|
-| `TextWidget`, `RichTextWidget` | `StringAliasedNodeData` |
-| `NonLocalizedTextWidget` | `NonLocalizedTextAliasedNodeData` |
-| `NumberWidget` | `NumberAliasedNodeData` |
-| `DatePickerWidget` | `DateAliasedNodeData` |
-| `EDTFWidget` | `EDTFAliasedNodeData` |
-| `ConceptSelectWidget`, `ConceptRadioWidget` | `ConceptAliasedNodeData` |
-| `ConceptMultiselectWidget` | `ConceptListAliasedNodeData` |
-| `DomainSelectWidget`, `DomainRadioWidget` | `DomainAliasedNodeData` |
-| `DomainCheckboxWidget`, `DomainMultiselectWidget` | `DomainListAliasedNodeData` |
-| `LanguageSelectWidget` | `LanguageAliasedNodeData` |
-| `RadioBooleanWidget`, `SwitchWidget` | `BooleanAliasedNodeData` |
-| `ResourceInstanceSelectWidget` | `ResourceInstanceAliasedNodeData` |
-| `ResourceInstanceMultiselectWidget` | `ResourceInstanceListAliasedNodeData` |
-| `FileListWidget` | `FileListAliasedNodeData` |
-| `NodeValueSelectWidget` | `NodeValueAliasedNodeData` |
-| `URLWidget` | `URLAliasedNodeData` |
-| `MapWidget` | `GeoJSONFeatureCollectionAliasedNodeData` |
-
-Widget config types (for `cardXNodeXWidgetData`):
-
-| Type | Used by |
-|------|---------|
-| `CardXNodeXWidgetData` | base type for all widgets |
-| `StringCardXNodeXWidgetData` | `TextWidget`, `RichTextWidget` |
-| `BooleanCardXNodeXWidgetData` | `RadioBooleanWidget`, `SwitchWidget` |
-| `ConceptCardXNodeXWidgetData` | `ConceptRadioWidget` |
-| `DateCardXNodeXWidgetData` | `DatePickerWidget` |
-| `DomainCardXNodeXWidgetData` | domain widgets |
-| `FileListCardXNodeXWidgetData` | `FileListWidget` |
-| `NumberCardXNodeXWidgetData` | `NumberWidget` |
-| `ResourceInstanceCardXNodeXWidgetData` | `ResourceInstanceSelectWidget` |
-| `ResourceInstanceListCardXNodeXWidgetData` | `ResourceInstanceMultiselectWidget` |
-| `MapCardXNodeXWidgetData` | `MapWidget` |
+| Widget | `aliasedNodeData` type | `cardXNodeXWidgetData` type |
+|--------|-------------------------|-------------------------------|
+| `TextWidget`, `RichTextWidget` | `StringAliasedNodeData` | `StringCardXNodeXWidgetData` |
+| `NonLocalizedTextWidget` | `NonLocalizedTextAliasedNodeData` | `CardXNodeXWidgetData` |
+| `NumberWidget` | `NumberAliasedNodeData` | `NumberCardXNodeXWidgetData` |
+| `DatePickerWidget` | `DateAliasedNodeData` | `DateCardXNodeXWidgetData` |
+| `EDTFWidget` | `EDTFAliasedNodeData` | `CardXNodeXWidgetData` |
+| `ConceptSelectWidget` | `ConceptAliasedNodeData` | `CardXNodeXWidgetData` |
+| `ConceptRadioWidget` | `ConceptAliasedNodeData` | `ConceptCardXNodeXWidgetData` |
+| `ConceptMultiselectWidget` | `ConceptListAliasedNodeData` | `CardXNodeXWidgetData` |
+| `DomainSelectWidget`, `DomainRadioWidget` | `DomainAliasedNodeData` | `DomainCardXNodeXWidgetData` |
+| `DomainCheckboxWidget`, `DomainMultiselectWidget` | `DomainListAliasedNodeData` | `DomainCardXNodeXWidgetData` |
+| `LanguageSelectWidget` | `LanguageAliasedNodeData` | `CardXNodeXWidgetData` |
+| `RadioBooleanWidget`, `SwitchWidget` | `BooleanAliasedNodeData` | `BooleanCardXNodeXWidgetData` |
+| `ResourceInstanceSelectWidget` | `ResourceInstanceAliasedNodeData` | `ResourceInstanceCardXNodeXWidgetData` |
+| `ResourceInstanceMultiselectWidget` | `ResourceInstanceListAliasedNodeData` | `ResourceInstanceListCardXNodeXWidgetData` |
+| `FileListWidget` | `FileListAliasedNodeData` | `FileListCardXNodeXWidgetData` |
+| `NodeValueSelectWidget` | `NodeValueAliasedNodeData` | `CardXNodeXWidgetData` |
+| `URLWidget` | `URLAliasedNodeData` | `CardXNodeXWidgetData` |
+| `MapWidget` | `GeoJSONFeatureCollectionAliasedNodeData` | `MapCardXNodeXWidgetData` |
 
 #### `@/arches_component_lab/generics`
+
+`GenericWidget`/`GenericCard` resolve their concrete component at runtime instead of being imported directly — that is the "generic" here, not a TypeScript `<T>`.
 
 | Export | Description |
 |--------|-------------|
@@ -156,6 +202,33 @@ Widget config types (for `cardXNodeXWidgetData`):
 | `GenericWidget` | Single widget resolved from widget config |
 | `GenericCardProps`, `GenericWidgetProps` | Props interfaces |
 | `AliasedNodeData`, `AliasedTileData` | Node/tile value types |
+
+`GenericWidgetProps`:
+
+| Name | Type | Description |
+|------|------|--------------|
+| `graphSlug` | `string` | Graph the node belongs to |
+| `nodeAlias` | `string` | Node to render |
+| `mode` | `WidgetMode` | `'edit'`, `'view'`, or `'configure'` |
+| `aliasedNodeData` | `AliasedNodeData \| null` | Current value; takes priority over `value` |
+| `value` | `unknown` | Raw value fallback, used only if `aliasedNodeData` is omitted |
+| `cardXNodeXWidgetData` | `CardXNodeXWidgetData` | Pre-fetched widget config; skips `GenericWidget`'s own fetch |
+| `cardXNodeXWidgetDataOverrides` | `Partial<CardXNodeXWidgetData>` | Merged into the fetched config after fetching |
+| `isDirty` | `boolean` | Marks the field dirty on the surrounding `<Form>` |
+| `shouldShowLabel` | `boolean` | Show the node's label (default `true`) |
+
+`GenericCardProps`:
+
+| Name | Type | Description |
+|------|------|--------------|
+| `graphSlug` | `string` | Graph the nodegroup belongs to |
+| `nodegroupAlias` | `string` | Nodegroup to render |
+| `mode` | `WidgetMode` | `'edit'`, `'view'`, or `'configure'` |
+| `resourceInstanceId` | `string \| null` | Resource this tile belongs to, for a new tile |
+| `selectedNodeAlias` | `string \| null` | Node to focus within the card |
+| `shouldShowFormButtons` | `boolean` | Show the built-in save/reset buttons (default `true`) |
+| `tileData` | `AliasedTileData` | Pre-fetched tile; skips `GenericCard`'s own fetch |
+| `tileId` | `string \| null` | Tile to fetch when `tileData` is not provided |
 
 #### `@/arches_component_lab/datatypes`
 
@@ -179,11 +252,143 @@ Widget config types (for `cardXNodeXWidgetData`):
 
 #### `@/arches_component_lab/themes`
 
-| Name | Type |
-|------|------|
-| `DEFAULT_THEME` | `ArchesThemeConfiguration` |
-| `ArchesThemeConfiguration` | PrimeVue theme configuration |
+| Name | Type | Description |
+|------|------|--------------|
+| `DEFAULT_THEME` | `ArchesThemeConfiguration` | Theme `createVueApplication` uses when `themeConfiguration` is not passed |
+| `ArchesThemeConfiguration` | — | PrimeVue theme configuration shape |
 
+
+## Creating a Custom Widget
+
+A widget is an editor/viewer pair plus a dispatcher that picks between them by `mode`. The example below, `RatingWidget`, is a new widget for the existing `number` datatype.
+
+1. Create `widgets/RatingWidget/` with a `types.ts` extending `BaseWidgetProps`:
+```ts
+import type { BaseWidgetProps } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    NumberAliasedNodeData,
+    NumberCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/number/types.ts";
+
+export interface RatingWidgetProps extends BaseWidgetProps {
+    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
+    aliasedNodeData?: NumberAliasedNodeData | null;
+    value?: number | null;
+}
+```
+
+2. Add `RatingWidget.vue`, the dispatcher — switches on `mode`, re-emits `update:aliasedNodeData`, `update:value`, `initialized`:
+```vue
+<script setup lang="ts">
+import { computed } from "vue";
+
+import RatingWidgetEditor from "@/arches_component_lab/widgets/RatingWidget/components/RatingWidgetEditor.vue";
+import RatingWidgetViewer from "@/arches_component_lab/widgets/RatingWidget/components/RatingWidgetViewer.vue";
+
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+import type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
+
+const { aliasedNodeData, value } = defineProps<RatingWidgetProps>();
+
+const emit = defineEmits<{
+    "update:value": [updatedValue: number | null];
+    "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
+    initialized: [updatedValue: NumberAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(updated: NumberAliasedNodeData) {
+    emit("update:aliasedNodeData", updated);
+    emit("update:value", updated.node_value);
+}
+</script>
+
+<template>
+    <RatingWidgetEditor
+        v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+    <RatingWidgetViewer
+        v-else-if="mode === VIEW"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+</template>
+```
+
+3. Add the editor and viewer. Both emit `initialized` on mount:
+```vue
+<!-- components/RatingWidgetEditor.vue -->
+<script setup lang="ts">
+import { onMounted } from "vue";
+import Rating from "primevue/rating";
+
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: NumberAliasedNodeData | null;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
+});
+
+function onUpdateModelValue(updatedValue: number | null) {
+    emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));
+}
+</script>
+
+<template>
+    <Rating
+        :model-value="aliasedNodeData?.node_value ?? null"
+        @update:model-value="onUpdateModelValue($event)"
+    />
+</template>
+```
+```vue
+<!-- components/RatingWidgetViewer.vue -->
+<script setup lang="ts">
+import { onMounted } from "vue";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+
+const { aliasedNodeData } = defineProps<{ aliasedNodeData: NumberAliasedNodeData }>();
+
+const emit = defineEmits<{ initialized: [updatedValue: NumberAliasedNodeData] }>();
+
+onMounted(() => emit("initialized", aliasedNodeData));
+</script>
+
+<template>
+    <div>{{ aliasedNodeData?.display_value }}</div>
+</template>
+```
+
+4. Reuse an existing datatype module (`@/arches_component_lab/datatypes` — string, number, boolean, concept, domain, etc.) for the value shape, as above, or add a new one following the same `types.ts` + `build<Datatype>AliasedNodeData` `utils.ts` pattern.
+
+5. If contributing to Arches Component Lab, export it from `widgets/index.ts`:
+```ts
+export { default as RatingWidget } from "@/arches_component_lab/widgets/RatingWidget/RatingWidget.vue";
+export type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
+```
+
+6. Register it — see [Extending Arches Component Lab](#extending-arches-component-lab).
 
 ## Extending Arches Component Lab
 
