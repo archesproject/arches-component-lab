@@ -25,9 +25,9 @@ watch(
 </script>
 
 <template>
-    <div :key="aliasedNodeData?.node_value?.resourceId ?? undefined">
+    <div :key="aliasedNodeData?.node_value?.[0]?.resourceId ?? undefined">
         <a
-            :href="`${arches.urls.resource_editor}${aliasedNodeData?.node_value?.resourceId}`"
+            :href="`${arches.urls.resource_editor}${aliasedNodeData?.node_value?.[0]?.resourceId}`"
             class="resource-instance-link"
         >
             {{ aliasedNodeData?.display_value }}

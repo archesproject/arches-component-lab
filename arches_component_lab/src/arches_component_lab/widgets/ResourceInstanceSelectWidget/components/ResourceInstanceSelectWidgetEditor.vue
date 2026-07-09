@@ -64,7 +64,7 @@ const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
 const selectedValue = ref<string | null>(
-    aliasedNodeData?.node_value?.resourceId ?? null,
+    aliasedNodeData?.node_value?.[0]?.resourceId ?? null,
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);

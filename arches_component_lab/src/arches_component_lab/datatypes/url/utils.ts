@@ -11,7 +11,7 @@ export function buildURLAliasedNodeData(
     }
     let displayValue = nodeValue.url;
     if (nodeValue.url_label) {
-        displayValue = `${nodeValue.url_label}(${nodeValue.url})`;
+        displayValue = `${nodeValue.url_label} (${nodeValue.url})`;
     }
     return { node_value: nodeValue, display_value: displayValue, details: [] };
 }
