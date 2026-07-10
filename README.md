@@ -1,3 +1,7 @@
+> [!WARNING]
+> **This package is deprecated and no longer maintained.**
+> Please migrate to [arches-vue-components](https://pypi.org/project/arches-vue-components/) instead.
+
 # Arches Component Lab
 
 A Vue 3 / PrimeVue component library for building custom Arches applications.

@@ -1,5 +1,6 @@
 {
     "name": "arches_component_lab",
+    "description": "[DEPRECATED: migrate to arches-vue-components] A Vue 3 / PrimeVue component library for building custom Arches applications.",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "npm run eslint:check && npm run ts:check && cross-env webpack --config ./webpack/webpack.config.dev.js",
