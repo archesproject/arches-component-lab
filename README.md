@@ -1,182 +1,403 @@
-# Welcome to Arches Component Lab!
+# Arches Component Lab
 
-Arches Component Lab is an experimental collection components that can be used to build custom applications on top of the Arches platform. It includes a set data management components and services designed for working with Arches data in Vue 3 and PrimeVue.
-
-Please see the [project page](http://archesproject.org/) for more information on the Arches project.
-
+A Vue 3 / PrimeVue component library for building custom Arches applications.
 
 ## Installation
 
-If you are installing Arches Component Lab for the first time, we strongly recommend that you install it as an Arches application into a existing (or new) project. Running Arches Component Lab as a standalone project can provide some convenience if you are a developer contributing to the Arches Component Lab project but you risk conflicts when upgrading to the next version of Arches Component Lab.
-
-Install Arches Component Lab using the following command:
 ```
 pip install arches-component-lab
 ```
 
-For developer install instructions, see the [Developer Setup](#developer-setup-for-contributing-to-the-arches-component-lab-project) section below.
-
-
 ## Project Configuration
 
-1. If you don't already have an Arches project, you'll need to create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
+1. If you do not already have an Arches project, create one by following the instructions in the Arches [documentation](http://archesproject.org/documentation/).
 
-2. When your project is ready, add "arches_querysets" and "arches_component_lab" to INSTALLED_APPS **below** the name of your project, but **above** "arches"
-For projects using Arches >= 8.x also add "pgtrigger" as follows:
+2. Add `arches_querysets` and `arches_component_lab` to `INSTALLED_APPS` below the name of your project but above `arches`. For Arches >= 8.x, also add `pgtrigger`:
 ```python
-    INSTALLED_APPS = (
-        "my_project_name",
-        ...
-        "arches_querysets",
-        "arches_component_lab",
-        "arches",
-        ...
-        "pgtrigger",             # Only when using Arches >= 8.x
-    )
+INSTALLED_APPS = (
+    "my_project_name",
+    ...
+    "arches_querysets",
+    "arches_component_lab",
+    "arches",
+    ...
+    "pgtrigger",
+)
 ```
 
-1. Next ensure arches and arches_component_lab are included as dependencies in package.json
-    ```
-    "dependencies": {
-        "arches": "archesproject/arches#dev/8.0.x",
-        "arches_component_lab": "archesproject/arches-component-lab#main"
-    }
-    ```
+3. Add `arches_component_lab` as a dependency in `package.json`:
+```json
+"dependencies": {
+    "arches_component_lab": "archesproject/arches-component-lab#main"
+}
+```
 
-2. Update urls.py to include the arches_component_lab urls
-    ```
-    urlpatterns = [
-        path("", include("arches_component_lab.urls")),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    ```
+4. Add the `arches_component_lab` URLs to `urls.py`:
+```python
+urlpatterns = [
+    path("", include("arches_component_lab.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
 
-3. Start your project
-    ```
-    python manage.py runserver
-    ```
+5. Start your project and install frontend dependencies:
+```
+python manage.py runserver
+```
+```
+npm install && npm run build_development
+```
 
-4. Next cd into your project's app directory (the one with package.json) install and build front-end dependencies:
-    ```
-    npm install
-    npm run build_development
-    ```
-
-5. Perform a quick health check to ensure that you are not missing WidgetMapping records.
+6. Check for missing `WidgetMapping` records:
 ```
 python manage.py validate --codes 2001 --verbosity 2
 ```
-For instructions on how to fix these issues, see [Extending Arches Component Lab](#extending-arches-component-lab).
-
-## Developer Setup (for contributing to the Arches Component Lab project)
-
-1. Download the arches-component-lab repo:
-
-    a.  If using the [Github CLI](https://cli.github.com/): `gh repo clone archesproject/arches-component-lab`
-    
-    b.  If not using the Github CLI: `git clone https://github.com/archesproject/arches-component-lab.git`
-
-2. Download the arches package:
-
-    a.  If using the [Github CLI](https://cli.github.com/): `gh repo clone archesproject/arches`
-
-    b.  If not using the Github CLI: `git clone https://github.com/archesproject/arches.git`
-
-3. Create a virtual environment outside of both repositories: 
-    ```
-    python3 -m venv ENV
-    ```
-
-4. Activate the virtual enviroment in your terminal:
-    ```
-    source ENV/bin/activate
-    ```
-
-5. Navigate to the `arches-component-lab` directory, and install the project (with development dependencies):
-    ```
-    cd arches-component-lab
-    pip install -e . --group dev
-    ```
-
-6. Also install core arches for local development:
-    ```
-    pip install -e ../arches
-    ```
+See [Extending Arches Component Lab](#extending-arches-component-lab) if any are missing.
 
 
-7. Run the Django server:
-    ```
-    python manage.py runserver
-    ```
+## Frontend API
 
-8.  (From the `arches-component-lab` top-level directory) install the frontend dependencies:
-    ```
-    npm install
-    ```
+### Bootstrapping an app
 
-9.  Once the dependencies have been installed, generate the static asset bundle:
+```typescript
+import MyComponent from '@/my_project/MyComponent.vue';
 
-    a. If you're planning on editing HTML/CSS/JavaScript files, run `npm start`. This will start a development server that will automatically detect changes to static assets and rebuild the bundle.
+import { createVueApplication } from '@/arches_component_lab/application';
 
-    b. If you're not planning on editing HTML/CSS/JavaScript files, run `npm run build_development`
+createVueApplication({ component: MyComponent }).then(app => app.mount('#app'));
+```
 
-10. If you ran `npm start` in the previous step, you will need to open a new terminal window and activate the virtual environment in the new terminal window. If you ran `npm run build_development` then you can skip this step.
+### Widgets
 
-11. Setup the database:
-    ```
-    python manage.py setup_db
-    ```
+`GenericWidget` looks up the widget mapped to a node (see [Extending Arches Component Lab](#extending-arches-component-lab)) and resolves the real component at runtime. In `edit` mode it wraps the resolved widget in a `GenericFormField`, which registers the node as a PrimeVue Forms `FormField` keyed by `nodeAlias`, ties its dirty/touched state and validation errors into an ancestor `<Form>`, and renders those errors:
 
-12. In the terminal window that is running the Django server, halt the server and restart it.
-    ```
-    (ctrl+c to halt the server)
-    python manage.py runserver
-    ```
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
 
-## Committing changes
+import GenericWidget from '@/arches_component_lab/generics/GenericWidget/GenericWidget.vue';
 
-NOTE: Changes are committed to the arches-component-lab repository. 
+import type { WidgetMode } from '@/arches_component_lab/widgets';
+import type { AliasedNodeData } from '@/arches_component_lab/generics';
 
-1. Navigate to the repository
-    ```
-    cd arches-component-lab
-    ```
+const MODE: WidgetMode = 'edit';
+const nodeData = ref<AliasedNodeData | null>(null);
+</script>
 
-2. Cut a new git branch
-    ```
-    git checkout origin/main -b my-descriptive-branch-name
-    ```
+<template>
+    <GenericWidget
+        node-alias="my_text_node"
+        graph-slug="my_graph"
+        :mode="MODE"
+        :aliased-node-data="nodeData"
+        @update:aliased-node-data="nodeData = $event"
+    />
+</template>
+```
 
-3. If updating models or branches
+`aliasedNodeData`/`value` are both optional. Without either, `GenericWidget` falls back to the node's configured default (`cardXNodeXWidgetData.config.defaultValue`, part of the widget config it already fetches), so it renders from just `graphSlug`/`nodeAlias`/`mode`:
 
-    1. Manually export the model or branch from the project
+```vue
+<template>
+    <GenericWidget
+        node-alias="my_text_node"
+        graph-slug="my_graph"
+        mode="edit"
+    />
+</template>
+```
 
-    2. Manually move the exported model or branch into one of the subdirectories in the `arches-component-lab/arches_component_lab/pkg/graphs` directory.
+Importing a widget directly skips the runtime resolution and the `FormField` integration described above. The widget emits `update:aliasedNodeData`/`update:value` on its own (some widgets also emit `update:isDirty`); the caller wires that into any surrounding form:
 
-4. Add your changes to the current git commit
-    ```
-    git status
-    git add -- path/to/file path/to/second/file
-    git commit -m "Descriptive commit message"
-    ```
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
 
-5. Update the remote repository with your commits:
-    ```
-    git push origin HEAD
-    ```
+import { TextWidget } from '@/arches_component_lab/widgets';
 
-6. Navigate to https://github.com/archesproject/arches-component-lab/pulls to see and commit the pull request
+import type { WidgetMode } from '@/arches_component_lab/widgets';
+import type { StringAliasedNodeData } from '@/arches_component_lab/datatypes';
 
+const MODE: WidgetMode = 'edit';
+const nodeData = ref<StringAliasedNodeData | null>(null);
+</script>
+
+<template>
+    <TextWidget
+        :mode="MODE"
+        :aliased-node-data="nodeData"
+        @update:aliased-node-data="nodeData = $event"
+    />
+</template>
+```
+
+### Cards
+
+`GenericCard` renders a whole nodegroup. It fetches the tile (`fetchTileData`) and every node's widget config, then renders `GenericCardEditor` or `GenericCardViewer` depending on `mode`. The editor wraps a PrimeVue `Form` and renders one `GenericWidget` per node, and saves the collected tile with `upsertTile` — from its own save button, or by calling `.save()` on it directly (exposed via `defineExpose`).
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+
+import GenericCard from '@/arches_component_lab/generics/GenericCard/GenericCard.vue';
+
+import type { AliasedTileData } from '@/arches_component_lab/generics';
+
+const tileData = ref<AliasedTileData>();
+</script>
+
+<template>
+    <GenericCard
+        graph-slug="my_graph"
+        nodegroup-alias="my_nodegroup"
+        :resource-instance-id="resourceInstanceId"
+        :tile-id="tileId"
+        :tile-data="tileData"
+        mode="edit"
+        @update:tile-data="tileData = $event"
+        @save="tileData = $event"
+        @reset="() => {}"
+    />
+</template>
+```
+
+### Reference
+
+#### `@/arches_component_lab/widgets`
+
+| Name | Type | Description |
+|------|------|--------------|
+| `WidgetMode` | `'edit' \| 'view' \| 'configure'` | The three states a widget can render in |
+| `BaseWidgetProps` | `{ mode: WidgetMode; nodeAlias?: string; graphSlug?: string }` | Props every widget accepts |
+
+Every widget's `aliasedNodeData`/`cardXNodeXWidgetData` prop is typed to one specific datatype. Where no widget-specific `cardXNodeXWidgetData` type is listed, the widget uses the base `CardXNodeXWidgetData` (no extra config fields). Both columns import from `@/arches_component_lab/datatypes`:
+
+| Widget | `aliasedNodeData` type | `cardXNodeXWidgetData` type |
+|--------|-------------------------|-------------------------------|
+| `TextWidget`, `RichTextWidget` | `StringAliasedNodeData` | `StringCardXNodeXWidgetData` |
+| `NonLocalizedTextWidget` | `NonLocalizedTextAliasedNodeData` | `CardXNodeXWidgetData` |
+| `NumberWidget` | `NumberAliasedNodeData` | `NumberCardXNodeXWidgetData` |
+| `DatePickerWidget` | `DateAliasedNodeData` | `DateCardXNodeXWidgetData` |
+| `EDTFWidget` | `EDTFAliasedNodeData` | `CardXNodeXWidgetData` |
+| `ConceptSelectWidget` | `ConceptAliasedNodeData` | `CardXNodeXWidgetData` |
+| `ConceptRadioWidget` | `ConceptAliasedNodeData` | `ConceptCardXNodeXWidgetData` |
+| `ConceptMultiselectWidget` | `ConceptListAliasedNodeData` | `CardXNodeXWidgetData` |
+| `DomainSelectWidget`, `DomainRadioWidget` | `DomainAliasedNodeData` | `DomainCardXNodeXWidgetData` |
+| `DomainCheckboxWidget`, `DomainMultiselectWidget` | `DomainListAliasedNodeData` | `DomainCardXNodeXWidgetData` |
+| `LanguageSelectWidget` | `LanguageAliasedNodeData` | `CardXNodeXWidgetData` |
+| `RadioBooleanWidget`, `SwitchWidget` | `BooleanAliasedNodeData` | `BooleanCardXNodeXWidgetData` |
+| `ResourceInstanceSelectWidget` | `ResourceInstanceAliasedNodeData` | `ResourceInstanceCardXNodeXWidgetData` |
+| `ResourceInstanceMultiselectWidget` | `ResourceInstanceListAliasedNodeData` | `ResourceInstanceListCardXNodeXWidgetData` |
+| `FileListWidget` | `FileListAliasedNodeData` | `FileListCardXNodeXWidgetData` |
+| `NodeValueSelectWidget` | `NodeValueAliasedNodeData` | `CardXNodeXWidgetData` |
+| `URLWidget` | `URLAliasedNodeData` | `CardXNodeXWidgetData` |
+| `MapWidget` | `GeoJSONFeatureCollectionAliasedNodeData` | `MapCardXNodeXWidgetData` |
+
+#### `@/arches_component_lab/generics`
+
+`GenericWidget`/`GenericCard` resolve their concrete component at runtime instead of being imported directly — that is the "generic" here, not a TypeScript `<T>`.
+
+| Export | Description |
+|--------|-------------|
+| `GenericCard` | Card editor/viewer for a nodegroup |
+| `GenericWidget` | Single widget resolved from widget config |
+| `GenericCardProps`, `GenericWidgetProps` | Props interfaces |
+| `AliasedNodeData`, `AliasedTileData` | Node/tile value types |
+
+`GenericWidgetProps`:
+
+| Name | Type | Description |
+|------|------|--------------|
+| `graphSlug` | `string` | Graph the node belongs to |
+| `nodeAlias` | `string` | Node to render |
+| `mode` | `WidgetMode` | `'edit'`, `'view'`, or `'configure'` |
+| `aliasedNodeData` | `AliasedNodeData \| null` | Current value; takes priority over `value` |
+| `value` | `unknown` | Raw value fallback, used only if `aliasedNodeData` is omitted |
+| `cardXNodeXWidgetData` | `CardXNodeXWidgetData` | Pre-fetched widget config; skips `GenericWidget`'s own fetch |
+| `cardXNodeXWidgetDataOverrides` | `Partial<CardXNodeXWidgetData>` | Merged into the fetched config after fetching |
+| `isDirty` | `boolean` | Marks the field dirty on the surrounding `<Form>` |
+| `shouldShowLabel` | `boolean` | Show the node's label (default `true`) |
+
+`GenericCardProps`:
+
+| Name | Type | Description |
+|------|------|--------------|
+| `graphSlug` | `string` | Graph the nodegroup belongs to |
+| `nodegroupAlias` | `string` | Nodegroup to render |
+| `mode` | `WidgetMode` | `'edit'`, `'view'`, or `'configure'` |
+| `resourceInstanceId` | `string \| null` | Resource this tile belongs to, for a new tile |
+| `selectedNodeAlias` | `string \| null` | Node to focus within the card |
+| `shouldShowFormButtons` | `boolean` | Show the built-in save/reset buttons (default `true`) |
+| `tileData` | `AliasedTileData` | Pre-fetched tile; skips `GenericCard`'s own fetch |
+| `tileId` | `string \| null` | Tile to fetch when `tileData` is not provided |
+
+#### `@/arches_component_lab/datatypes`
+
+`*AliasedNodeData` types are listed in the widget table above. Supporting types:
+
+| Export | Description |
+|--------|-------------|
+| `LanguageValue` | Per-language string value (`{ value: string; direction: 'ltr' \| 'rtl' }`) |
+| `URLNodeValue` | URL node value (`{ url: string; url_label: string }`) |
+| `FileReference` | File attachment reference |
+| `ResourceInstanceReference` | Resource instance link reference |
+| `DomainOption` | Domain value option |
+
+#### `@/arches_component_lab/application`
+
+| Name | Type |
+|------|------|
+| `createVueApplication` | `(options: CreateVueApplicationOptions) => Promise<App>` |
+| `generateArchesURL` | `(urlName: string, urlParameters?: Record<string, string \| number>, queryParameters?: Record<string, string \| number>, languageCode?: string) => string` |
+| `CreateVueApplicationOptions` | `{ component: Component; themeConfiguration?: ArchesThemeConfiguration; initialProps?: Record<string, unknown> }` |
+
+#### `@/arches_component_lab/themes`
+
+| Name | Type | Description |
+|------|------|--------------|
+| `DEFAULT_THEME` | `ArchesThemeConfiguration` | Theme `createVueApplication` uses when `themeConfiguration` is not passed |
+| `ArchesThemeConfiguration` | — | PrimeVue theme configuration shape |
+
+
+## Creating a Custom Widget
+
+A widget is an editor/viewer pair plus a dispatcher that picks between them by `mode`. The example below, `RatingWidget`, is a new widget for the existing `number` datatype.
+
+1. Create `widgets/RatingWidget/` with a `types.ts` extending `BaseWidgetProps`:
+```ts
+import type { BaseWidgetProps } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    NumberAliasedNodeData,
+    NumberCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/number/types.ts";
+
+export interface RatingWidgetProps extends BaseWidgetProps {
+    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
+    aliasedNodeData?: NumberAliasedNodeData | null;
+    value?: number | null;
+}
+```
+
+2. Add `RatingWidget.vue`, the dispatcher — switches on `mode`, re-emits `update:aliasedNodeData`, `update:value`, `initialized`:
+```vue
+<script setup lang="ts">
+import { computed } from "vue";
+
+import RatingWidgetEditor from "@/arches_component_lab/widgets/RatingWidget/components/RatingWidgetEditor.vue";
+import RatingWidgetViewer from "@/arches_component_lab/widgets/RatingWidget/components/RatingWidgetViewer.vue";
+
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+import type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
+
+const { aliasedNodeData, value } = defineProps<RatingWidgetProps>();
+
+const emit = defineEmits<{
+    "update:value": [updatedValue: number | null];
+    "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
+    initialized: [updatedValue: NumberAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(updated: NumberAliasedNodeData) {
+    emit("update:aliasedNodeData", updated);
+    emit("update:value", updated.node_value);
+}
+</script>
+
+<template>
+    <RatingWidgetEditor
+        v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+    <RatingWidgetViewer
+        v-else-if="mode === VIEW"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+</template>
+```
+
+3. Add the editor and viewer. Both emit `initialized` on mount:
+```vue
+<!-- components/RatingWidgetEditor.vue -->
+<script setup lang="ts">
+import { onMounted } from "vue";
+import Rating from "primevue/rating";
+
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: NumberAliasedNodeData | null;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
+});
+
+function onUpdateModelValue(updatedValue: number | null) {
+    emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));
+}
+</script>
+
+<template>
+    <Rating
+        :model-value="aliasedNodeData?.node_value ?? null"
+        @update:model-value="onUpdateModelValue($event)"
+    />
+</template>
+```
+```vue
+<!-- components/RatingWidgetViewer.vue -->
+<script setup lang="ts">
+import { onMounted } from "vue";
+
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+
+const { aliasedNodeData } = defineProps<{ aliasedNodeData: NumberAliasedNodeData }>();
+
+const emit = defineEmits<{ initialized: [updatedValue: NumberAliasedNodeData] }>();
+
+onMounted(() => emit("initialized", aliasedNodeData));
+</script>
+
+<template>
+    <div>{{ aliasedNodeData?.display_value }}</div>
+</template>
+```
+
+4. Reuse an existing datatype module (`@/arches_component_lab/datatypes` — string, number, boolean, concept, domain, etc.) for the value shape, as above, or add a new one following the same `types.ts` + `build<Datatype>AliasedNodeData` `utils.ts` pattern.
+
+5. If contributing to Arches Component Lab, export it from `widgets/index.ts`:
+```ts
+export { default as RatingWidget } from "@/arches_component_lab/widgets/RatingWidget/RatingWidget.vue";
+export type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
+```
+
+6. Register it — see [Extending Arches Component Lab](#extending-arches-component-lab).
 
 ## Extending Arches Component Lab
 
-Arches Component Lab uses the `WidgetMapping` model to map Widgets to their Vue components in the file system. To identify missing mappings, run:
+Arches Component Lab uses the `WidgetMapping` model to map widgets to their Vue components. To check for missing mappings:
 ```
 python manage.py widget check_mappings
 ```
 
-If a mapping is missing, you should use the `add_mapping` operation of the `widget` command module.
-
-This command takes two parameters, `widget_name` (`-wn`) and `component_path` (`-cp`):
+To add a mapping:
 ```
 python manage.py widget add_mapping -wn language-select -cp arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue
 ```
