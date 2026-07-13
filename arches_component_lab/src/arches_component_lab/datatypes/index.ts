@@ -1,3 +1,8 @@
+console.warn(
+    "[arches-component-lab] This package is deprecated and no longer maintained. " +
+        "Please migrate to arches-vue-components instead.",
+);
+
 export type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 export type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 export type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";

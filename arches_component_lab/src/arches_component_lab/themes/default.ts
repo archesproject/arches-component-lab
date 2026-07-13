@@ -6,6 +6,11 @@ import type { ArchesThemeConfiguration } from "@/arches_component_lab/themes/typ
 // @ts-ignore: This is a workaround for PrimeVue theme import issues after v1.20
 import Aura from "@primeuix/themes/aura";
 
+console.warn(
+    "[arches-component-lab] This package is deprecated and no longer maintained. " +
+        "Please migrate to arches-vue-components instead.",
+);
+
 const archesColors = Object.freeze({
     blue: "#579ddb",
     green: "#3acaa1",
