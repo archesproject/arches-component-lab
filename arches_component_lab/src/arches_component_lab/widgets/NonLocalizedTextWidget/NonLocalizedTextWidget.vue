@@ -10,13 +10,28 @@ import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/dat
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 import type { NonLocalizedTextWidgetProps } from "@/arches_component_lab/widgets/NonLocalizedTextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<NonLocalizedTextWidgetProps>();
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+    "renderContext",
+]) as NonLocalizedTextWidgetProps;
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: string | null];
-    "update:aliasedNodeData": [updatedValue: NonLocalizedTextAliasedNodeData];
-    initialized: [updatedValue: NonLocalizedTextAliasedNodeData];
-}>();
+const emit = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
+    (event: "update:value", updatedValue: string | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: NonLocalizedTextAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
+};
 
 const resolvedAliasedNodeData = computed(
     () =>

@@ -10,19 +10,23 @@ import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/dat
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-const { cardXNodeXWidgetData, renderContext, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData, renderContext, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "renderContext",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     renderContext?: string;
     aliasedNodeData: NonLocalizedTextAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: NonLocalizedTextAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
-}>();
+};
 
 onMounted(() => {
     emit(

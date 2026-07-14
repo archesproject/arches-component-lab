@@ -9,18 +9,21 @@ import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/l
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: LanguageAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: LanguageAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
-}>();
+};
 
 const languageStore = useLanguageStore();
 languageStore.fetchAllLanguages();

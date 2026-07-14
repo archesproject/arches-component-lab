@@ -15,13 +15,13 @@ import type {
     NodeGroup,
 } from "@/arches_component_lab/types.ts";
 
-const { graphId } = defineProps<{
+const { graphId } = defineProps(["graphId"]) as {
     graphId: string;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["resourceCreated"]) as {
     (event: "resourceCreated", resource: AliasedTileData): void;
-}>();
+};
 
 const visible = ref(true);
 

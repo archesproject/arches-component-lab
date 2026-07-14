@@ -266,6 +266,12 @@ Every widget's `aliasedNodeData`/`cardXNodeXWidgetData` prop is typed to one spe
 
 A widget is an editor/viewer pair plus a dispatcher that picks between them by `mode`. The example below, `RatingWidget`, is a new widget for the existing `number` datatype.
 
+> [!IMPORTANT]
+> Use `defineProps([...])`/`defineEmits([...])` cast `as` the real type, shown below — never
+> `defineProps<T>()`/`defineEmits<T>()` with a generic argument. That generic argument makes
+> `@vue/compiler-sfc` resolve types via its own tsconfig walk, separate from webpack, which breaks
+> on a real (non-editable) pip install.
+
 1. Create `widgets/RatingWidget/` with a `types.ts` extending `BaseWidgetProps`:
 ```ts
 import type { BaseWidgetProps } from "@/arches_component_lab/widgets/types.ts";
@@ -295,13 +301,24 @@ import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/num
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 import type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<RatingWidgetProps>();
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as RatingWidgetProps;
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: number | null];
-    "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
-    initialized: [updatedValue: NumberAliasedNodeData];
-}>();
+const emit = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
+    (event: "update:value", updatedValue: number | null): void;
+    (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+};
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
@@ -340,14 +357,14 @@ import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/num
 
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: NumberAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
     (event: "initialized", updatedValue: NumberAliasedNodeData): void;
-}>();
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
@@ -372,9 +389,13 @@ import { onMounted } from "vue";
 
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { aliasedNodeData } = defineProps<{ aliasedNodeData: NumberAliasedNodeData }>();
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
+    aliasedNodeData: NumberAliasedNodeData;
+};
 
-const emit = defineEmits<{ initialized: [updatedValue: NumberAliasedNodeData] }>();
+const emit = defineEmits(["initialized"]) as {
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+};
 
 onMounted(() => emit("initialized", aliasedNodeData));
 </script>

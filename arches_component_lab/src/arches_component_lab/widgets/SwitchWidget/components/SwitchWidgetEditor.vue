@@ -7,18 +7,21 @@ import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/bo
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
-}>();
+};
 
 onMounted(() => {
     emit(

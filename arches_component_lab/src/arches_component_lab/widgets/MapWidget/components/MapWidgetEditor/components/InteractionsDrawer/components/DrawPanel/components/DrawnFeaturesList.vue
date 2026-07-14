@@ -17,10 +17,10 @@ import {
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 import { getMapboxDraw } from "@/arches_component_lab/widgets/MapWidget/utils.ts";
 
-const { map, features } = defineProps<{
+const { map, features } = defineProps(["map", "features"]) as {
     map: MaplibreMap;
     features: Feature[];
-}>();
+};
 
 const selectedDrawnFeature = inject<Ref<Feature | null>>(
     "selectedDrawnFeature",

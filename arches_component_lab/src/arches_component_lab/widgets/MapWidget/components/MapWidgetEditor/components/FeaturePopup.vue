@@ -12,7 +12,9 @@ import type { MapGeoJSONFeature } from "maplibre-gl";
 
 import type { ResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-const { features } = defineProps<{ features: MapGeoJSONFeature[] }>();
+const { features } = defineProps(["features"]) as {
+    features: MapGeoJSONFeature[];
+};
 
 const { $gettext } = useGettext();
 

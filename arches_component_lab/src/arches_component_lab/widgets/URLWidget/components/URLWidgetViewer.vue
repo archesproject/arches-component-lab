@@ -5,13 +5,13 @@ import { useGettext } from "vue3-gettext";
 
 import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: URLAliasedNodeData;
-}>();
+};
 
-const emit = defineEmits<{
-    initialized: [updatedValue: URLAliasedNodeData];
-}>();
+const emit = defineEmits(["initialized"]) as {
+    (event: "initialized", updatedValue: URLAliasedNodeData): void;
+};
 
 const { $gettext } = useGettext();
 

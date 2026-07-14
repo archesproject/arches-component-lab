@@ -6,18 +6,18 @@ import { REMOVE } from "@/arches_component_lab/datatypes/file-list/constants.ts"
 
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
 
-const { files } = defineProps<{
+const { files } = defineProps(["files"]) as {
     files: FileReference[];
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits([REMOVE]) as {
     (
         e: typeof REMOVE,
         fileReference: FileReference,
         fileIndex: number,
         event: Event,
     ): void;
-}>();
+};
 </script>
 
 <template>

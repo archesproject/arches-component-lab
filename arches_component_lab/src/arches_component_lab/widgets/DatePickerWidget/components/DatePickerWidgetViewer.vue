@@ -3,13 +3,13 @@ import { onMounted } from "vue";
 
 import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: DateAliasedNodeData;
-}>();
+};
 
-const emit = defineEmits<{
-    initialized: [updatedValue: DateAliasedNodeData];
-}>();
+const emit = defineEmits(["initialized"]) as {
+    (event: "initialized", updatedValue: DateAliasedNodeData): void;
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

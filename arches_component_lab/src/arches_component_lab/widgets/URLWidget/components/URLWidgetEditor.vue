@@ -9,15 +9,18 @@ import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/ut
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: URLAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
     (event: "initialized", updatedValue: URLAliasedNodeData): void;
-}>();
+};
 
 const { $gettext } = useGettext();
 

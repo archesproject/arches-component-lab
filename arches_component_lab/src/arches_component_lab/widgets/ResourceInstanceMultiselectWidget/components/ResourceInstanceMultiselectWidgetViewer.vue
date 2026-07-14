@@ -5,13 +5,16 @@ import arches from "arches";
 
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
-}>();
+};
 
-const emit = defineEmits<{
-    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
-}>();
+const emit = defineEmits(["initialized"]) as {
+    (
+        event: "initialized",
+        updatedValue: ResourceInstanceListAliasedNodeData,
+    ): void;
+};
 
 watch(
     () => aliasedNodeData,
