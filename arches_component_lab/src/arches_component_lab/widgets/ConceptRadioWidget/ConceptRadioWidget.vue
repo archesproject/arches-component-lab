@@ -9,40 +9,19 @@ import { buildConceptAliasedNodeData } from "@/arches_component_lab/datatypes/co
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { ConceptRadioWidgetProps } from "@/arches_component_lab/widgets/ConceptRadioWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } = defineProps({
-    mode: {
-        type: String as PropType<ConceptRadioWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<ConceptRadioWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<ConceptRadioWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            ConceptRadioWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<ConceptRadioWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<ConceptRadioWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, graphSlug, nodeAlias, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as ConceptRadioWidgetProps;
 
-interface ConceptRadioWidgetEmits {
+const emit: {
     (event: "update:isDirty", isDirty: boolean): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:value", updatedValue: string | null): void;
@@ -51,9 +30,7 @@ interface ConceptRadioWidgetEmits {
         updatedValue: ConceptAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
-}
-
-const emit: ConceptRadioWidgetEmits = defineEmits([
+} = defineEmits([
     "update:isDirty",
     "update:isLoading",
     "update:value",

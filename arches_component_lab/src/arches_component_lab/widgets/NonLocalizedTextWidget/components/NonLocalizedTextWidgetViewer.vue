@@ -1,27 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type { PropType } from "vue";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-interface NonLocalizedTextWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: NonLocalizedTextAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<
-            NonLocalizedTextWidgetViewerProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
-
-interface NonLocalizedTextWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
-}
-
-const emit: NonLocalizedTextWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

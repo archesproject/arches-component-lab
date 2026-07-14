@@ -1,27 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type { PropType } from "vue";
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-interface DomainRadioWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: DomainAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<
-            DomainRadioWidgetViewerProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
-
-interface DomainRadioWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: DomainAliasedNodeData): void;
-}
-
-const emit: DomainRadioWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

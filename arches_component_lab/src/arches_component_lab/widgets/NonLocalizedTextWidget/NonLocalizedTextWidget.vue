@@ -7,59 +7,31 @@ import NonLocalizedTextWidgetViewer from "@/arches_component_lab/widgets/NonLoca
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/utils.ts";
 
-import type { PropType } from "vue";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 import type { NonLocalizedTextWidgetProps } from "@/arches_component_lab/widgets/NonLocalizedTextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps({
-    mode: {
-        type: String as PropType<NonLocalizedTextWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<NonLocalizedTextWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<NonLocalizedTextWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            NonLocalizedTextWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            NonLocalizedTextWidgetProps["aliasedNodeData"]
-        >,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<NonLocalizedTextWidgetProps["value"]>,
-        default: undefined,
-    },
-    renderContext: {
-        type: String as PropType<NonLocalizedTextWidgetProps["renderContext"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+    "renderContext",
+]) as NonLocalizedTextWidgetProps;
 
-interface NonLocalizedTextWidgetEmits {
+const emit = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: NonLocalizedTextAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
-}
-
-const emit: NonLocalizedTextWidgetEmits = defineEmits([
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const resolvedAliasedNodeData = computed(
     () =>

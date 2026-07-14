@@ -267,14 +267,16 @@ Every widget's `aliasedNodeData`/`cardXNodeXWidgetData` prop is typed to one spe
 A widget is an editor/viewer pair plus a dispatcher that picks between them by `mode`. The example below, `RatingWidget`, is a new widget for the existing `number` datatype.
 
 > [!IMPORTANT]
-> Widgets must declare props/emits with the runtime `defineProps({...})`/`defineEmits([...])`
-> forms shown below, using `PropType<T>` casts and an explicit emit interface for type safety —
-> never `defineProps<T>()`/`defineEmits<T>()` with a generic type argument. `@vue/compiler-sfc`
-> resolves that generic argument using its own filesystem walk for a `tsconfig.json`, completely
-> separate from webpack's own module resolution — which fails whenever this package is installed
-> as a real (non-editable) pip package, since a real install ships only the Python package
-> directory, not a repo root with a `tsconfig.json`. The runtime form sidesteps that resolution
-> entirely, so it works regardless of how this package is installed.
+> Widgets must declare props/emits with the runtime `defineProps([...])`/`defineEmits([...])`
+> array forms shown below, cast (`as`) to the real TypeScript type for type safety — never
+> `defineProps<T>()`/`defineEmits<T>()` with a generic type argument. `@vue/compiler-sfc` resolves
+> that generic argument using its own filesystem walk for a `tsconfig.json`, completely separate
+> from webpack's own module resolution — which fails whenever this package is installed as a real
+> (non-editable) pip package, since a real install ships only the Python package directory, not a
+> repo root with a `tsconfig.json`. The array form sidesteps that resolution entirely, so it works
+> regardless of how this package is installed. It also means Vue's dev-mode-only prop-type
+> warnings no longer fire (they never affected production behavior), which is why the cast is
+> load-bearing for actual type safety here.
 
 1. Create `widgets/RatingWidget/` with a `types.ts` extending `BaseWidgetProps`:
 ```ts
@@ -302,48 +304,27 @@ import RatingWidgetViewer from "@/arches_component_lab/widgets/RatingWidget/comp
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
-import type { PropType } from "vue";
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 import type { RatingWidgetProps } from "@/arches_component_lab/widgets/RatingWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps({
-    mode: {
-        type: String as PropType<RatingWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<RatingWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<RatingWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<RatingWidgetProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<RatingWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: Number as PropType<RatingWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as RatingWidgetProps;
 
-interface RatingWidgetEmits {
-    (event: "update:value", updatedValue: number | null): void;
-    (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
-    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
-}
-
-const emit: RatingWidgetEmits = defineEmits([
+const emit = defineEmits([
     "update:value",
     "update:aliasedNodeData",
     "initialized",
-]);
+]) as {
+    (event: "update:value", updatedValue: number | null): void;
+    (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+};
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
@@ -380,29 +361,16 @@ import Rating from "primevue/rating";
 
 import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
-import type { PropType } from "vue";
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-interface RatingWidgetEditorProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: NumberAliasedNodeData | null;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<RatingWidgetEditorProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface RatingWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (event: "update:aliasedNodeData", updatedValue: NumberAliasedNodeData): void;
     (event: "initialized", updatedValue: NumberAliasedNodeData): void;
-}
-
-const emit: RatingWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
@@ -425,25 +393,15 @@ function onUpdateModelValue(updatedValue: number | null) {
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type { PropType } from "vue";
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-interface RatingWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: NumberAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<RatingWidgetViewerProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface RatingWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: NumberAliasedNodeData): void;
-}
-
-const emit: RatingWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => emit("initialized", aliasedNodeData));
 </script>

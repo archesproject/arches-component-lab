@@ -18,7 +18,6 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useWidgetConfigStore } from "@/arches_component_lab/stores/useWidgetConfigStore.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type { PropType } from "vue";
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 import type { GenericWidgetProps } from "@/arches_component_lab/generics/GenericWidget/types.ts";
 
@@ -32,66 +31,33 @@ const {
     nodeAlias,
     shouldShowLabel = true,
     value,
-} = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<GenericWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<GenericWidgetProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetDataOverrides: {
-        type: Object as PropType<
-            GenericWidgetProps["cardXNodeXWidgetDataOverrides"]
-        >,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<GenericWidgetProps["graphSlug"]>,
-        required: true,
-    },
-    isDirty: {
-        type: Boolean as PropType<GenericWidgetProps["isDirty"]>,
-        default: false,
-    },
-    mode: {
-        type: String as PropType<GenericWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<GenericWidgetProps["nodeAlias"]>,
-        required: true,
-    },
-    shouldShowLabel: {
-        type: Boolean as PropType<GenericWidgetProps["shouldShowLabel"]>,
-        default: true,
-    },
-    value: {
-        type: [String, Number, Boolean, Object, Array] as PropType<
-            GenericWidgetProps["value"]
-        >,
-        default: undefined as GenericWidgetProps["value"],
-    },
-});
+} = defineProps([
+    "aliasedNodeData",
+    "cardXNodeXWidgetData",
+    "cardXNodeXWidgetDataOverrides",
+    "graphSlug",
+    "isDirty",
+    "mode",
+    "nodeAlias",
+    "shouldShowLabel",
+    "value",
+]) as GenericWidgetProps;
 
-interface GenericWidgetEmits {
-    (event: "update:isDirty", isDirty: boolean): void;
-    (event: "update:isFocused", isFocused: boolean): void;
-    (event: "update:isLoading", isLoading: boolean): void;
-    (event: "update:value", value: unknown): void;
-    (event: "update:aliasedNodeData", aliasedNodeData: AliasedNodeData): void;
-    (event: "initialized", aliasedNodeData: AliasedNodeData): void;
-}
-
-const emit: GenericWidgetEmits = defineEmits([
+const emit = defineEmits([
     "update:isDirty",
     "update:isFocused",
     "update:isLoading",
     "update:value",
     "update:aliasedNodeData",
     "initialized",
-]);
+]) as {
+    (event: "update:isDirty", isDirty: boolean): void;
+    (event: "update:isFocused", isFocused: boolean): void;
+    (event: "update:isLoading", isLoading: boolean): void;
+    (event: "update:value", value: unknown): void;
+    (event: "update:aliasedNodeData", aliasedNodeData: AliasedNodeData): void;
+    (event: "initialized", aliasedNodeData: AliasedNodeData): void;
+};
 
 defineOptions({ inheritAttrs: false });
 

@@ -7,53 +7,26 @@ import DomainRadioWidgetViewer from "@/arches_component_lab/widgets/DomainRadioW
 import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { DomainRadioWidgetProps } from "@/arches_component_lab/widgets/DomainRadioWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData, value } = defineProps({
-    mode: {
-        type: String as PropType<DomainRadioWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<DomainRadioWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<DomainRadioWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            DomainRadioWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<DomainRadioWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<DomainRadioWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, cardXNodeXWidgetData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as DomainRadioWidgetProps;
 
-interface DomainRadioWidgetEmits {
+const emit: {
     (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainAliasedNodeData): void;
-}
-
-const emit: DomainRadioWidgetEmits = defineEmits([
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+} = defineEmits(["update:value", "update:aliasedNodeData", "initialized"]);
 
 const resolvedAliasedNodeData = computed(
     () =>

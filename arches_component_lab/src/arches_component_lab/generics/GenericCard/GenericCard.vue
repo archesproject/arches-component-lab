@@ -12,7 +12,6 @@ import { useNodegroupWidgetConfigStore } from "@/arches_component_lab/stores/use
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type {
     AliasedNodeData,
     AliasedTileData,
@@ -29,42 +28,25 @@ const {
     shouldShowFormButtons = true,
     tileData,
     tileId,
-} = defineProps({
-    mode: {
-        type: String as PropType<GenericCardProps["mode"]>,
-        required: true,
-    },
-    nodegroupAlias: {
-        type: String as PropType<GenericCardProps["nodegroupAlias"]>,
-        required: true,
-    },
-    graphSlug: {
-        type: String as PropType<GenericCardProps["graphSlug"]>,
-        required: true,
-    },
-    resourceInstanceId: {
-        type: String as PropType<GenericCardProps["resourceInstanceId"]>,
-        default: undefined,
-    },
-    selectedNodeAlias: {
-        type: String as PropType<GenericCardProps["selectedNodeAlias"]>,
-        default: undefined,
-    },
-    shouldShowFormButtons: {
-        type: Boolean as PropType<GenericCardProps["shouldShowFormButtons"]>,
-        default: true,
-    },
-    tileData: {
-        type: Object as PropType<GenericCardProps["tileData"]>,
-        default: undefined,
-    },
-    tileId: {
-        type: String as PropType<GenericCardProps["tileId"]>,
-        default: undefined,
-    },
-});
+} = defineProps([
+    "mode",
+    "nodegroupAlias",
+    "graphSlug",
+    "resourceInstanceId",
+    "selectedNodeAlias",
+    "shouldShowFormButtons",
+    "tileData",
+    "tileId",
+]) as GenericCardProps;
 
-interface GenericCardEmits {
+const emit = defineEmits([
+    "update:tileData",
+    "update:widgetDirtyStates",
+    "update:widgetFocusStates",
+    "save",
+    "reset",
+    "initialized",
+]) as {
     (event: "update:tileData", tileData: AliasedTileData): void;
     (
         event: "update:widgetDirtyStates",
@@ -80,16 +62,7 @@ interface GenericCardEmits {
         event: "initialized",
         aliasedNodeData: Record<string, AliasedNodeData>,
     ): void;
-}
-
-const emit: GenericCardEmits = defineEmits([
-    "update:tileData",
-    "update:widgetDirtyStates",
-    "update:widgetFocusStates",
-    "save",
-    "reset",
-    "initialized",
-]);
+};
 
 const isLoading = ref(true);
 const configurationError = ref();

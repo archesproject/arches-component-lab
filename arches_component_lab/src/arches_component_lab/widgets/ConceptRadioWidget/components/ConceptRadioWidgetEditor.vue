@@ -15,58 +15,33 @@ import {
     buildConceptAliasedNodeData,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { PropType } from "vue";
 import type { ConceptCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-interface ConceptRadioWidgetEditorProps {
-    graphSlug?: string;
-    nodeAlias?: string;
-    aliasedNodeData?: ConceptAliasedNodeData | null;
-    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
-}
-
 const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps({
-        graphSlug: {
-            type: String as PropType<
-                ConceptRadioWidgetEditorProps["graphSlug"]
-            >,
-            default: undefined,
-        },
-        nodeAlias: {
-            type: String as PropType<
-                ConceptRadioWidgetEditorProps["nodeAlias"]
-            >,
-            default: undefined,
-        },
-        aliasedNodeData: {
-            type: Object as PropType<
-                ConceptRadioWidgetEditorProps["aliasedNodeData"]
-            >,
-            default: undefined,
-        },
-        cardXNodeXWidgetData: {
-            type: Object as PropType<
-                ConceptRadioWidgetEditorProps["cardXNodeXWidgetData"]
-            >,
-            default: undefined,
-        },
-    });
+    defineProps([
+        "graphSlug",
+        "nodeAlias",
+        "aliasedNodeData",
+        "cardXNodeXWidgetData",
+    ]) as {
+        graphSlug?: string;
+        nodeAlias?: string;
+        aliasedNodeData?: ConceptAliasedNodeData | null;
+        cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
+    };
 
-interface ConceptRadioWidgetEditorEmits {
+const emit = defineEmits([
+    "update:isLoading",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ConceptAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
-}
-
-const emit: ConceptRadioWidgetEditorEmits = defineEmits([
-    "update:isLoading",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const flexDirection =
     cardXNodeXWidgetData?.config?.groupDirection === "column"

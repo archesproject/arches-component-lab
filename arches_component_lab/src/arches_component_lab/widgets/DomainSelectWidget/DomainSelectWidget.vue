@@ -7,53 +7,26 @@ import DomainSelectWidgetViewer from "@/arches_component_lab/widgets/DomainSelec
 import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { DomainSelectWidgetProps } from "@/arches_component_lab/widgets/DomainSelectWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData, value } = defineProps({
-    mode: {
-        type: String as PropType<DomainSelectWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<DomainSelectWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<DomainSelectWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            DomainSelectWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<DomainSelectWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<DomainSelectWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, cardXNodeXWidgetData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as DomainSelectWidgetProps;
 
-interface DomainSelectWidgetEmits {
+const emit: {
     (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainAliasedNodeData): void;
-}
-
-const emit: DomainSelectWidgetEmits = defineEmits([
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+} = defineEmits(["update:value", "update:aliasedNodeData", "initialized"]);
 
 const resolvedAliasedNodeData = computed(
     () =>

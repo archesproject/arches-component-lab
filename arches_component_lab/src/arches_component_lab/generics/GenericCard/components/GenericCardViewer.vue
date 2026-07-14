@@ -3,47 +3,30 @@ import GenericWidget from "@/arches_component_lab/generics/GenericWidget/Generic
 import { isAliasedNodeData } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 import { VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type {
     AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 
-interface GenericCardViewerProps {
+const { cardXNodeXWidgetData, graphSlug, tileData } = defineProps([
+    "cardXNodeXWidgetData",
+    "graphSlug",
+    "nodegroupAlias",
+    "tileData",
+]) as {
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     nodegroupAlias: string;
     tileData?: AliasedTileData;
-}
+};
 
-const { cardXNodeXWidgetData, graphSlug, tileData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Array as PropType<GenericCardViewerProps["cardXNodeXWidgetData"]>,
-        required: true,
-    },
-    graphSlug: {
-        type: String as PropType<GenericCardViewerProps["graphSlug"]>,
-        required: true,
-    },
-    nodegroupAlias: {
-        type: String as PropType<GenericCardViewerProps["nodegroupAlias"]>,
-        required: true,
-    },
-    tileData: {
-        type: Object as PropType<GenericCardViewerProps["tileData"]>,
-        default: undefined,
-    },
-});
-
-interface GenericCardViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (
         event: "initialized",
         aliasedNodeData: Record<string, AliasedNodeData>,
     ): void;
-}
-
-const emit: GenericCardViewerEmits = defineEmits(["initialized"]);
+};
 
 const initializedNodeAliases = new Set<string>();
 const initializedNodeData: Record<string, AliasedNodeData> = {};

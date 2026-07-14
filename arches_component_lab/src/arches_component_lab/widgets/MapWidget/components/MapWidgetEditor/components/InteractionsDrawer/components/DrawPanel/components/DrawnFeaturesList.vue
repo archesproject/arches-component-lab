@@ -6,7 +6,6 @@ import { useGettext } from "vue3-gettext";
 
 import Listbox from "primevue/listbox";
 
-import type { PropType } from "vue";
 import type { Feature } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
@@ -18,21 +17,10 @@ import {
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 import { getMapboxDraw } from "@/arches_component_lab/widgets/MapWidget/utils.ts";
 
-interface DrawnFeaturesListProps {
+const { map, features } = defineProps(["map", "features"]) as {
     map: MaplibreMap;
     features: Feature[];
-}
-
-const { map, features } = defineProps({
-    map: {
-        type: Object as PropType<DrawnFeaturesListProps["map"]>,
-        required: true,
-    },
-    features: {
-        type: Array as PropType<DrawnFeaturesListProps["features"]>,
-        required: true,
-    },
-});
+};
 
 const selectedDrawnFeature = inject<Ref<Feature | null>>(
     "selectedDrawnFeature",

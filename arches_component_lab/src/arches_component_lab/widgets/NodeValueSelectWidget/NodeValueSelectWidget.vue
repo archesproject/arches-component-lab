@@ -7,53 +7,30 @@ import NodeValueSelectWidgetViewer from "@/arches_component_lab/widgets/NodeValu
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/utils.ts";
 
-import type { PropType } from "vue";
 import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
 import type { NodeValueSelectWidgetProps } from "@/arches_component_lab/widgets/NodeValueSelectWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps({
-    mode: {
-        type: String as PropType<NodeValueSelectWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<NodeValueSelectWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<NodeValueSelectWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            NodeValueSelectWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<NodeValueSelectWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<NodeValueSelectWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as NodeValueSelectWidgetProps;
 
-interface NodeValueSelectWidgetEmits {
+const emit = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:value", updatedValue: string | null): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: NodeValueAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: NodeValueAliasedNodeData): void;
-}
-
-const emit: NodeValueSelectWidgetEmits = defineEmits([
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildNodeValueAliasedNodeData(value ?? null),

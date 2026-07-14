@@ -1,25 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type { PropType } from "vue";
 import type { StringAliasedNodeData } from "@/arches_component_lab/datatypes/string/types";
 
-interface TextWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: StringAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<TextWidgetViewerProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface TextWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: StringAliasedNodeData): void;
-}
-
-const emit: TextWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

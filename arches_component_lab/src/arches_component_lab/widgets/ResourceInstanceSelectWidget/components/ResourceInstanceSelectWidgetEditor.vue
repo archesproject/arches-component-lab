@@ -21,20 +21,11 @@ import type {
     ResourceInstanceCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-import type { PropType } from "vue";
 import type { AliasedTileData } from "@/arches_component_lab/types";
 import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 // in future iteration these may be declared in the CardXNodeXWidgetData config
 const ITEM_SIZE = 36;
-
-interface ResourceInstanceSelectWidgetEditorProps {
-    cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
-    nodeAlias?: string;
-    graphSlug?: string;
-    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
-    defaultTerm?: string;
-}
 
 const {
     cardXNodeXWidgetData,
@@ -42,53 +33,32 @@ const {
     graphSlug,
     aliasedNodeData,
     defaultTerm,
-} = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            ResourceInstanceSelectWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    nodeAlias: {
-        type: String as PropType<
-            ResourceInstanceSelectWidgetEditorProps["nodeAlias"]
-        >,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<
-            ResourceInstanceSelectWidgetEditorProps["graphSlug"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            ResourceInstanceSelectWidgetEditorProps["aliasedNodeData"]
-        >,
-        default: undefined,
-    },
-    defaultTerm: {
-        type: String as PropType<
-            ResourceInstanceSelectWidgetEditorProps["defaultTerm"]
-        >,
-        default: undefined,
-    },
-});
+} = defineProps([
+    "cardXNodeXWidgetData",
+    "nodeAlias",
+    "graphSlug",
+    "aliasedNodeData",
+    "defaultTerm",
+]) as {
+    cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
+    nodeAlias?: string;
+    graphSlug?: string;
+    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
+    defaultTerm?: string;
+};
 
-interface ResourceInstanceSelectWidgetEditorEmits {
+const emit = defineEmits([
+    "update:isLoading",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ResourceInstanceAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ResourceInstanceAliasedNodeData): void;
-}
-
-const emit: ResourceInstanceSelectWidgetEditorEmits = defineEmits([
-    "update:isLoading",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const { $gettext } = useGettext();
 

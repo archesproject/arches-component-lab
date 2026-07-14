@@ -4,21 +4,11 @@ import { inject, onMounted, ref, watch } from "vue";
 import RadioButton from "primevue/radiobutton";
 
 import type { Map } from "maplibre-gl";
-import type { PropType } from "vue";
 import type { Ref } from "vue";
 
 import type { Basemap } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-interface BasemapPanelProps {
-    map: Map;
-}
-
-defineProps({
-    map: {
-        type: Object as PropType<BasemapPanelProps["map"]>,
-        required: true,
-    },
-});
+defineProps(["map"]) as { map: Map };
 
 const basemaps = inject<Ref<Basemap[]>>("basemaps", ref([]));
 const selectedBasemap = ref<Basemap | null>(null);

@@ -10,7 +10,6 @@ import FocusController from "@/arches_component_lab/widgets/RichTextWidget/compo
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     StringCardXNodeXWidgetData,
     Language,
@@ -20,36 +19,21 @@ import type {
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 
-interface RichTextWidgetEditorProps {
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     aliasedNodeData: StringAliasedNodeData | null;
-}
+};
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            RichTextWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<RichTextWidgetEditorProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface RichTextWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: StringAliasedNodeData): void;
-}
-
-const emit: RichTextWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const { $gettext } = useGettext();
 

@@ -7,49 +7,26 @@ import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/NonLoca
 
 import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/utils.ts";
 
-import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-interface NonLocalizedTextWidgetEditorProps {
+const { cardXNodeXWidgetData, renderContext, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "renderContext",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     renderContext?: string;
     aliasedNodeData: NonLocalizedTextAliasedNodeData | null;
-}
+};
 
-const { cardXNodeXWidgetData, renderContext, aliasedNodeData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            NonLocalizedTextWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    renderContext: {
-        type: String as PropType<
-            NonLocalizedTextWidgetEditorProps["renderContext"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            NonLocalizedTextWidgetEditorProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
-
-interface NonLocalizedTextWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: NonLocalizedTextAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
-}
-
-const emit: NonLocalizedTextWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 onMounted(() => {
     emit(

@@ -5,41 +5,21 @@ import Button from "primevue/button";
 import Divider from "primevue/divider";
 
 import type { Component } from "vue";
-import type { PropType } from "vue";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
 import type { MapInteractionItem } from "@/arches_component_lab/widgets/MapWidget/types.ts";
-
-interface InteractionsDrawerProps {
-    map: MaplibreMap;
-    items: MapInteractionItem[];
-    position?: "left" | "right";
-    defaultOpenIndex?: number;
-}
 
 const {
     map,
     items,
     position = "right",
     defaultOpenIndex,
-} = defineProps({
-    map: {
-        type: Object as PropType<InteractionsDrawerProps["map"]>,
-        required: true,
-    },
-    items: {
-        type: Array as PropType<InteractionsDrawerProps["items"]>,
-        required: true,
-    },
-    position: {
-        type: String as PropType<InteractionsDrawerProps["position"]>,
-        default: "right",
-    },
-    defaultOpenIndex: {
-        type: Number as PropType<InteractionsDrawerProps["defaultOpenIndex"]>,
-        default: undefined,
-    },
-});
+} = defineProps(["map", "items", "position", "defaultOpenIndex"]) as {
+    map: MaplibreMap;
+    items: MapInteractionItem[];
+    position?: "left" | "right";
+    defaultOpenIndex?: number;
+};
 
 const selectedComponent = shallowRef<Component | null>(null);
 const isOverlayVisible = ref(false);

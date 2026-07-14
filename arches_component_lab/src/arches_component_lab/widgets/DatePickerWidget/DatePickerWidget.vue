@@ -7,48 +7,27 @@ import DatePickerWidgetViewer from "@/arches_component_lab/widgets/DatePickerWid
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildDateAliasedNodeData } from "@/arches_component_lab/datatypes/date/utils.ts";
 
-import type { PropType } from "vue";
 import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
 import type { DatePickerWidgetProps } from "@/arches_component_lab/widgets/DatePickerWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps({
-    mode: {
-        type: String as PropType<DatePickerWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<DatePickerWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<DatePickerWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<DatePickerWidgetProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<DatePickerWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: String as PropType<DatePickerWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as DatePickerWidgetProps;
 
-interface DatePickerWidgetEmits {
-    (event: "update:value", updatedValue: string | null): void;
-    (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
-    (event: "initialized", updatedValue: DateAliasedNodeData): void;
-}
-
-const emit: DatePickerWidgetEmits = defineEmits([
+const emit = defineEmits([
     "update:value",
     "update:aliasedNodeData",
     "initialized",
-]);
+]) as {
+    (event: "update:value", updatedValue: string | null): void;
+    (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
+    (event: "initialized", updatedValue: DateAliasedNodeData): void;
+};
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildDateAliasedNodeData(value ?? null),

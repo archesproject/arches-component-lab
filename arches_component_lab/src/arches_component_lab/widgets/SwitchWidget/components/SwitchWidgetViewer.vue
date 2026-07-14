@@ -2,33 +2,20 @@
 import { computed, onMounted } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import type { PropType } from "vue";
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-interface SwitchWidgetViewerProps {
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanAliasedNodeData;
-}
+};
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            SwitchWidgetViewerProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<SwitchWidgetViewerProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface SwitchWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
-}
-
-const emit: SwitchWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 const { $gettext } = useGettext();
 

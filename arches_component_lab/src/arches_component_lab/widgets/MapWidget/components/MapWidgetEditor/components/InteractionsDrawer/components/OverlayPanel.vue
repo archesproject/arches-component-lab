@@ -4,21 +4,11 @@ import { inject, ref } from "vue";
 import ToggleSwitch from "primevue/toggleswitch";
 
 import type { Map } from "maplibre-gl";
-import type { PropType } from "vue";
 import type { Ref } from "vue";
 
 import type { MapLayer } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-interface OverlayPanelProps {
-    map: Map;
-}
-
-defineProps({
-    map: {
-        type: Object as PropType<OverlayPanelProps["map"]>,
-        required: true,
-    },
-});
+defineProps(["map"]) as { map: Map };
 
 const overlays = inject<Ref<MapLayer[]>>("overlays", ref([]));
 </script>

@@ -1,27 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type { PropType } from "vue";
 import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
 
-interface DatePickerWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: DateAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<
-            DatePickerWidgetViewerProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
-
-interface DatePickerWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: DateAliasedNodeData): void;
-}
-
-const emit: DatePickerWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

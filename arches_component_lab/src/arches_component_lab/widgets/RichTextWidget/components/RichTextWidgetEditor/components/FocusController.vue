@@ -6,18 +6,9 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from "vue";
 
-import type { PropType } from "vue";
-
-interface FocusControllerProps {
+const { nodeAlias } = defineProps(["nodeAlias"]) as {
     nodeAlias: string;
-}
-
-const { nodeAlias } = defineProps({
-    nodeAlias: {
-        type: String as PropType<FocusControllerProps["nodeAlias"]>,
-        required: true,
-    },
-});
+};
 
 const wrapperElementRef = ref<HTMLElement | null>(null);
 

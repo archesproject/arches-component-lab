@@ -9,7 +9,6 @@ import InputNumber from "primevue/inputnumber";
 import Panel from "primevue/panel";
 import Select from "primevue/select";
 
-import type { PropType } from "vue";
 import type { Feature } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
@@ -22,16 +21,9 @@ import {
     YARDS,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
-interface BufferControlsProps {
+const { map } = defineProps(["map"]) as {
     map: MaplibreMap;
-}
-
-const { map } = defineProps({
-    map: {
-        type: Object as PropType<BufferControlsProps["map"]>,
-        required: true,
-    },
-});
+};
 
 const { $gettext } = useGettext();
 

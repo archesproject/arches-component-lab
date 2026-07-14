@@ -4,28 +4,18 @@ import { computed, onMounted } from "vue";
 import arches from "arches";
 import { Image, Galleria } from "primevue";
 
-import type { PropType } from "vue";
 import type {
     FileListAliasedNodeData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types";
 
-interface FileListWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: FileListAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<FileListWidgetViewerProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface FileListWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: FileListAliasedNodeData): void;
-}
-
-const emit: FileListWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

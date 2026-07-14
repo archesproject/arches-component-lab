@@ -9,41 +9,26 @@ import RichTextWidgetViewer from "@/arches_component_lab/widgets/RichTextWidget/
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     LanguageValue,
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 import type { RichTextWidgetProps } from "@/arches_component_lab/widgets/RichTextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps({
-    mode: {
-        type: String as PropType<RichTextWidgetProps["mode"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<RichTextWidgetProps["nodeAlias"]>,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<RichTextWidgetProps["graphSlug"]>,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<RichTextWidgetProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<RichTextWidgetProps["aliasedNodeData"]>,
-        default: undefined,
-    },
-    value: {
-        type: Object as PropType<RichTextWidgetProps["value"]>,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as RichTextWidgetProps;
 
-interface RichTextWidgetEmits {
+const emit = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (
         event: "update:value",
         updatedValue: Record<string, LanguageValue> | null,
@@ -53,13 +38,7 @@ interface RichTextWidgetEmits {
         updatedValue: StringAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: StringAliasedNodeData): void;
-}
-
-const emit: RichTextWidgetEmits = defineEmits([
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const { current } = useGettext();
 const resolvedAliasedNodeData = computed(

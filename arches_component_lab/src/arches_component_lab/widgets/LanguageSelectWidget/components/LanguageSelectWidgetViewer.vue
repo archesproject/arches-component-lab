@@ -1,27 +1,15 @@
 <script setup lang="ts">
 import { watch } from "vue";
 
-import type { PropType } from "vue";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 
-interface LanguageSelectWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData?: LanguageAliasedNodeData | null;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<
-            LanguageSelectWidgetViewerProps["aliasedNodeData"]
-        >,
-        default: undefined,
-    },
-});
-
-interface LanguageSelectWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
-}
-
-const emit: LanguageSelectWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 watch(
     () => aliasedNodeData,

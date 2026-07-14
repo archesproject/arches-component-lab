@@ -5,46 +5,28 @@ import RadioButtonGroup from "primevue/radiobuttongroup";
 
 import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     DomainAliasedNodeData,
     DomainCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-interface DomainRadioWidgetEditorProps {
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainAliasedNodeData | null;
-}
-
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            DomainRadioWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            DomainRadioWidgetEditorProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
+};
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
-interface DomainRadioWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainAliasedNodeData): void;
-}
-
-const emit: DomainRadioWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 onMounted(() => {
     emit(

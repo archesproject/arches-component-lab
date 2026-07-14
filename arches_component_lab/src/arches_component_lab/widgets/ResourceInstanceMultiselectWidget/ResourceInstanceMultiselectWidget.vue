@@ -8,53 +8,22 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useResourceDisplayNamesResolver } from "@/arches_component_lab/datatypes/resource-instance-list/useResourceDisplayNamesResolver.ts";
 import { buildResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     ResourceInstanceListAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { ResourceInstanceMultiselectWidgetProps } from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } = defineProps({
-    mode: {
-        type: String as PropType<
-            ResourceInstanceMultiselectWidgetProps["mode"]
-        >,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<
-            ResourceInstanceMultiselectWidgetProps["nodeAlias"]
-        >,
-        default: undefined,
-    },
-    graphSlug: {
-        type: String as PropType<
-            ResourceInstanceMultiselectWidgetProps["graphSlug"]
-        >,
-        default: undefined,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            ResourceInstanceMultiselectWidgetProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            ResourceInstanceMultiselectWidgetProps["aliasedNodeData"]
-        >,
-        default: undefined,
-    },
-    value: {
-        type: Array as PropType<
-            ResourceInstanceMultiselectWidgetProps["value"]
-        >,
-        default: undefined,
-    },
-});
+const { aliasedNodeData, graphSlug, nodeAlias, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as ResourceInstanceMultiselectWidgetProps;
 
-interface ResourceInstanceMultiselectWidgetEmits {
+const emit: {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:value",
@@ -68,9 +37,7 @@ interface ResourceInstanceMultiselectWidgetEmits {
         event: "initialized",
         updatedValue: ResourceInstanceListAliasedNodeData,
     ): void;
-}
-
-const emit: ResourceInstanceMultiselectWidgetEmits = defineEmits([
+} = defineEmits([
     "update:isLoading",
     "update:value",
     "update:aliasedNodeData",

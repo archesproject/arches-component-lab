@@ -51,7 +51,6 @@ import {
     STYLE_LOAD_EVENT,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
-import type { PropType } from "vue";
 import type { Ref } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
@@ -80,28 +79,23 @@ interface DrawEvent {
     features: Feature[];
 }
 
-interface MapWidgetEditorProps {
+const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps([
+    "aliasedNodeData",
+    "cardXNodeXWidgetData",
+    "renderContext",
+]) as {
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
-}
+};
 
-const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<MapWidgetEditorProps["aliasedNodeData"]>,
-        required: true,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<MapWidgetEditorProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    renderContext: {
-        type: String as PropType<MapWidgetEditorProps["renderContext"]>,
-        default: undefined,
-    },
-});
-
-interface MapWidgetEditorEmits {
+const emit = defineEmits([
+    "update:value",
+    "update:isLoading",
+    "update:overlays",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:value", value: FeatureCollection): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:overlays"): void;
@@ -113,15 +107,7 @@ interface MapWidgetEditorEmits {
         event: "initialized",
         updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
     ): void;
-}
-
-const emit: MapWidgetEditorEmits = defineEmits([
-    "update:value",
-    "update:isLoading",
-    "update:overlays",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const { $gettext } = useGettext();
 

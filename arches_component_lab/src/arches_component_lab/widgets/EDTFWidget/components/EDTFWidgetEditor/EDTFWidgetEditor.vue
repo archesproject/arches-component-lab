@@ -8,35 +8,21 @@ import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components
 
 import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
-import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
 
-interface EDTFWidgetEditorProps {
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: EDTFAliasedNodeData | null;
-}
+};
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<EDTFWidgetEditorProps["cardXNodeXWidgetData"]>,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<EDTFWidgetEditorProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface EDTFWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
     (event: "initialized", updatedValue: EDTFAliasedNodeData): void;
-}
-
-const emit: EDTFWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const { $gettext } = useGettext();
 

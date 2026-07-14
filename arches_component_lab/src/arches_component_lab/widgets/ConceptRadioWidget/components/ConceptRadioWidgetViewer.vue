@@ -1,27 +1,15 @@
 <script setup lang="ts">
 import { watch } from "vue";
 
-import type { PropType } from "vue";
 import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-interface ConceptRadioWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData?: ConceptAliasedNodeData | null;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<
-            ConceptRadioWidgetViewerProps["aliasedNodeData"]
-        >,
-        default: undefined,
-    },
-});
-
-interface ConceptRadioWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
-}
-
-const emit: ConceptRadioWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 watch(
     () => aliasedNodeData,

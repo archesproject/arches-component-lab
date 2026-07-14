@@ -3,25 +3,15 @@ import { onMounted } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import type { PropType } from "vue";
 import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types.ts";
 
-interface URLWidgetViewerProps {
+const { aliasedNodeData } = defineProps(["aliasedNodeData"]) as {
     aliasedNodeData: URLAliasedNodeData;
-}
+};
 
-const { aliasedNodeData } = defineProps({
-    aliasedNodeData: {
-        type: Object as PropType<URLWidgetViewerProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface URLWidgetViewerEmits {
+const emit = defineEmits(["initialized"]) as {
     (event: "initialized", updatedValue: URLAliasedNodeData): void;
-}
-
-const emit: URLWidgetViewerEmits = defineEmits(["initialized"]);
+};
 
 const { $gettext } = useGettext();
 

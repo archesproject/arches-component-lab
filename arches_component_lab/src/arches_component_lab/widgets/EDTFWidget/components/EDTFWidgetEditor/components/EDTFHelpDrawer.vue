@@ -3,26 +3,15 @@ import Drawer from "primevue/drawer";
 
 import { useGettext } from "vue3-gettext";
 
-import type { PropType } from "vue";
-
 const { $gettext } = useGettext();
 
-interface EDTFHelpDrawerProps {
+const { shouldShowHelpDrawer } = defineProps(["shouldShowHelpDrawer"]) as {
     shouldShowHelpDrawer: boolean;
-}
+};
 
-const { shouldShowHelpDrawer } = defineProps({
-    shouldShowHelpDrawer: {
-        type: Boolean as PropType<EDTFHelpDrawerProps["shouldShowHelpDrawer"]>,
-        required: true,
-    },
-});
-
-interface EDTFHelpDrawerEmits {
+const emit = defineEmits(["update:shouldShowHelpDrawer"]) as {
     (event: "update:shouldShowHelpDrawer", value: boolean): void;
-}
-
-const emit: EDTFHelpDrawerEmits = defineEmits(["update:shouldShowHelpDrawer"]);
+};
 
 type EdtfExample = {
     primaryValue: string;

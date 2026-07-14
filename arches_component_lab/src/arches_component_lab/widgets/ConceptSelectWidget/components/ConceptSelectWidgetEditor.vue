@@ -13,58 +13,33 @@ import type {
     ConceptAliasedNodeData,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
-import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-interface ConceptSelectWidgetEditorProps {
-    graphSlug?: string;
-    nodeAlias?: string;
-    aliasedNodeData?: ConceptAliasedNodeData | null;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-}
-
 const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps({
-        graphSlug: {
-            type: String as PropType<
-                ConceptSelectWidgetEditorProps["graphSlug"]
-            >,
-            default: undefined,
-        },
-        nodeAlias: {
-            type: String as PropType<
-                ConceptSelectWidgetEditorProps["nodeAlias"]
-            >,
-            default: undefined,
-        },
-        aliasedNodeData: {
-            type: Object as PropType<
-                ConceptSelectWidgetEditorProps["aliasedNodeData"]
-            >,
-            default: undefined,
-        },
-        cardXNodeXWidgetData: {
-            type: Object as PropType<
-                ConceptSelectWidgetEditorProps["cardXNodeXWidgetData"]
-            >,
-            default: undefined,
-        },
-    });
+    defineProps([
+        "graphSlug",
+        "nodeAlias",
+        "aliasedNodeData",
+        "cardXNodeXWidgetData",
+    ]) as {
+        graphSlug?: string;
+        nodeAlias?: string;
+        aliasedNodeData?: ConceptAliasedNodeData | null;
+        cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    };
 
-interface ConceptSelectWidgetEditorEmits {
+const emit = defineEmits([
+    "update:isLoading",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ConceptAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
-}
-
-const emit: ConceptSelectWidgetEditorEmits = defineEmits([
-    "update:isLoading",
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
     null,

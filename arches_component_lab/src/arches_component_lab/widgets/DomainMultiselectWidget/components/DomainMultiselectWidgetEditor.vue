@@ -4,46 +4,28 @@ import MultiSelect from "primevue/multiselect";
 
 import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     DomainCardXNodeXWidgetData,
     DomainListAliasedNodeData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-interface DomainMultiselectWidgetEditorProps {
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainListAliasedNodeData | null;
-}
-
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            DomainMultiselectWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<
-            DomainMultiselectWidgetEditorProps["aliasedNodeData"]
-        >,
-        required: true,
-    },
-});
+};
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
-interface DomainMultiselectWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainListAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainListAliasedNodeData): void;
-}
-
-const emit: DomainMultiselectWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 onMounted(() => {
     emit(

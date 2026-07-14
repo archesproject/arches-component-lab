@@ -8,21 +8,13 @@ import { useGettext } from "vue3-gettext";
 
 import { fetchResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/api.ts";
 
-import type { PropType } from "vue";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 
 import type { ResourceDescriptor } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-interface FeaturePopupProps {
+const { features } = defineProps(["features"]) as {
     features: MapGeoJSONFeature[];
-}
-
-const { features } = defineProps({
-    features: {
-        type: Array as PropType<FeaturePopupProps["features"]>,
-        required: true,
-    },
-});
+};
 
 const { $gettext } = useGettext();
 

@@ -3,27 +3,16 @@ import { computed } from "vue";
 
 import { VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-interface GenericWidgetLabelProps {
+const { mode, cardXNodeXWidgetData } = defineProps([
+    "mode",
+    "cardXNodeXWidgetData",
+]) as {
     mode: WidgetMode;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-}
-
-const { mode, cardXNodeXWidgetData } = defineProps({
-    mode: {
-        type: String as PropType<GenericWidgetLabelProps["mode"]>,
-        required: true,
-    },
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            GenericWidgetLabelProps["cardXNodeXWidgetData"]
-        >,
-        required: true,
-    },
-});
+};
 
 const shouldShowRequiredAsterisk = computed(() => {
     return Boolean(mode !== VIEW && cardXNodeXWidgetData.node.isrequired);

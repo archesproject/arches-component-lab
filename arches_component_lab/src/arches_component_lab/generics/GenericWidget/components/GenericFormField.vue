@@ -4,7 +4,6 @@ import { useTemplateRef, watchEffect } from "vue";
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
 
-import type { PropType } from "vue";
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
 type FormFieldType = {
@@ -21,32 +20,19 @@ type FormFieldType = {
     };
 };
 
-interface GenericFormFieldProps {
+const { isDirty, nodeAlias, initialValue } = defineProps([
+    "isDirty",
+    "nodeAlias",
+    "initialValue",
+]) as {
     isDirty: boolean;
     nodeAlias: string;
     initialValue: AliasedNodeData | null;
-}
+};
 
-const { isDirty, nodeAlias, initialValue } = defineProps({
-    isDirty: {
-        type: Boolean as PropType<GenericFormFieldProps["isDirty"]>,
-        required: true,
-    },
-    nodeAlias: {
-        type: String as PropType<GenericFormFieldProps["nodeAlias"]>,
-        required: true,
-    },
-    initialValue: {
-        type: Object as PropType<GenericFormFieldProps["initialValue"]>,
-        required: true,
-    },
-});
-
-interface GenericFormFieldEmits {
+const emit = defineEmits(["update:isDirty"]) as {
     (e: "update:isDirty", dirty: boolean): void;
-}
-
-const emit: GenericFormFieldEmits = defineEmits(["update:isDirty"]);
+};
 
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
 

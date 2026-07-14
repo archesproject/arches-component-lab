@@ -4,42 +4,26 @@ import InputNumber from "primevue/inputnumber";
 
 import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
-import type { PropType } from "vue";
 import type {
     NumberAliasedNodeData,
     NumberCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-interface NumberWidgetEditorProps {
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps([
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+]) as {
     cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
     aliasedNodeData: NumberAliasedNodeData | null;
-}
+};
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
-    cardXNodeXWidgetData: {
-        type: Object as PropType<
-            NumberWidgetEditorProps["cardXNodeXWidgetData"]
-        >,
-        default: undefined,
-    },
-    aliasedNodeData: {
-        type: Object as PropType<NumberWidgetEditorProps["aliasedNodeData"]>,
-        required: true,
-    },
-});
-
-interface NumberWidgetEditorEmits {
+const emit = defineEmits(["update:aliasedNodeData", "initialized"]) as {
     (
         event: "update:aliasedNodeData",
         updatedValue: NumberAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: NumberAliasedNodeData): void;
-}
-
-const emit: NumberWidgetEditorEmits = defineEmits([
-    "update:aliasedNodeData",
-    "initialized",
-]);
+};
 
 onMounted(() => {
     emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
