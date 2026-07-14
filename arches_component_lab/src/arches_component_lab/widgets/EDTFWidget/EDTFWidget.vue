@@ -7,17 +7,50 @@ import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
+import type { PropType } from "vue";
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
 import type { EDTFWidgetProps } from "@/arches_component_lab/widgets/EDTFWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<EDTFWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<EDTFWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<EDTFWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<EDTFWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<EDTFWidgetProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<EDTFWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: String as PropType<EDTFWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:isDirty": [isDirty: boolean];
-    "update:value": [updatedValue: string | null];
-    "update:aliasedNodeData": [updatedValue: EDTFAliasedNodeData];
-    initialized: [updatedValue: EDTFAliasedNodeData];
-}>();
+interface EDTFWidgetEmits {
+    (event: "update:isDirty", isDirty: boolean): void;
+    (event: "update:value", updatedValue: string | null): void;
+    (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
+    (event: "initialized", updatedValue: EDTFAliasedNodeData): void;
+}
+
+const emit: EDTFWidgetEmits = defineEmits([
+    "update:isDirty",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildEDTFAliasedNodeData(value ?? null),

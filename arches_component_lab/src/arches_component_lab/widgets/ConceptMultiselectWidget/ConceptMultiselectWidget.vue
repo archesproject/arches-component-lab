@@ -9,18 +9,57 @@ import { buildConceptListAliasedNodeData } from "@/arches_component_lab/datatype
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
+import type { PropType } from "vue";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 import type { ConceptMultiselectWidgetProps } from "@/arches_component_lab/widgets/ConceptMultiselectWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } =
-    defineProps<ConceptMultiselectWidgetProps>();
+const { aliasedNodeData, graphSlug, nodeAlias, value } = defineProps({
+    mode: {
+        type: String as PropType<ConceptMultiselectWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<ConceptMultiselectWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<ConceptMultiselectWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            ConceptMultiselectWidgetProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            ConceptMultiselectWidgetProps["aliasedNodeData"]
+        >,
+        default: undefined,
+    },
+    value: {
+        type: Array as PropType<ConceptMultiselectWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:isLoading": [isLoading: boolean];
-    "update:value": [updatedValue: string[] | null];
-    "update:aliasedNodeData": [updatedValue: ConceptListAliasedNodeData];
-    initialized: [updatedValue: ConceptListAliasedNodeData];
-}>();
+interface ConceptMultiselectWidgetEmits {
+    (event: "update:isLoading", isLoading: boolean): void;
+    (event: "update:value", updatedValue: string[] | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ConceptListAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
+}
+
+const emit: ConceptMultiselectWidgetEmits = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const { resolvedItems, loading } = useConceptLabelsResolver(
     toRef(() => {

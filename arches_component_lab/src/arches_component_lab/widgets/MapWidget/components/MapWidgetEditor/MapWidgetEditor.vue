@@ -51,6 +51,7 @@ import {
     STYLE_LOAD_EVENT,
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 
+import type { PropType } from "vue";
 import type { Ref } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
@@ -79,13 +80,28 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps<{
+interface MapWidgetEditorProps {
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
-}>();
+}
 
-const emit = defineEmits<{
+const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<MapWidgetEditorProps["aliasedNodeData"]>,
+        required: true,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<MapWidgetEditorProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    renderContext: {
+        type: String as PropType<MapWidgetEditorProps["renderContext"]>,
+        default: undefined,
+    },
+});
+
+interface MapWidgetEditorEmits {
     (event: "update:value", value: FeatureCollection): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:overlays"): void;
@@ -97,7 +113,15 @@ const emit = defineEmits<{
         event: "initialized",
         updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
     ): void;
-}>();
+}
+
+const emit: MapWidgetEditorEmits = defineEmits([
+    "update:value",
+    "update:isLoading",
+    "update:overlays",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const { $gettext } = useGettext();
 

@@ -4,21 +4,40 @@ import ToggleSwitch from "primevue/toggleswitch";
 
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
+import type { PropType } from "vue";
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+interface SwitchWidgetEditorProps {
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            SwitchWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<SwitchWidgetEditorProps["aliasedNodeData"]>,
+        required: true,
+    },
+});
+
+interface SwitchWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
-}>();
+}
+
+const emit: SwitchWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 onMounted(() => {
     emit(

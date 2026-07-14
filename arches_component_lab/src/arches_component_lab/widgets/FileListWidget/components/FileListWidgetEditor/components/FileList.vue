@@ -4,20 +4,30 @@ import Button from "primevue/button";
 
 import { REMOVE } from "@/arches_component_lab/datatypes/file-list/constants.ts";
 
+import type { PropType } from "vue";
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
 
-const { files } = defineProps<{
+interface FileListProps {
     files: FileReference[];
-}>();
+}
 
-const emit = defineEmits<{
+const { files } = defineProps({
+    files: {
+        type: Array as PropType<FileListProps["files"]>,
+        required: true,
+    },
+});
+
+interface FileListEmits {
     (
         e: typeof REMOVE,
         fileReference: FileReference,
         fileIndex: number,
         event: Event,
     ): void;
-}>();
+}
+
+const emit: FileListEmits = defineEmits([REMOVE]);
 </script>
 
 <template>

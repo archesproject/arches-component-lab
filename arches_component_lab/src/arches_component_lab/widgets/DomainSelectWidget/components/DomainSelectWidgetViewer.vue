@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
+import type { PropType } from "vue";
 import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+interface DomainSelectWidgetViewerProps {
     aliasedNodeData: DomainAliasedNodeData;
-}>();
+}
 
-const emit = defineEmits<{
-    initialized: [updatedValue: DomainAliasedNodeData];
-}>();
+const { aliasedNodeData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<
+            DomainSelectWidgetViewerProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
+
+interface DomainSelectWidgetViewerEmits {
+    (event: "initialized", updatedValue: DomainAliasedNodeData): void;
+}
+
+const emit: DomainSelectWidgetViewerEmits = defineEmits(["initialized"]);
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

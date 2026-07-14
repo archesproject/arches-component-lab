@@ -23,12 +23,23 @@ import {
 } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
+import type { PropType } from "vue";
 import type {
     AliasedData,
     AliasedNodeData,
     AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
+
+interface GenericCardEditorProps {
+    cardXNodeXWidgetData: CardXNodeXWidgetData[];
+    graphSlug: string;
+    nodegroupAlias: string;
+    resourceInstanceId: string | null | undefined;
+    selectedNodeAlias?: string | null;
+    shouldShowFormButtons: boolean | undefined;
+    tileData?: AliasedTileData;
+}
 
 const {
     cardXNodeXWidgetData,
@@ -38,15 +49,38 @@ const {
     selectedNodeAlias,
     shouldShowFormButtons = true,
     tileData,
-} = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData[];
-    graphSlug: string;
-    nodegroupAlias: string;
-    resourceInstanceId: string | null | undefined;
-    selectedNodeAlias?: string | null;
-    shouldShowFormButtons: boolean | undefined;
-    tileData?: AliasedTileData;
-}>();
+} = defineProps({
+    cardXNodeXWidgetData: {
+        type: Array as PropType<GenericCardEditorProps["cardXNodeXWidgetData"]>,
+        required: true,
+    },
+    graphSlug: {
+        type: String as PropType<GenericCardEditorProps["graphSlug"]>,
+        required: true,
+    },
+    nodegroupAlias: {
+        type: String as PropType<GenericCardEditorProps["nodegroupAlias"]>,
+        required: true,
+    },
+    resourceInstanceId: {
+        type: String as PropType<GenericCardEditorProps["resourceInstanceId"]>,
+        default: undefined,
+    },
+    selectedNodeAlias: {
+        type: String as PropType<GenericCardEditorProps["selectedNodeAlias"]>,
+        default: undefined,
+    },
+    shouldShowFormButtons: {
+        type: Boolean as PropType<
+            GenericCardEditorProps["shouldShowFormButtons"]
+        >,
+        default: true,
+    },
+    tileData: {
+        type: Object as PropType<GenericCardEditorProps["tileData"]>,
+        default: undefined,
+    },
+});
 
 const emit = defineEmits([
     "update:tileData",

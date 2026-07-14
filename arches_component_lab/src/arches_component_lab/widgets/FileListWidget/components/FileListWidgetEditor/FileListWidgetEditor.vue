@@ -8,6 +8,7 @@ import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/componen
 
 import { buildFileListAliasedNodeData } from "@/arches_component_lab/datatypes/file-list/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     FileListAliasedNodeData,
     FileListCardXNodeXWidgetData,
@@ -18,18 +19,36 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+interface FileListWidgetEditorProps {
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
-}>();
+}
 
-const emit = defineEmits<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<FileListWidgetEditorProps["aliasedNodeData"]>,
+        required: true,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            FileListWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+});
+
+interface FileListWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: FileListAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: FileListAliasedNodeData): void;
-}>();
+}
+
+const emit: FileListWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 

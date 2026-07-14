@@ -2,17 +2,37 @@
 import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const { $gettext } = useGettext();
 
+interface FileDropZoneProps {
+    openFileChooser: () => void;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    isDisabled: boolean;
+    acceptedFileTypes: string[];
+}
+
 const { openFileChooser, cardXNodeXWidgetData, isDisabled, acceptedFileTypes } =
-    defineProps<{
-        openFileChooser: () => void;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-        isDisabled: boolean;
-        acceptedFileTypes: string[];
-    }>();
+    defineProps({
+        openFileChooser: {
+            type: Function as PropType<FileDropZoneProps["openFileChooser"]>,
+            required: true,
+        },
+        cardXNodeXWidgetData: {
+            type: Object as PropType<FileDropZoneProps["cardXNodeXWidgetData"]>,
+            default: undefined,
+        },
+        isDisabled: {
+            type: Boolean as PropType<FileDropZoneProps["isDisabled"]>,
+            required: true,
+        },
+        acceptedFileTypes: {
+            type: Array as PropType<FileDropZoneProps["acceptedFileTypes"]>,
+            required: true,
+        },
+    });
 
 const displayFileTypes = computed(() => {
     if (!acceptedFileTypes.length) {

@@ -13,24 +13,58 @@ import type {
     ConceptAliasedNodeData,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug?: string;
-        nodeAlias?: string;
-        aliasedNodeData?: ConceptAliasedNodeData | null;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    }>();
+interface ConceptSelectWidgetEditorProps {
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: ConceptAliasedNodeData | null;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+}
 
-const emit = defineEmits<{
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps({
+        graphSlug: {
+            type: String as PropType<
+                ConceptSelectWidgetEditorProps["graphSlug"]
+            >,
+            default: undefined,
+        },
+        nodeAlias: {
+            type: String as PropType<
+                ConceptSelectWidgetEditorProps["nodeAlias"]
+            >,
+            default: undefined,
+        },
+        aliasedNodeData: {
+            type: Object as PropType<
+                ConceptSelectWidgetEditorProps["aliasedNodeData"]
+            >,
+            default: undefined,
+        },
+        cardXNodeXWidgetData: {
+            type: Object as PropType<
+                ConceptSelectWidgetEditorProps["cardXNodeXWidgetData"]
+            >,
+            default: undefined,
+        },
+    });
+
+interface ConceptSelectWidgetEditorEmits {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ConceptAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
-}>();
+}
+
+const emit: ConceptSelectWidgetEditorEmits = defineEmits([
+    "update:isLoading",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
     null,

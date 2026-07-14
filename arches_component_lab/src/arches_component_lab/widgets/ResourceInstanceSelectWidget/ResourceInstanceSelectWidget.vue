@@ -8,6 +8,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useResourceDisplayNameResolver } from "@/arches_component_lab/datatypes/resource-instance/useResourceDisplayNameResolver.ts";
 import { buildResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     ResourceInstanceAliasedNodeData,
     ResourceInstanceReference,
@@ -22,14 +23,66 @@ const {
     cardXNodeXWidgetData,
     value,
     defaultTerm,
-} = defineProps<ResourceInstanceSelectWidgetProps>();
+} = defineProps({
+    mode: {
+        type: String as PropType<ResourceInstanceSelectWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<
+            ResourceInstanceSelectWidgetProps["nodeAlias"]
+        >,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<
+            ResourceInstanceSelectWidgetProps["graphSlug"]
+        >,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            ResourceInstanceSelectWidgetProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            ResourceInstanceSelectWidgetProps["aliasedNodeData"]
+        >,
+        default: undefined,
+    },
+    value: {
+        type: Object as PropType<ResourceInstanceSelectWidgetProps["value"]>,
+        default: undefined,
+    },
+    defaultTerm: {
+        type: String as PropType<
+            ResourceInstanceSelectWidgetProps["defaultTerm"]
+        >,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:isLoading": [isLoading: boolean];
-    "update:value": [updatedValue: ResourceInstanceReference | null];
-    "update:aliasedNodeData": [updatedValue: ResourceInstanceAliasedNodeData];
-    initialized: [updatedValue: ResourceInstanceAliasedNodeData];
-}>();
+interface ResourceInstanceSelectWidgetEmits {
+    (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceReference | null,
+    ): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ResourceInstanceAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: ResourceInstanceAliasedNodeData): void;
+}
+
+const emit: ResourceInstanceSelectWidgetEmits = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const isEditorLoading = ref(false);
 

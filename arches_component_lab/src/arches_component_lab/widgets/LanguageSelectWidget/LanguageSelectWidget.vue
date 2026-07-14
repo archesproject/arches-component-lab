@@ -8,17 +8,55 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
 import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
+import type { PropType } from "vue";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 import type { LanguageSelectWidgetProps } from "@/arches_component_lab/widgets/LanguageSelectWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<LanguageSelectWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<LanguageSelectWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<LanguageSelectWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<LanguageSelectWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            LanguageSelectWidgetProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<LanguageSelectWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: String as PropType<LanguageSelectWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:isLoading": [isLoading: boolean];
-    "update:value": [updatedValue: string | null];
-    "update:aliasedNodeData": [updatedValue: LanguageAliasedNodeData];
-    initialized: [updatedValue: LanguageAliasedNodeData];
-}>();
+interface LanguageSelectWidgetEmits {
+    (event: "update:isLoading", isLoading: boolean): void;
+    (event: "update:value", updatedValue: string | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: LanguageAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
+}
+
+const emit: LanguageSelectWidgetEmits = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const languageStore = useLanguageStore();
 const isLanguagesLoading = ref(true);

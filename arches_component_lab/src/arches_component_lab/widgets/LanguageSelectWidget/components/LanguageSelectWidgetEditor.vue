@@ -6,21 +6,42 @@ import Select from "primevue/select";
 import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
 import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
+import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+interface LanguageSelectWidgetEditorProps {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: LanguageAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            LanguageSelectWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            LanguageSelectWidgetEditorProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
+
+interface LanguageSelectWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: LanguageAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
-}>();
+}
+
+const emit: LanguageSelectWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const languageStore = useLanguageStore();
 languageStore.fetchAllLanguages();

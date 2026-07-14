@@ -4,25 +4,46 @@ import Select from "primevue/select";
 
 import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     DomainAliasedNodeData,
     DomainCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+interface DomainSelectWidgetEditorProps {
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainAliasedNodeData | null;
-}>();
+}
+
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            DomainSelectWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            DomainSelectWidgetEditorProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
-const emit = defineEmits<{
+interface DomainSelectWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainAliasedNodeData): void;
-}>();
+}
+
+const emit: DomainSelectWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 onMounted(() => {
     emit(

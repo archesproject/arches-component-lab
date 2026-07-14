@@ -7,16 +7,53 @@ import RadioBooleanWidgetViewer from "@/arches_component_lab/widgets/RadioBoolea
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
+import type { PropType } from "vue";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 import type { RadioBooleanWidgetProps } from "@/arches_component_lab/widgets/RadioBooleanWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<RadioBooleanWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<RadioBooleanWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<RadioBooleanWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<RadioBooleanWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            RadioBooleanWidgetProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<RadioBooleanWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: Boolean as PropType<RadioBooleanWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: boolean | null];
-    "update:aliasedNodeData": [updatedValue: BooleanAliasedNodeData];
-    initialized: [updatedValue: BooleanAliasedNodeData];
-}>();
+interface RadioBooleanWidgetEmits {
+    (event: "update:value", updatedValue: boolean | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: BooleanAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
+}
+
+const emit: RadioBooleanWidgetEmits = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildBooleanAliasedNodeData(value ?? null),

@@ -10,12 +10,20 @@ import BufferControls from "@/arches_component_lab/widgets/MapWidget/components/
 import DrawControls from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/components/DrawControls.vue";
 import DrawnFeaturesList from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetEditor/components/InteractionsDrawer/components/DrawPanel/components/DrawnFeaturesList.vue";
 
+import type { PropType } from "vue";
 import type { Feature } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
-const { map } = defineProps<{
+interface DrawPanelProps {
     map: MaplibreMap;
-}>();
+}
+
+const { map } = defineProps({
+    map: {
+        type: Object as PropType<DrawPanelProps["map"]>,
+        required: true,
+    },
+});
 
 const drawnFeatures = inject<Ref<Feature[]>>("drawnFeatures", ref([]));
 

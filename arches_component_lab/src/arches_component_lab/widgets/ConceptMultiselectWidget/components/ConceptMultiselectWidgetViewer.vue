@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import { watch } from "vue";
 
+import type { PropType } from "vue";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+interface ConceptMultiselectWidgetViewerProps {
     aliasedNodeData?: ConceptListAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
-    initialized: [updatedValue: ConceptListAliasedNodeData];
-}>();
+const { aliasedNodeData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<
+            ConceptMultiselectWidgetViewerProps["aliasedNodeData"]
+        >,
+        default: undefined,
+    },
+});
+
+interface ConceptMultiselectWidgetViewerEmits {
+    (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
+}
+
+const emit: ConceptMultiselectWidgetViewerEmits = defineEmits(["initialized"]);
 
 watch(
     () => aliasedNodeData,

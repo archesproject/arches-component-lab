@@ -6,6 +6,7 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
+import type { PropType } from "vue";
 import type { Feature } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
@@ -23,9 +24,16 @@ import {
 } from "@/arches_component_lab/widgets/MapWidget/constants.ts";
 import { getMapboxDraw } from "@/arches_component_lab/widgets/MapWidget/utils.ts";
 
-const { map } = defineProps<{
+interface DrawControlsProps {
     map: MaplibreMap;
-}>();
+}
+
+const { map } = defineProps({
+    map: {
+        type: Object as PropType<DrawControlsProps["map"]>,
+        required: true,
+    },
+});
 
 defineExpose({
     deleteSelectedDrawnFeature,

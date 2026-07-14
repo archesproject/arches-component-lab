@@ -5,21 +5,42 @@ import RadioButtonGroup from "primevue/radiobuttongroup";
 
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
+import type { PropType } from "vue";
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+interface RadioBooleanWidgetEditorProps {
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            RadioBooleanWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            RadioBooleanWidgetEditorProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
+
+interface RadioBooleanWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: BooleanAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
-}>();
+}
+
+const emit: RadioBooleanWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 onMounted(() => {
     emit(

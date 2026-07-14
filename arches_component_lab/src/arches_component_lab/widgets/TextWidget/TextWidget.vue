@@ -9,19 +9,61 @@ import TextWidgetViewer from "@/arches_component_lab/widgets/TextWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     LanguageValue,
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 import type { TextWidgetProps } from "@/arches_component_lab/widgets/TextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<TextWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<TextWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<TextWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<TextWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<TextWidgetProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<TextWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: Object as PropType<TextWidgetProps["value"]>,
+        default: undefined,
+    },
+    renderContext: {
+        type: String as PropType<TextWidgetProps["renderContext"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: Record<string, LanguageValue> | null];
-    "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
-    initialized: [updatedValue: StringAliasedNodeData];
-}>();
+interface TextWidgetEmits {
+    (
+        event: "update:value",
+        updatedValue: Record<string, LanguageValue> | null,
+    ): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: StringAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: StringAliasedNodeData): void;
+}
+
+const emit: TextWidgetEmits = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const { current } = useGettext();
 const resolvedAliasedNodeData = computed(

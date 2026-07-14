@@ -7,19 +7,51 @@ import URLWidgetViewer from "@/arches_component_lab/widgets/URLWidget/components
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     URLAliasedNodeData,
     URLNodeValue,
 } from "@/arches_component_lab/datatypes/url/types.ts";
 import type { URLWidgetProps } from "@/arches_component_lab/widgets/URLWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<URLWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<URLWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<URLWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<URLWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<URLWidgetProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<URLWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: Object as PropType<URLWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: URLNodeValue | null];
-    "update:aliasedNodeData": [updatedValue: URLAliasedNodeData];
-    initialized: [updatedValue: URLAliasedNodeData];
-}>();
+interface URLWidgetEmits {
+    (event: "update:value", updatedValue: URLNodeValue | null): void;
+    (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
+    (event: "initialized", updatedValue: URLAliasedNodeData): void;
+}
+
+const emit: URLWidgetEmits = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildURLAliasedNodeData(value ?? null),

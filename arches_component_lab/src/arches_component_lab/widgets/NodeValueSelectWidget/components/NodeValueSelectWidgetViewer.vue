@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
+import type { PropType } from "vue";
 import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+interface NodeValueSelectWidgetViewerProps {
     aliasedNodeData: NodeValueAliasedNodeData;
-}>();
+}
 
-const emit = defineEmits<{
-    initialized: [updatedValue: NodeValueAliasedNodeData];
-}>();
+const { aliasedNodeData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<
+            NodeValueSelectWidgetViewerProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
+
+interface NodeValueSelectWidgetViewerEmits {
+    (event: "initialized", updatedValue: NodeValueAliasedNodeData): void;
+}
+
+const emit: NodeValueSelectWidgetViewerEmits = defineEmits(["initialized"]);
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

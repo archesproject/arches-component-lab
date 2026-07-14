@@ -6,18 +6,35 @@ import InputText from "primevue/inputtext";
 
 import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
 
+import type { PropType } from "vue";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+interface URLWidgetEditorProps {
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: URLAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<URLWidgetEditorProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<URLWidgetEditorProps["aliasedNodeData"]>,
+        required: true,
+    },
+});
+
+interface URLWidgetEditorEmits {
     (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
     (event: "initialized", updatedValue: URLAliasedNodeData): void;
-}>();
+}
+
+const emit: URLWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const { $gettext } = useGettext();
 

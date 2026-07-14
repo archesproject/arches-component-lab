@@ -10,6 +10,7 @@ import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/TextWid
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     StringCardXNodeXWidgetData,
     Language,
@@ -19,21 +20,41 @@ import type {
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, renderContext } = defineProps<{
+interface TextWidgetEditorProps {
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     aliasedNodeData: StringAliasedNodeData | null;
     renderContext?: string;
-}>();
+}
+
+const { cardXNodeXWidgetData, aliasedNodeData, renderContext } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<TextWidgetEditorProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<TextWidgetEditorProps["aliasedNodeData"]>,
+        required: true,
+    },
+    renderContext: {
+        type: String as PropType<TextWidgetEditorProps["renderContext"]>,
+        default: undefined,
+    },
+});
 
 const initialNodeValue = aliasedNodeData?.node_value;
 
-const emit = defineEmits<{
+interface TextWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: StringAliasedNodeData): void;
-}>();
+}
+
+const emit: TextWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const { $gettext } = useGettext();
 

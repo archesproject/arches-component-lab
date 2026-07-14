@@ -13,20 +13,41 @@ import {
     formatDate,
 } from "@/arches_component_lab/datatypes/date/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     DateAliasedNodeData,
     DateCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+interface DatePickerWidgetEditorProps {
     cardXNodeXWidgetData?: DateCardXNodeXWidgetData;
     aliasedNodeData: DateAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            DatePickerWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            DatePickerWidgetEditorProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
+
+interface DatePickerWidgetEditorEmits {
     (event: "update:aliasedNodeData", updatedValue: DateAliasedNodeData): void;
     (event: "initialized", updatedValue: DateAliasedNodeData): void;
-}>();
+}
+
+const emit: DatePickerWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();

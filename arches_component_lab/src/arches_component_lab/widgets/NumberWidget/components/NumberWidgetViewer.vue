@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
+import type { PropType } from "vue";
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+interface NumberWidgetViewerProps {
     aliasedNodeData: NumberAliasedNodeData;
-}>();
+}
 
-const emit = defineEmits<{
-    initialized: [updatedValue: NumberAliasedNodeData];
-}>();
+const { aliasedNodeData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<NumberWidgetViewerProps["aliasedNodeData"]>,
+        required: true,
+    },
+});
+
+interface NumberWidgetViewerEmits {
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+}
+
+const emit: NumberWidgetViewerEmits = defineEmits(["initialized"]);
 
 onMounted(() => {
     emit("initialized", aliasedNodeData);

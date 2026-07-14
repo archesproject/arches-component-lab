@@ -3,15 +3,32 @@ import { watch } from "vue";
 
 import arches from "arches";
 
+import type { PropType } from "vue";
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
-const { aliasedNodeData } = defineProps<{
+interface ResourceInstanceMultiselectWidgetViewerProps {
     aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
-}>();
+}
 
-const emit = defineEmits<{
-    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
-}>();
+const { aliasedNodeData } = defineProps({
+    aliasedNodeData: {
+        type: Object as PropType<
+            ResourceInstanceMultiselectWidgetViewerProps["aliasedNodeData"]
+        >,
+        default: undefined,
+    },
+});
+
+interface ResourceInstanceMultiselectWidgetViewerEmits {
+    (
+        event: "initialized",
+        updatedValue: ResourceInstanceListAliasedNodeData,
+    ): void;
+}
+
+const emit: ResourceInstanceMultiselectWidgetViewerEmits = defineEmits([
+    "initialized",
+]);
 
 watch(
     () => aliasedNodeData,

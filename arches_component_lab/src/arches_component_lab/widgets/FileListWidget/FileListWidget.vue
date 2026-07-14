@@ -7,19 +7,54 @@ import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildFileListAliasedNodeData } from "@/arches_component_lab/datatypes/file-list/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     FileListAliasedNodeData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type { FileListWidgetProps } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<FileListWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<FileListWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<FileListWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<FileListWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<FileListWidgetProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<FileListWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: Array as PropType<FileListWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:value": [updatedValue: FileReference[] | null];
-    "update:aliasedNodeData": [updatedValue: FileListAliasedNodeData];
-    initialized: [updatedValue: FileListAliasedNodeData];
-}>();
+interface FileListWidgetEmits {
+    (event: "update:value", updatedValue: FileReference[] | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: FileListAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: FileListAliasedNodeData): void;
+}
+
+const emit: FileListWidgetEmits = defineEmits([
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildFileListAliasedNodeData(value ?? null),

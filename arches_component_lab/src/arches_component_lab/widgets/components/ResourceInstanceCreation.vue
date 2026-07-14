@@ -8,6 +8,7 @@ import { fetchGraph } from "@/arches_component_lab/datatypes/resource-instance-l
 import GenericCard from "@/arches_component_lab/generics/GenericCard/GenericCard.vue";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
+import type { PropType } from "vue";
 import type {
     AliasedTileData,
     Card,
@@ -15,13 +16,22 @@ import type {
     NodeGroup,
 } from "@/arches_component_lab/types.ts";
 
-const { graphId } = defineProps<{
+interface ResourceInstanceCreationProps {
     graphId: string;
-}>();
+}
 
-const emit = defineEmits<{
+const { graphId } = defineProps({
+    graphId: {
+        type: String as PropType<ResourceInstanceCreationProps["graphId"]>,
+        required: true,
+    },
+});
+
+interface ResourceInstanceCreationEmits {
     (event: "resourceCreated", resource: AliasedTileData): void;
-}>();
+}
+
+const emit: ResourceInstanceCreationEmits = defineEmits(["resourceCreated"]);
 
 const visible = ref(true);
 

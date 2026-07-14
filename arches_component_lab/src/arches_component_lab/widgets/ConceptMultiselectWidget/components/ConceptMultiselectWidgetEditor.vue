@@ -13,24 +13,58 @@ import type {
     CollectionItem,
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { PropType } from "vue";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug?: string;
-        nodeAlias?: string;
-        aliasedNodeData?: ConceptListAliasedNodeData | null;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    }>();
+interface ConceptMultiselectWidgetEditorProps {
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: ConceptListAliasedNodeData | null;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+}
 
-const emit = defineEmits<{
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps({
+        graphSlug: {
+            type: String as PropType<
+                ConceptMultiselectWidgetEditorProps["graphSlug"]
+            >,
+            default: undefined,
+        },
+        nodeAlias: {
+            type: String as PropType<
+                ConceptMultiselectWidgetEditorProps["nodeAlias"]
+            >,
+            default: undefined,
+        },
+        aliasedNodeData: {
+            type: Object as PropType<
+                ConceptMultiselectWidgetEditorProps["aliasedNodeData"]
+            >,
+            default: undefined,
+        },
+        cardXNodeXWidgetData: {
+            type: Object as PropType<
+                ConceptMultiselectWidgetEditorProps["cardXNodeXWidgetData"]
+            >,
+            default: undefined,
+        },
+    });
+
+interface ConceptMultiselectWidgetEditorEmits {
     (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ConceptListAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
-}>();
+}
+
+const emit: ConceptMultiselectWidgetEditorEmits = defineEmits([
+    "update:isLoading",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
     null,

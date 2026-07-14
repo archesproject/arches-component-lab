@@ -7,17 +7,53 @@ import NumberWidgetViewer from "@/arches_component_lab/widgets/NumberWidget/comp
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
+import type { PropType } from "vue";
 import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
 import type { NumberWidgetProps } from "@/arches_component_lab/widgets/NumberWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<NumberWidgetProps>();
+const { aliasedNodeData, value } = defineProps({
+    mode: {
+        type: String as PropType<NumberWidgetProps["mode"]>,
+        required: true,
+    },
+    nodeAlias: {
+        type: String as PropType<NumberWidgetProps["nodeAlias"]>,
+        default: undefined,
+    },
+    graphSlug: {
+        type: String as PropType<NumberWidgetProps["graphSlug"]>,
+        default: undefined,
+    },
+    cardXNodeXWidgetData: {
+        type: Object as PropType<NumberWidgetProps["cardXNodeXWidgetData"]>,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<NumberWidgetProps["aliasedNodeData"]>,
+        default: undefined,
+    },
+    value: {
+        type: Number as PropType<NumberWidgetProps["value"]>,
+        default: undefined,
+    },
+});
 
-const emit = defineEmits<{
-    "update:isDirty": [isDirty: boolean];
-    "update:value": [updatedValue: number | null];
-    "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
-    initialized: [updatedValue: NumberAliasedNodeData];
-}>();
+interface NumberWidgetEmits {
+    (event: "update:isDirty", isDirty: boolean): void;
+    (event: "update:value", updatedValue: number | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: NumberAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+}
+
+const emit: NumberWidgetEmits = defineEmits([
+    "update:isDirty",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),

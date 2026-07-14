@@ -5,25 +5,46 @@ import CheckboxGroup from "primevue/checkboxgroup";
 
 import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 
+import type { PropType } from "vue";
 import type {
     DomainCardXNodeXWidgetData,
     DomainListAliasedNodeData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+interface DomainCheckboxWidgetEditorProps {
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainListAliasedNodeData | null;
-}>();
+}
+
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps({
+    cardXNodeXWidgetData: {
+        type: Object as PropType<
+            DomainCheckboxWidgetEditorProps["cardXNodeXWidgetData"]
+        >,
+        default: undefined,
+    },
+    aliasedNodeData: {
+        type: Object as PropType<
+            DomainCheckboxWidgetEditorProps["aliasedNodeData"]
+        >,
+        required: true,
+    },
+});
 
 const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
-const emit = defineEmits<{
+interface DomainCheckboxWidgetEditorEmits {
     (
         event: "update:aliasedNodeData",
         updatedValue: DomainListAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: DomainListAliasedNodeData): void;
-}>();
+}
+
+const emit: DomainCheckboxWidgetEditorEmits = defineEmits([
+    "update:aliasedNodeData",
+    "initialized",
+]);
 
 onMounted(() => {
     emit(
