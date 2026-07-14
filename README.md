@@ -267,16 +267,10 @@ Every widget's `aliasedNodeData`/`cardXNodeXWidgetData` prop is typed to one spe
 A widget is an editor/viewer pair plus a dispatcher that picks between them by `mode`. The example below, `RatingWidget`, is a new widget for the existing `number` datatype.
 
 > [!IMPORTANT]
-> Widgets must declare props/emits with the runtime `defineProps([...])`/`defineEmits([...])`
-> array forms shown below, cast (`as`) to the real TypeScript type for type safety — never
-> `defineProps<T>()`/`defineEmits<T>()` with a generic type argument. `@vue/compiler-sfc` resolves
-> that generic argument using its own filesystem walk for a `tsconfig.json`, completely separate
-> from webpack's own module resolution — which fails whenever this package is installed as a real
-> (non-editable) pip package, since a real install ships only the Python package directory, not a
-> repo root with a `tsconfig.json`. The array form sidesteps that resolution entirely, so it works
-> regardless of how this package is installed. It also means Vue's dev-mode-only prop-type
-> warnings no longer fire (they never affected production behavior), which is why the cast is
-> load-bearing for actual type safety here.
+> Use `defineProps([...])`/`defineEmits([...])` cast `as` the real type, shown below — never
+> `defineProps<T>()`/`defineEmits<T>()` with a generic argument. That generic argument makes
+> `@vue/compiler-sfc` resolve types via its own tsconfig walk, separate from webpack, which breaks
+> on a real (non-editable) pip install.
 
 1. Create `widgets/RatingWidget/` with a `types.ts` extending `BaseWidgetProps`:
 ```ts
